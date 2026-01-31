@@ -121,11 +121,26 @@ local function locateTargetChat(fullChat)
   return targetIndex
 end
 
+---@param text string
+---@return string
+local function insertSlots(text)
+  local slotIndex = 0
+  local trimmed = text:match('^%s*(.-)%s*$') or text
+  trimmed = trimmed:match('^%s*(.-)%s*$'):gsub('\n\n+', function()
+    local out = '\n\n[Slot ' .. slotIndex .. ']\n\n'
+    slotIndex = slotIndex + 1
+    return out
+  end)
+  return trimmed
+end
+
 ---@class XNAIGen
 ---@field generate fun (triggerId: string, desc: XNAIDescriptor): string?
+---@field insertSlots fun (text: string): string
 ---@field locateTargetChat fun (fullChat: Chat[]): number?
 
 return {
   generate = generate,
+  insertSlots = insertSlots,
   locateTargetChat = locateTargetChat,
 }

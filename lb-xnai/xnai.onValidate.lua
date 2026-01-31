@@ -28,46 +28,31 @@ function onValidate(triggerId, output)
     error('InvalidOutput: Invalid TOON format. ' .. tostring(content))
   end
 
-  local chats = getFullChat(triggerId)
-  local targetIndex = nil
-
-  for i = #chats, 1, -1 do
-    local chat = chats[i]
-    if prelude.trim(chat.data) ~= '' and chat.role == 'char' then
-      local stripped, count = chat.data:gsub('%-%-%-\n%[LBDATA START%].-LBDATA END%]\n%-%-%-', '')
-
-      if count > 0 then
-        targetIndex = i -- Unlike onOutput, we use the index within Lua only, so no offset here
-        stripped, _ = prelude.trim(stripped)
-
-        if stripped == '' then
-          targetIndex = targetIndex - 1 -- Skip this one; LBDATA-only, content located above
-        end
-
-        break
-      end
-    end
-  end
-
   --- @type XNAIData
   local xnaiContent = content
   local errors = {}
 
-  for _, desc in ipairs(xnaiContent.scenes) do
-    local locator = desc.locator or ''
-    if locator ~= '' then
-      local locStart = chats[targetIndex].data:find(prelude.escMatch(locator))
+  for index, desc in ipairs(xnaiContent.scenes) do
+    local errIndex = index - 1
 
-      print('locating', locator, locStart)
-
-      if not locStart then
-        table.insert(errors, 'Cannot locate "' .. locator .. '". Fix the locator or remove the entry. Supervisor approval still valid.')
+    if not desc.camera or type(desc.camera) ~= 'string' or desc.camera == '' then
+      table.insert(errors, 'Scene ' .. errIndex .. ' has no camera field. Parsed type: ' .. type(desc.camera))
+    end
+    if not desc.characters or type(desc.characters) ~= 'table' or #desc.characters == 0 then
+      table.insert(errors, 'Scene ' .. errIndex .. ' has no character or is not a valid array. Parsed type: ' .. type(desc.characters))
+    end
+    for cIndex, character in ipairs(desc.characters) do
+      local charErrIndex = cIndex - 1
+      if type(character) ~= 'string' or character == '' then
+        table.insert(errors, 'Scene ' .. errIndex .. ', character ' .. charErrIndex .. ' is not a valid string. Parsed type: ' .. type(character))
       end
     end
-  end
-
-  if #errors > 0 then
-    error('InvalidOutput: One or more targets are invalid. Aggregated errors:\n' .. table.concat(errors, '\n'))
+    if not desc.scene or type(desc.scene) ~= 'string' or desc.scene == '' then
+      table.insert(errors, 'Scene ' .. errIndex .. ' has no scene field. Parsed type: ' .. type(desc.scene))
+    end
+    if not desc.slot or type(desc.slot) ~= 'number' then
+      table.insert(errors, 'Scene ' .. errIndex .. ' has invalid slot field. Parsed type: ' .. type(desc.slot))
+    end
   end
 end
 

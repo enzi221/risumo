@@ -262,7 +262,6 @@ local function makePrompt(triggerId, man, fullChat, type, extras)
 
     if userChatsAllowed or fullChat[originalIndex].role ~= 'user' then
       local text = prelude.removeAllNodes(fullChat[originalIndex].data, { identifier })
-      text = '\n<!-- Log #' .. adjustedIndex .. ' -->\n\n' .. text .. '\n<!-- /Log #' .. adjustedIndex .. ' -->'
       if man.onInput then
         local success, modifiedText = pcall(man.onInput, triggerId, text, { index = --[[Lua to JS]] originalIndex - 1, type = type })
         if success then
@@ -271,6 +270,7 @@ local function makePrompt(triggerId, man, fullChat, type, extras)
           print("[LightBoard Backend] Error in onInput for " .. identifier .. ": " .. tostring(modifiedText))
         end
       end
+      text = '\n<!-- Log #' .. adjustedIndex .. ' -->\n\n' .. text .. '\n<!-- /Log #' .. adjustedIndex .. ' -->'
 
       local tokenCount = getTokens(triggerId, text):await()
       if chatTokens + tokenCount > maxCtxLen then

@@ -22,26 +22,21 @@ function onInput(tid, input, meta)
     fullChatCache = getFullChat(triggerId)
   end
 
+  ---@type XNAIGen
+  local gen = prelude.import(triggerId, 'lb-xnai.gen')
+
   local lazy = getGlobalVar(triggerId, 'toggle_lb-xnai.lazy') or '0'
   if lazy == '0' and meta.type == 'generation' then
     local fullChatLength = #fullChatCache
     if meta.index == fullChatLength then
-      local slotIndex = 0
-      input = input:gsub('\n\n', function()
-        local out = '\n\n[Slot ' .. slotIndex .. ']\n\n'
-        slotIndex = slotIndex + 1
-        return out
-      end)
+      input = gen.insertSlots(input)
     end
   else
     if not targetIndexCache then
-      ---@type XNAIGen
-      local gen = prelude.import(triggerId, 'lb-xnai.gen')
       targetIndexCache = gen.locateTargetChat(fullChatCache)
     end
     if meta.index == targetIndexCache then
-      local slotIndex = 0
-      input = input:gsub('\n\n', '\n\n[Slot ' .. slotIndex .. ']\n\n')
+      input = gen.insertSlots(input)
     end
   end
 

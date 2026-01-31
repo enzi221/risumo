@@ -70,7 +70,7 @@ Limit character count to {{dictelement::{"0":"3","1":"2","2":"1"}::{{getglobalva
 
 Start with either `interior` or `exterior`, then add specific tags such as `bedroom`, `classroom`, `forest`, `meadow`, `horizon`, etc. Add prominent props here: `computer`, `chair`, `table`, etc.
 
-Add lighting related tags as well. `daylight, noon`, `sunset`, `night, ::dark::3`, `backlighting`, `sidelighting`, etc. Note the `dark` intensity tag. `dark` requires increased intensity.
+Add lighting related tags as well. `daylight, noon`, `sunset`, `night, 3::dark::`, `backlighting`, `sidelighting`, etc. Note the `dark` intensity tag. `dark` requires increased intensity.
 
 ### Characters
 
@@ -133,16 +133,13 @@ Scenes should capture the moments of interaction, emotion, or significant action
 
 Key Visual will occupy the top, so the first scene should have some distance from Key Visual. Do not add scenes in the early part of the target log entry.
 
-#### Locator
+#### Slot
 
-Specifies which part of the log the scene corresponds to. Provide a string excerpted from the log text without modification. The image will be placed after the text's paragraph.
+We've prepared slots where scenes can be placed: `[Slot #]`. Pick a slot number, and the scene will be placed there.
 
-- Use the last phrase of the paragraph that the scene represents.
-- Make the locator as short as possible while still uniquely identifying the paragraph.
-- Locator must not intrude other locators' paragraphs.
-- Preserve any Markdown marks or inline elements. Stop before any quotes (Do not include).
+Since slots were placed mechanically, some slots might be unsuitable for scene placement, such as slots within out-of-prose contents. Avoid such slots.
 
-Remember: All images must be for the LAST LOG ENTRY, so does the locator. Going out of the last log entry will result in system failure.
+Key visuals are placed at either the top or the bottom of the log entry. So scene placement should avoid those areas as well.
 
 {{#when {{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.direction}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.direction}} != null }}}} }}
 
@@ -167,28 +164,29 @@ scenes[2]:
     characters[2]:
       girl, adolescent, long pink hair, red eyes, slender, small breasts, red silk off-shoulder dress, sitting on bed, hugging knees, head down, target#conversation
       girl, female, green braided hair, brown eyes, slender, medium breasts, maid uniform, white headband, black onepiece, black flat shoes, standing, smiling, source#conversation
-    locator: Just take a seat and relax.
     scene: 2girls, interior, bedroom, morning, daylight, sidelighting
+    slot: 3
   - camera: ...
     characters[1]:
       ...
-    locator: ...
+    scene: ...
+    slot: ...
 keyvis:
-  camera: from below, upper body
+  camera: from above, upper body, tilted angle
   characters[1]:
-    ...
-  scene: 1girl, exterior, railing, night, ::dark::3
+    girl, adolescent, long pink hair, red eyes, slender, small breasts, red silk off-shoulder dress, laying on back, on bed, blush, raised arm, forearm on forehead, looking at viewer
+  scene: 1girl, exterior, railing, night, 3::dark::
 </lb-xnai>
 ```
 
 - Use `<lb-xnai>`.
-- Output in TOON format (2-space indent, array length in header).
+- Output in TOON format (2-space indent, array length in header). No `-` in front of simple arrays (`characters`).
 - keyvis for key visual, scenes (optional) for scenes list.
 - Close `</lb-xnai>`.
 
 Generate {{dictelement::{"0":"0-1","1":"0-3","2":"1-3","2":"1-5","3":"2-5"}::{{getglobalvar::toggle_lb-xnai.scene.quantity}}}} scenes.
 
-Do not point locators to anything inside codeblocks, headings, or any kind of structured data out of prose content.
+Do not use slots placed out of prose content.
 
 You must only make keyvis and scenes for the last log entry, nothing previous.
 

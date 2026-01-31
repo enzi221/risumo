@@ -22,8 +22,8 @@ end
 ---@field camera string
 ---@field characters string[]
 ---@field inlay? string
----@field locator? string
 ---@field scene string
+---@field slot? number
 
 ---@class XNAIData
 ---@field keyvis? XNAIDescriptor
@@ -145,6 +145,32 @@ local function renderInline(xnaiData, data, chatIndex, pinned)
   local output = data
   local scenes = xnaiData.scenes or {}
 
+  ---@type XNAIGen
+  local gen = prelude.import(triggerId, 'lb-xnai.gen')
+
+  for sceneIndex, desc in ipairs(scenes) do
+    local slot = desc.slot
+    local locator = ''
+    if slot then
+      local slotted = gen.insertSlots(output)
+      -- find the previous text content before \n\n of matching slot (\n\n[Slot #])
+      local pattern = "\n([^\n]*)\n\n%[Slot " .. slot .. "%]"
+      locator = slotted:match(pattern) or ''
+    end
+
+    if locator ~= '' then
+      local locStart, locEnd = output:find(prelude.escMatch(locator))
+      if locStart then
+        local lineEnd = output:find('\n', locEnd + 1)
+        local insertPos = lineEnd or #output
+        local before = output:sub(1, insertPos)
+        local after = output:sub(insertPos + 1)
+        local inlay = renderDescriptorInline(desc, chatIndex, sceneIndex, pinned, false)
+        output = before .. '\n' .. inlay .. '\n' .. after
+      end
+    end
+  end
+
   local keyvis = xnaiData.keyvis
   if keyvis then
     local keyvisInlay = renderDescriptorInline(keyvis, chatIndex, 0, pinned, true)
@@ -174,21 +200,6 @@ local function renderInline(xnaiData, data, chatIndex, pinned)
       output = keyvisInlay .. '\n\n' .. output
     else
       output = output .. '\n\n' .. keyvisInlay
-    end
-  end
-
-  for sceneIndex, desc in ipairs(scenes) do
-    local locator = desc.locator or ''
-    if locator ~= '' then
-      local locStart, locEnd = output:find(prelude.escMatch(locator))
-      if locStart then
-        local lineEnd = output:find('\n', locEnd + 1)
-        local insertPos = lineEnd or #output
-        local before = output:sub(1, insertPos)
-        local after = output:sub(insertPos + 1)
-        local inlay = renderDescriptorInline(desc, chatIndex, sceneIndex, pinned, false)
-        output = before .. '\n' .. inlay .. '\n' .. after
-      end
     end
   end
 
