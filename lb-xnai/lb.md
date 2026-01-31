@@ -101,10 +101,10 @@ Properties are yours to follow (see Required), but tags are mere examples. Use y
   - Bottom: `bottomless`, `pale gray jeans`, `red long skirt`, `black shorts`. Optionally `side slit`, `lifted skirt`
   - Footwear: `white ankle socks`, `black sneakers`, `bare feet`
   - Accessories: `golden rimless glasses`, `blue gem necklace`, `black backpack`
-- Expression: `annoyed`, `angry`, `drunk`, `embarrassed`, `expressionless`, `blush`, `grin`, etc. Can be combined.
-- Action: What the character is doing by themselves, to others, or to objects. `standing`, `sitting`, `laying on back`, `raised hand`, `trembling`, `hands together`, `holding sword`. Clear visual tags only. No generic tags such as `fighting` (how?), `playing` (what?).
+- Expression: `annoyed`, `angry`, `drunk`, `embarrassed`, `indifferent`, `blush`, `grin`, etc. Can be combined.
+- Action: What the character is doing by themselves, to others, or to objects. `standing`, `sitting`, `laying on back`, `raised hand`, `trembling` (whole body), `hands together`, `holding sword`. Clear visual tags only. No generic tags such as `fighting` (how?), `playing` (what?).
   - Eye focus: `looking at viewer`, `looking at other`, `looking away`, `closed eyes`
-  - Interaction between characters: MUST apply ONE OF NAI action modifiers:
+  - Interactions between characters: MUST apply ONE OF action modifiers:
     - `mutual#` for mutual actions, `mutual#kissing`, `mutual#holding hands`.
     - `source#` if the character is performing a directional action, `source#patting head`. The other character must have the corresponding `target#` tag.
     - `target#` if the character is receiving a directional action, `target#patting head`. The other character must have the corresponding `source#` tag.{{#when::keep::toggle::lb-xnai.nsfw}}
@@ -192,4 +192,4 @@ Do not point locators to anything inside codeblocks, headings, or any kind of st
 
 You must only make keyvis and scenes for the last log entry, nothing previous.
 
-All tag contents must be in English.
+Everything must be in English.

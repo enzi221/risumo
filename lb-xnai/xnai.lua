@@ -74,79 +74,6 @@ local function buildRawPrompt(desc)
   return table.concat(parts, ' | ')
 end
 
-local function buildPresetPrompt(desc)
-  local lead = {}
-  if desc.camera and desc.camera ~= '' then
-    table.insert(lead, desc.camera)
-  end
-  if desc.scene and desc.scene ~= '' then
-    table.insert(lead, desc.scene)
-  end
-
-  local leadText = #lead > 0 and table.concat(lead, ', ') or ''
-
-  local chars = {}
-  if desc.characters then
-    for _, character in ipairs(desc.characters) do
-      if character and character ~= '' then
-        table.insert(chars, character)
-      end
-    end
-  end
-
-  local preset = getGlobalVar(triggerId, 'toggle_lb-xnai.preset')
-  if not preset or preset == '' or preset == 'null' then
-    preset = '1'
-  end
-
-  local presetBook = prelude.getPriorityLoreBook(triggerId, '프리셋 ' .. tostring(preset))
-  if not presetBook or not presetBook.content or presetBook.content == '' then
-    presetBook = prelude.getPriorityLoreBook(triggerId, '프리셋 1')
-  end
-
-  if not presetBook or not presetBook.content or presetBook.content == '' then
-    alertError(triggerId, 'XNAI 프리셋 로어북을 찾을 수 없습니다.')
-    return '', ''
-  end
-
-  local content = prelude.trim(presetBook.content)
-  local positive = content:match('%[Positive%]%s*([%s%S]-)%s*%[Negative%]')
-  local negative = content:match('%[Negative%]%s*([%s%S]-)%s*$')
-
-  positive = positive and prelude.trim(positive) or ''
-  negative = negative and prelude.trim(negative) or ''
-
-  if positive ~= '' then
-    if positive:find('{prompt}', 1, true) then
-      positive = positive:gsub('{prompt}', leadText)
-    elseif leadText ~= '' then
-      positive = table.concat({ leadText, positive }, ', ')
-    end
-  else
-    positive = leadText
-  end
-
-  local positiveNote = getGlobalVar(triggerId, 'toggle_lb-xnai.positive') or ''
-  if positiveNote ~= '' and positiveNote ~= null then
-    positive = table.concat({ positive, positiveNote }, ', ')
-  end
-  local negativeNote = getGlobalVar(triggerId, 'toggle_lb-xnai.negative') or ''
-  if negativeNote ~= '' and negativeNote ~= null then
-    negative = table.concat({ negative, negativeNote }, ', ')
-  end
-
-  if #chars > 0 then
-    local charText = table.concat(chars, ' | ')
-    if positive ~= '' then
-      positive = positive .. ' | ' .. charText
-    else
-      positive = charText
-    end
-  end
-
-  return positive, negative
-end
-
 local function getPinnedIndex(pinned, chatIndex, sceneIndex)
   for i, item in ipairs(pinned) do
     if item.chatIndex == chatIndex and item.sceneIndex == sceneIndex then
@@ -663,92 +590,30 @@ onButtonClick = async(function(tid, code)
     return
   end
 
+  -- lb-xnai-gen/{chatIndex}_{sceneIndex}, lb-xnai-genall/{chatIndex}
   local genPrefix = 'lb%-xnai%-gen/'
+  local genAllPrefix = 'lb%-xnai%-genall/'
   local _, genPrefixEnd = string.find(code, genPrefix)
+  local _, genAllPrefixEnd = string.find(code, genAllPrefix)
 
-  if not genPrefixEnd then
-    local genAllPrefix = 'lb%-xnai%-genall/'
-    local _, genAllPrefixEnd = string.find(code, genAllPrefix)
+  if not genPrefixEnd and not genAllPrefixEnd then
+    return
+  end
 
-    if not genAllPrefixEnd then
-      return
-    end
+  local chatIndex, sceneIndex
 
+  if genAllPrefixEnd then
     local body = code:sub(genAllPrefixEnd + 1)
-    if body == '' then
-      return
-    end
-
-    local chatIndex = tonumber(body)
-    if not chatIndex then
-      return
-    end
-
-    addChat(tid, 'user',
-      '<lb-rerolling><div class="lb-pending lb-rerolling"><span class="lb-pending-note">이미지 생성 중, 채팅을 보내거나 다른 작업을 하지 마세요...</span></div></lb-rerolling>')
-
-    ---@type XNAIState
-    local xnaiState = getState(triggerId, 'lb-xnai-data') or {}
-    local stack = xnaiState.stack or {}
-
-    local targetItem = nil
-    for _, item in ipairs(stack) do
-      if item.chatIndex == chatIndex then
-        targetItem = item
-        break
-      end
-    end
-
-    if not targetItem or not targetItem.xnai then
-      removeChat(tid, -1)
-      return
-    end
-
-    local descriptors = {}
-    if targetItem.xnai.keyvis then
-      table.insert(descriptors, { index = 0, desc = targetItem.xnai.keyvis })
-    end
-    for i, desc in ipairs(targetItem.xnai.scenes or {}) do
-      table.insert(descriptors, { index = i, desc = desc })
-    end
-
-    for _, item in ipairs(descriptors) do
-      local desc = item.desc
-      local prompt, negative = buildPresetPrompt(desc)
-      if prompt ~= '' then
-        local inlay = generateImage(tid, prompt, negative or ''):await()
-        if inlay and inlay ~= '' then
-          desc.inlay = inlay
-        end
-      end
-    end
-
-    setState(triggerId, 'lb-xnai-data', {
-      pinned = xnaiState.pinned or {},
-      stack = stack,
-    })
-
-    reloadChat(triggerId, chatIndex)
-    reloadChat(triggerId, chatIndex + 1)
-    removeChat(tid, -1)
-    return
+    chatIndex = tonumber(body)
+    sceneIndex = nil
+  else
+    local body = code:sub(genPrefixEnd + 1)
+    local parts = prelude.split(body, '_')
+    chatIndex = tonumber(parts[1])
+    sceneIndex = tonumber(parts[2])
   end
 
-  local body = code:sub(genPrefixEnd + 1)
-  if body == '' then
-    return
-  end
-
-  -- body: {chatIndex}_{sceneIndex}
-  local parts = prelude.split(body, '_')
-  if #parts < 2 then
-    return
-  end
-
-  local chatIndex = tonumber(parts[1])
-  local sceneIndex = tonumber(parts[2])
-
-  if not chatIndex or not sceneIndex then
+  if not chatIndex then
     return
   end
 
@@ -765,39 +630,49 @@ onButtonClick = async(function(tid, code)
     end
   end
 
-  if not targetItem or not targetItem.xnai or not targetItem.xnai.scenes then
+  if not targetItem or not targetItem.xnai then
     return
   end
 
-  local desc = nil
-  if sceneIndex == 0 then
-    desc = targetItem.xnai.keyvis
+  local descriptors = {}
+  if sceneIndex then
+    local desc = sceneIndex == 0 and targetItem.xnai.keyvis or
+        (targetItem.xnai.scenes and targetItem.xnai.scenes[sceneIndex])
+    if desc then
+      table.insert(descriptors, desc)
+    end
   else
-    desc = targetItem.xnai.scenes[sceneIndex]
-  end
-  if not desc then
-    return
+    if targetItem.xnai.keyvis then
+      table.insert(descriptors, targetItem.xnai.keyvis)
+    end
+    for _, desc in ipairs(targetItem.xnai.scenes or {}) do
+      table.insert(descriptors, desc)
+    end
   end
 
-  local prompt, negative = buildPresetPrompt(desc)
-  if prompt == '' then
-    alertNormal(tid, '프롬프트가 비어 있어요.')
+  if #descriptors == 0 then
     return
   end
 
   addChat(tid, 'user',
     '<lb-rerolling><div class="lb-pending lb-rerolling"><span class="lb-pending-note">이미지 생성 중, 채팅을 보내거나 다른 작업을 하지 마세요...</span></div></lb-rerolling>')
 
-  local inlay = generateImage(tid, prompt, negative or ''):await()
-  if inlay and inlay ~= '' then
-    desc.inlay = inlay
-    setState(triggerId, 'lb-xnai-data', {
-      pinned = xnaiState.pinned or {},
-      stack = stack,
-    })
-
-    reloadChat(triggerId, chatIndex)
-    reloadChat(triggerId, chatIndex + 1)
+  local generate = prelude.import(triggerId, 'lb-xnai.gen')
+  for _, desc in ipairs(descriptors) do
+    local success, data = pcall(generate, triggerId, desc)
+    if success then
+      desc.inlay = data
+    else
+      alertNormal(tid, '이미지 생성 중 오류가 발생했습니다.\n' .. tostring(data))
+    end
   end
+
+  setState(triggerId, 'lb-xnai-data', {
+    pinned = xnaiState.pinned or {},
+    stack = stack,
+  })
+
+  reloadChat(triggerId, chatIndex)
+  reloadChat(triggerId, chatIndex + 1)
   removeChat(tid, -1)
 end)

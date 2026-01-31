@@ -165,7 +165,7 @@ local function cleanLLMResult(man, response)
 end
 
 --- @class PipelineOptions
---- @field type 'generation'|'interaction'
+--- @field type 'generation'|'interaction'|'reroll'
 --- @field extras string?
 --- @field lazy boolean? Manifest laziness or reroll/interaction eagerness
 
@@ -211,7 +211,7 @@ local function runPipeline(man, fullChat, options)
     print('[LightBoard Backend][VERBOSE] Response cleaned.')
 
     -- critical failure, instant fallback
-    if modeType == 'generation' and (not result or result == '' or result == nil) then
+    if (modeType == 'generation' or modeType == 'reroll') and (not result or result == '' or result == nil) then
       error('모델 응답이 비어있거나 null입니다. 검열됐을 수 있습니다.')
     end
 
@@ -271,12 +271,12 @@ local function runPipeline(man, fullChat, options)
 
     local thoughtsFlag = getGlobalVar(triggerId, 'toggle_lightboard.thoughts') or '0'
     local printInstruction = string.format(
-    'Only print the corrected full data wrapped in %s, without apologies, explanations, or any preambles.',
+      'Only print the corrected full data wrapped in %s, without apologies, explanations, or any preambles.',
       man.identifier)
     if thoughtsFlag == '0' then
       printInstruction =
           string.format(
-          'Only print the corrected full data wrapped in %s, without `<lb-process>` block, apologies, explanations, or any preambles.',
+            'Only print the corrected full data wrapped in %s, without `<lb-process>` block, apologies, explanations, or any preambles.',
             man.identifier)
     end
 
@@ -462,7 +462,7 @@ local function reroll(identifier, blockID)
   local contextSlice = { table.unpack(fullChat, 1, idx) }
 
   local success, result = pcall(function()
-    return runPipelineAsync(man, contextSlice, { type = 'generation', lazy = false }):await()
+    return runPipelineAsync(man, contextSlice, { type = 'reroll', lazy = false }):await()
   end)
 
   if not success or not result then

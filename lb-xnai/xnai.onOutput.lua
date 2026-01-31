@@ -31,26 +31,10 @@ function onOutput(tid, output)
     return prelude.removeAllNodes(output, { 'lb-xnai' })
   end
 
-  local chats = getFullChat(triggerId)
-  local targetIndex = nil
-
-  for i = #chats, 1, -1 do
-    local chat = chats[i]
-    if prelude.trim(chat.data) ~= '' and chat.role == 'char' then
-      local stripped, count = chat.data:gsub('%-%-%-\n%[LBDATA START%].-LBDATA END%]\n%-%-%-', '')
-
-      if count > 0 then
-        targetIndex = i - 1 -- Lua 1-based -> JS 0-based
-        stripped, _ = prelude.trim(stripped)
-
-        if stripped == '' then
-          targetIndex = targetIndex - 1 -- Skip this one; LBDATA-only, content located above
-        end
-
-        break
-      end
-    end
-  end
+  ---@type XNAIGen
+  local gen = prelude.import(triggerId, 'lb-xnai.gen')
+  local fullChat = getFullChat(triggerId)
+  local targetIndex = gen.locateTargetChat(fullChat)
 
   if targetIndex then
     local node = nodes[#nodes]
@@ -65,6 +49,25 @@ function onOutput(tid, output)
       for _, item in ipairs(stack) do
         if item.chatIndex < targetIndex then
           table.insert(newList, item)
+        end
+      end
+
+      if getGlobalVar(triggerId, 'toggle_lb-xnai.generation') == '0' then
+        ---@type { generate: fun (triggerId: string, desc: XNAIDescriptor): string? }
+        local gen = prelude.import(triggerId, 'lb-xnai.gen')
+
+        if xnaiData.keyvis then
+          local ok, inlay = pcall(gen.generate, triggerId, xnaiData.keyvis)
+          if ok then
+            xnaiData.keyvis.inlay = inlay
+          end
+        end
+
+        for _, desc in ipairs(xnaiData.scenes or {}) do
+          local ok, inlay = pcall(gen.generate, triggerId, desc)
+          if ok then
+            desc.inlay = inlay
+          end
         end
       end
 

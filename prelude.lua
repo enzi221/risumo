@@ -19,10 +19,16 @@ end
 
 local t_insert = table.insert
 
+local moduleCache = {}
+
 ---@param triggerId string
 ---@param moduleName string
 ---@return any
 local function import(triggerId, moduleName)
+  if moduleCache[moduleName] then
+    return moduleCache[moduleName]
+  end
+
   local source = getLoreBooks(triggerId, moduleName)
   if not source or #source == 0 then
     error('Failed to load module: ' .. moduleName)
@@ -31,7 +37,10 @@ local function import(triggerId, moduleName)
   if not chunk then
     error('Error loading module ' .. moduleName .. ': ' .. err)
   end
-  return chunk()
+
+  local result = chunk()
+  moduleCache[moduleName] = result
+  return result
 end
 
 ---@param str string

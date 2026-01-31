@@ -103,7 +103,7 @@ end
 
 --- @param triggerId string
 --- @param man Manifest
---- @param type 'generation'|'interaction'
+--- @param type 'generation'|'interaction'|'reroll'
 local function makeOutro(triggerId, man, type)
   local identifier = man.identifier
 
@@ -119,7 +119,7 @@ local function makeOutro(triggerId, man, type)
   local thoughtsFormatExternal = nil
   local thoughtsFlag = getGlobalVar(triggerId, "toggle_lightboard.thoughts") or "0"
   if thoughtsFlag ~= '1' then
-    if type == 'generation' then
+    if type == 'generation' or type == 'reroll' then
       thoughtsFormatExternal = prelude.getPriorityLoreBook(triggerId, identifier .. ".lb.thoughts")
     elseif type == 'interaction' then
       thoughtsFormatExternal = prelude.getPriorityLoreBook(triggerId, identifier .. ".lb.thoughts-interaction")
@@ -160,11 +160,11 @@ end
 
 --- @param triggerId string
 --- @param man Manifest
---- @param log Chat[]
---- @param type 'generation'|'interaction'
+--- @param fullChat Chat[]
+--- @param type 'generation'|'interaction'|'reroll'
 --- @param extras string?
 --- @return Chat[]
-local function makePrompt(triggerId, man, log, type, extras)
+local function makePrompt(triggerId, man, fullChat, type, extras)
   local identifier = man.identifier
 
   local intro = makeIntro(triggerId, man)
@@ -254,17 +254,17 @@ local function makePrompt(triggerId, man, log, type, extras)
   local maxLogs = math.max(1, man.maxLogs or tonumber(getGlobalVar(triggerId, "toggle_lightboard.maxLogs")) or 4)
 
   -- This takes user chat exclusion into account
-  local indexAdjusted = #log + 1
-  for i = #log, 1, -1 do
+  local adjustedIndex = #fullChat + 1
+  for originalIndex = #fullChat, 1, -1 do
     if #logsToAdd >= maxLogs then
       break
     end
 
-    if userChatsAllowed or log[i].role ~= 'user' then
-      local text = prelude.removeAllNodes(log[i].data, { identifier })
-      text = '\n<!-- Log #' .. indexAdjusted .. ' -->\n\n' .. text .. '\n<!-- /Log #' .. indexAdjusted .. ' -->'
+    if userChatsAllowed or fullChat[originalIndex].role ~= 'user' then
+      local text = prelude.removeAllNodes(fullChat[originalIndex].data, { identifier })
+      text = '\n<!-- Log #' .. adjustedIndex .. ' -->\n\n' .. text .. '\n<!-- /Log #' .. adjustedIndex .. ' -->'
       if man.onInput then
-        local success, modifiedText = pcall(man.onInput, triggerId, text, indexAdjusted - i)
+        local success, modifiedText = pcall(man.onInput, triggerId, text, { index = --[[Lua to JS]] originalIndex - 1, type = type })
         if success then
           text = modifiedText
         else
@@ -281,9 +281,9 @@ local function makePrompt(triggerId, man, log, type, extras)
 
       table.insert(logsToAdd, {
         content = text,
-        role = log[i].role,
+        role = fullChat[originalIndex].role,
       })
-      indexAdjusted = indexAdjusted - 1
+      adjustedIndex = adjustedIndex - 1
     end
   end
 
