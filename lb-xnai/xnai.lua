@@ -2,6 +2,7 @@
 --! CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
 --! LightBoard XNAI
 
+local t_concat = table.concat
 local triggerId = ''
 
 local function setTriggerId(tid)
@@ -20,18 +21,22 @@ end
 
 ---@class XNAIDescriptor
 ---@field camera string
----@field characters string[]
+---@field characters { positive: string; negative: string }[]
 ---@field inlay? string
 ---@field scene string
 ---@field slot? number
 
----@class XNAIData
+---@class XNAIResponse
 ---@field keyvis? XNAIDescriptor
 ---@field scenes? XNAIDescriptor[]
 
+---@class XNAIStackData
+---@field keyvis? XNAIDescriptor
+---@field scenes? table<string, XNAIDescriptor>
+
 ---@class XNAIStackItem
 ---@field chatIndex number
----@field xnai XNAIData
+---@field data XNAIStackData
 
 ---@class XNAIPinnedItem
 ---@field chatIndex number
@@ -39,10 +44,8 @@ end
 ---@field label string
 ---@field desc XNAIDescriptor
 
----@class XNAIState
----@field pinned XNAIPinnedItem[]
----@field stack XNAIStackItem[]
-
+---@param desc XNAIDescriptor
+---@return { positive: string, negative: string }
 local function buildRawPrompt(desc)
   local lead = {}
   if desc.scene and desc.scene ~= '' then
@@ -52,361 +55,259 @@ local function buildRawPrompt(desc)
     table.insert(lead, desc.camera)
   end
 
-  local leadText = #lead > 0 and table.concat(lead, ', ') or ''
+  local leadText = #lead > 0 and t_concat(lead, ', ') or ''
 
-  local chars = {}
+  local positiveParts = {
+    leadText
+  }
+  local negativeParts = {
+    ''
+  }
+  
   if desc.characters then
     for _, character in ipairs(desc.characters) do
-      if character and character ~= '' then
-        table.insert(chars, character)
-      end
+      table.insert(positiveParts, character.positive)
+      table.insert(negativeParts, character.negative)
     end
   end
 
-  local parts = {}
-  if leadText ~= '' then
-    table.insert(parts, leadText)
-  end
-  for _, character in ipairs(chars) do
-    table.insert(parts, character)
-  end
-
-  return table.concat(parts, ' | ')
+  return { positive = t_concat(positiveParts, ' | '), negative = t_concat(negativeParts, ' | ') }
 end
 
-local function getPinnedIndex(pinned, chatIndex, sceneIndex)
-  for i, item in ipairs(pinned) do
-    if item.chatIndex == chatIndex and item.sceneIndex == sceneIndex then
-      return i
-    end
-  end
-  return nil
-end
-
-local function renderDescriptorInline(desc, chatIndex, sceneIndex, pinned, isKeyvis)
-  local pinnedState = getPinnedIndex(pinned or {}, chatIndex, sceneIndex) ~= nil
-
-  local btn = h.button['lb-xnai-gen-btn'] {
-    risu_btn = 'lb-xnai-gen/' .. chatIndex .. '_' .. sceneIndex,
-    title = '재생성',
-    type = 'button',
-    h.lb_xnai_play_icon { closed = true },
-  }
-
-  local pinBtn = h.button['lb-xnai-pin-btn'] {
-    risu_btn = 'lb-xnai-pin/' .. chatIndex .. '_' .. sceneIndex,
-    title = pinnedState and '고정 해제' or '고정',
-    type = 'button',
-    pinnedState and h.lb_pin_icon { closed = true, pinned = true } or h.lb_pin_icon { closed = true },
-  }
-
-  local containerClass = isKeyvis and 'lb-xnai-inlay-kv' or 'lb-xnai-inlay'
-
-  if not desc.inlay or desc.inlay == '' then
-    local placeholderText = isKeyvis and '키 비주얼 생성' or ('씬 #' .. sceneIndex .. ' 생성')
-    local placeholder = h.button['lb-xnai-placeholder'] {
-      risu_btn = 'lb-xnai-gen/' .. chatIndex .. '_' .. sceneIndex,
-      type = 'button',
-      '✦ ' .. placeholderText,
-    }
-    return tostring(h.div['lb-xnai-placeholder-wrapper'] { placeholder })
-  end
-
-  if isKeyvis then
-    local wrapperClass = 'lb-xnai-inlay-kv-wrapper'
-    return tostring(h.div[wrapperClass] { h.div[containerClass] { btn, pinBtn, desc.inlay } })
-  end
-
-  local actionsClass = 'lb-xnai-inlay-actions'
-  local actions = h.div[actionsClass] { btn, pinBtn }
-
-  local popId = 'lb-xnai-pop-' .. chatIndex .. '-' .. sceneIndex
-
-  local fullsizePop = h.dialog['lb-xnai-fullsize-pop'] {
-    id = popId,
-    popover = '',
-    desc.inlay,
-    h.div['lb-xnai-fullsize-actions'] { btn, pinBtn },
-  }
-
-  local inlayImg = h.button {
-    popovertarget = popId,
-    type = 'button',
-    desc.inlay,
-  }
-
-  return tostring(h.div[containerClass] { actions, inlayImg, fullsizePop })
-end
-
----@param xnaiData XNAIData
 ---@param data string
 ---@param chatIndex number
-local function renderInline(xnaiData, data, chatIndex, pinned)
-  local output = data
-  local scenes = xnaiData.scenes or {}
+---@param chatLength number
+---@param stackItem XNAIStackItem?
+---@return string
+local function renderInline(data, chatIndex, chatLength, stackItem)
+  local imageNodes = prelude.queryNodes('lb-xnai', data)
+  if #imageNodes == 0 then
+    return data
+  end
 
-  ---@type XNAIGen
-  local gen = prelude.import(triggerId, 'lb-xnai.gen')
+  local out = data
 
-  for sceneIndex, desc in ipairs(scenes) do
-    local slot = desc.slot
-    local locator = ''
+  -- kv should be appended/prepended after the loop to not mess up ranges
+  ---@type string
+  local kv = nil
+
+  -- reverse order to not mess up ranges
+  for nodeIndex = #imageNodes, 1, -1 do
+    local imageNode = imageNodes[nodeIndex]
+    local slot = imageNode.attributes.scene
+    local inlay = prelude.trim(imageNode.content)
+
+    local popID = t_concat({ 'lb-xnai-pop-', chatIndex, '-', nodeIndex })
+    local promptID = t_concat({ 'lb-xnai-prompt-', chatIndex, '-', nodeIndex })
+
     if slot then
-      local slotted = gen.insertSlots(output)
-      -- find the previous text content before \n\n of matching slot (\n\n[Slot #])
-      local pattern = "\n([^\n]*)\n\n%[Slot " .. slot .. "%]"
-      locator = slotted:match(pattern) or ''
-    end
+      -- scenes
+      -- not generated yet and has data in the stack: can generate new
+      if inlay == '' and stackItem and stackItem.data.scenes[slot] then
+        local placeholderText = t_concat({ '씬 #', nodeIndex, ' 생성' })
+        local placeholder = h.button['lb-xnai-placeholder'] {
+          risu_btn = t_concat({ 'lb-xnai-gen/', chatIndex, '_', slot }),
+          type = 'button',
+          t_concat({ '✦ ', placeholderText }),
+        }
+        out = t_concat({
+          out:sub(1, imageNode.rangeStart - 1),
+          tostring(h.div['lb-xnai-placeholder-wrapper'] { placeholder }),
+          out:sub(imageNode.rangeEnd + 1),
+        })
+      elseif inlay ~= '' then
+        local inStack = stackItem and stackItem.data.scenes[slot]
 
-    if locator ~= '' then
-      local locStart, locEnd = output:find(prelude.escMatch(locator))
-      if locStart then
-        local lineEnd = output:find('\n', locEnd + 1)
-        local insertPos = lineEnd or #output
-        local before = output:sub(1, insertPos)
-        local after = output:sub(insertPos + 1)
-        local inlay = renderDescriptorInline(desc, chatIndex, sceneIndex, pinned, false)
-        output = before .. '\n' .. inlay .. '\n' .. after
-      end
-    end
-  end
+        local function createToolbar(fullsizePop)
+          return {
+            -- generated and has data in the stack: can regenerate
+            inStack and h.button['lb-xnai-toolbar-btn'] {
+              popovertarget = fullsizePop and popID or nil,
+              risu_btn = t_concat({ 'lb-xnai-gen/', chatIndex, '_', slot }),
+              title = '재생성',
+              type = 'button',
+              h.lb_xnai_play_icon { closed = true },
+            } or nil,
+            h.button['lb-xnai-toolbar-btn'] {
+              popovertarget = fullsizePop and popID or nil,
+              risu_btn = t_concat({ 'lb-xnai-delete/', chatIndex, '_', slot }),
+              title = '제거',
+              type = 'button',
+              h.lb_trash_icon { closed = true },
+            },
+            fullsizePop and inStack and h.label['lb-xnai-toolbar-btn'] {
+              htmlFor = promptID,
+              title = '프롬프트 확인',
+              h.lb_comment_icon { closed = true }
+            } or nil,
+          }
+        end
 
-  local keyvis = xnaiData.keyvis
-  if keyvis then
-    local keyvisInlay = renderDescriptorInline(keyvis, chatIndex, 0, pinned, true)
-    local xnaiPos = getGlobalVar(triggerId, 'toggle_lb-xnai.kv.position') or '0'
-    local lbPos = getGlobalVar(triggerId, 'toggle_lightboard.position') or '0'
+        ---@diagnostic disable-next-line: need-check-nil
+        local prompts = inStack and buildRawPrompt(stackItem.data.scenes[slot]) or { positive = '', negative = '' }
+        local promptPreview = inStack and h.div['lb-xnai-fullsize-prompt-wrapper'] {
+          h.input { id = promptID, type = 'checkbox' },
+          h.pre['lb-xnai-fullsize-prompt'] {
+            '[Positive]\n',
+            prompts.positive,
+            h.br { void = true },
+            h.br { void = true },
+            '[Negative]\n',
+            prompts.negative,
+          }
+        } or nil
 
-    -- xnai 아래(1) + lb 아래 = ---\n[LBDATA START] 앞에
-    -- xnai 위(0) + lb 위 = [LBDATA END]\n--- 뒤에
-    -- 나머지(분리 포함) = 그냥 붙임
-    if xnaiPos == '1' and lbPos == '0' then
-      local markerStart = '%-%-%-\n%[LBDATA START%]'
-      local startPos = output:find(markerStart)
-      if startPos then
-        output = output:sub(1, startPos - 1) .. keyvisInlay .. '\n\n' .. output:sub(startPos)
-      else
-        output = output .. '\n\n' .. keyvisInlay
+        local fullsizePop = h.dialog['lb-xnai-fullsize-pop'] {
+          id = popID,
+          popover = '',
+          h.div['lb-xnai-fullsize-pop-body'] {
+            h.button {
+              popovertarget = popID,
+              type = 'button',
+              inlay,
+            },
+            promptPreview,
+            h.div['lb-xnai-fullsize-actions'] { table.unpack(createToolbar(true)) },
+          }
+        }
+
+        local inlineImage = h.button {
+          popovertarget = popID,
+          type = 'button',
+          inlay,
+        }
+
+        out = t_concat({
+          out:sub(1, imageNode.rangeStart - 1),
+          tostring(h.div['lb-xnai-inlay-wrapper'] {
+            h.div['lb-xnai-inlay'] {
+              h.div['lb-xnai-inlay-actions'] { table.unpack(createToolbar()) }, inlineImage, fullsizePop
+            }
+          }),
+          out:sub(imageNode.rangeEnd + 1),
+        })
       end
-    elseif xnaiPos == '0' and lbPos == '1' then
-      local markerEnd = '%[LBDATA END%]\n%-%-%-'
-      local _, endPos = output:find(markerEnd)
-      if endPos then
-        output = output:sub(1, endPos) .. '\n\n' .. keyvisInlay .. output:sub(endPos + 1)
-      else
-        output = keyvisInlay .. '\n\n' .. output
-      end
-    elseif xnaiPos == '0' then
-      output = keyvisInlay .. '\n\n' .. output
     else
-      output = output .. '\n\n' .. keyvisInlay
-    end
-  end
-
-  return output
-end
-
----@param stackItemMaybe XNAIStackItem?
----@param fullState XNAIState
-local function renderCollection(stackItemMaybe, fullState)
-  local id = triggerId .. '-lb-xnai'
-
-  local stackItem = stackItemMaybe or {}
-  local current = stackItem.xnai or {}
-  local pinned = fullState.pinned or {}
-  local stack = fullState.stack or {}
-
-  local function renderDescriptorItem(desc, label, chatIndex, sceneIndex)
-    local isDone = desc.inlay and desc.inlay ~= ''
-    local status = isDone and '완료' or '대기'
-    local prompt = buildRawPrompt(desc)
-    local pinnedState = getPinnedIndex(pinned, chatIndex, sceneIndex) ~= nil
-    local inlay = isDone and desc.inlay or nil
-    local inlayWrapped = nil
-    if inlay then
-      inlayWrapped = h.div['lb-xnai-collection-inlay'] { inlay }
-    end
-
-    local statusEl = isDone
-        and h.span['lb-xnai-item-status'] { data_done = '', status }
-        or h.span['lb-xnai-item-status'] { status }
-
-    return h.details['lb-xnai-item'] {
-      name = 'lb-xnai-item-' .. chatIndex,
-      h.summary['lb-xnai-item-head'] {
-        h.span['lb-xnai-item-title'] {
-          label,
-          h.button['lb-xnai-gen-btn'] {
-            popovertarget = id,
-            risu_btn = 'lb-xnai-gen/' .. chatIndex .. '_' .. sceneIndex,
-            title = '재생성',
+      -- kv
+      -- not generated yet and has data in the stack: can generate new
+      if inlay == '' and stackItem and stackItem.data.keyvis then
+        local placeholder = h.button['lb-xnai-placeholder'] {
+          risu_btn = t_concat({ 'lb-xnai-gen/', chatIndex, '_-1' }),
+          type = 'button',
+          '✦ 키 비주얼 생성',
+          stackItem and stackItem.data.keyvis and h.button['lb-xnai-toolbar-btn'] {
+            risu_btn = t_concat({ 'lb-xnai-gen/', chatIndex }),
+            title = '전체 생성',
             type = 'button',
-            h.lb_xnai_play_icon { closed = true },
+            h.lb_xnai_ff_icon { closed = true },
+          } or nil,
+          chatIndex == chatLength - 1 and h.button['lb-xnai-toolbar-btn'] {
+            risu_btn = 'lb-reroll__lb-xnai',
+            title = '전체 프롬프트 재생성',
+            type = 'button',
+            h.lb_reroll_icon { closed = true },
+          } or nil,
+        }
+
+        kv = tostring(h.div['lb-xnai-placeholder-wrapper'] {
+          placeholder
+        })
+
+        out = t_concat({
+          out:sub(1, imageNode.rangeStart - 1),
+          out:sub(imageNode.rangeEnd + 1),
+        })
+      elseif inlay ~= '' then
+        local inStack = stackItem and stackItem.data.keyvis
+
+        local function createToolbar(fullsizePop)
+          return {
+            -- generated and has data in the stack: can regenerate
+            inStack and h.button['lb-xnai-toolbar-btn'] {
+              popovertarget = fullsizePop and popID or nil,
+              risu_btn = t_concat({ 'lb-xnai-gen/', chatIndex, '_-1' }),
+              title = '재생성',
+              type = 'button',
+              h.lb_xnai_play_icon { closed = true },
+            } or nil,
+            inStack and h.button['lb-xnai-toolbar-btn'] {
+              popovertarget = fullsizePop and popID or nil,
+              risu_btn = t_concat({ 'lb-xnai-gen/', chatIndex }),
+              title = '전체 재생성',
+              type = 'button',
+              h.lb_xnai_ff_icon { closed = true },
+            } or nil,
+            chatIndex == chatLength - 1 and h.button['lb-xnai-toolbar-btn'] {
+              popovertarget = fullsizePop and popID or nil,
+              risu_btn = 'lb-reroll__lb-xnai',
+              title = '전체 프롬프트 재생성',
+              type = 'button',
+              h.lb_reroll_icon { closed = true },
+            } or nil,
+            fullsizePop and inStack and h.label['lb-xnai-toolbar-btn'] {
+              htmlFor = promptID,
+              title = '프롬프트 확인',
+              h.lb_comment_icon { closed = true }
+            } or nil,
+          }
+        end
+
+        ---@diagnostic disable-next-line: need-check-nil
+        local prompts = inStack and buildRawPrompt(stackItem.data.keyvis) or { positive = '', negative = '' }
+        local promptPreview = inStack and h.div['lb-xnai-fullsize-prompt-wrapper'] {
+          h.input { id = promptID, type = 'checkbox' },
+          h.pre['lb-xnai-fullsize-prompt'] {
+            '[Positive]\n',
+            prompts.positive,
+            h.br { void = true },
+            h.br { void = true },
+            '[Negative]\n',
+            prompts.negative,
+          }
+        } or nil
+
+        local fullsizePop = h.dialog['lb-xnai-fullsize-pop'] {
+          id = popID,
+          popover = '',
+          h.div['lb-xnai-fullsize-pop-body'] {
+            h.button {
+              popovertarget = popID,
+              type = 'button',
+              inlay,
+            },
+            promptPreview,
+            h.div['lb-xnai-fullsize-actions'] { table.unpack(createToolbar(true)) },
+          }
+        }
+
+        kv = tostring(h.div['lb-xnai-kv-wrapper'] {
+          h.div['lb-xnai-kv-actions'] { table.unpack(createToolbar()) },
+          h.button['lb-xnai-kv'] {
+            popovertarget = popID,
+            type = 'button',
+            inlay
           },
-        },
-        statusEl,
-        h.button['lb-xnai-pin-btn'] {
-          risu_btn = 'lb-xnai-pin/' .. chatIndex .. '_' .. sceneIndex,
-          title = pinnedState and '고정 해제' or '고정',
-          type = 'button',
-          pinnedState and h.lb_pin_icon { closed = true, pinned = true } or h.lb_pin_icon { closed = true },
-        },
-        h.button['lb-xnai-delete-btn'] {
-          popovertarget = id,
-          risu_btn = 'lb-xnai-delete/' .. chatIndex .. '_' .. sceneIndex,
-          title = '삭제',
-          type = 'button',
-          h.lb_trash_icon { closed = true },
-        },
-      },
-      h.div['lb-xnai-item-body'] {
-        h.pre['lb-xnai-prompt'] { prompt },
-        inlayWrapped,
-      },
-    }
-  end
+          fullsizePop
+        })
 
-  local current_es = {}
-  if current.keyvis then
-    table.insert(current_es, renderDescriptorItem(current.keyvis, '키 비주얼', stackItem.chatIndex or 0, 0))
-  end
-
-  for i, desc in ipairs(current.scenes or {}) do
-    table.insert(current_es, renderDescriptorItem(desc, '씬 #' .. i, stackItem.chatIndex or 0, i))
-  end
-
-  if #current_es == 0 then
-    current_es = { h.div['lb-xnai-collection-empty'] { '표시할 씬이 없어요' } }
-  end
-
-  local function renderHistoryScene(desc, label, chatIndex, sceneIndex)
-    local pinnedState = getPinnedIndex(pinned, chatIndex, sceneIndex) ~= nil
-    local inlayWrapped = nil
-    if desc.inlay and desc.inlay ~= '' then
-      inlayWrapped = h.div['lb-xnai-collection-inlay'] { desc.inlay }
+        out = t_concat({
+          out:sub(1, imageNode.rangeStart - 1),
+          out:sub(imageNode.rangeEnd + 1),
+        })
+      end
     end
-
-    return h.div['lb-xnai-hist-scene'] {
-      h.div['lb-xnai-hist-scene-head'] {
-        h.span['lb-xnai-item-title'] { label },
-        h.button['lb-xnai-pin-btn'] {
-          risu_btn = 'lb-xnai-pin/' .. chatIndex .. '_' .. sceneIndex,
-          type = 'button',
-          pinnedState and h.lb_pin_icon { closed = true, pinned = true } or h.lb_pin_icon { closed = true },
-        },
-        h.button['lb-xnai-delete-btn'] {
-          popovertarget = id,
-          risu_btn = 'lb-xnai-delete/' .. chatIndex .. '_' .. sceneIndex,
-          type = 'button',
-          h.lb_trash_icon { closed = true },
-        },
-      },
-      inlayWrapped,
-    }
   end
 
-  local stack_es = {}
-  for i = #stack, 1, -1 do
-    local item = stack[i]
-    local hist_scenes = {}
-    if item.xnai and item.xnai.keyvis then
-      table.insert(hist_scenes, renderHistoryScene(item.xnai.keyvis, '키 비주얼', item.chatIndex, 0))
+  if kv then
+    local xnaiPos = getGlobalVar(triggerId, 'toggle_lb-xnai.kv.position') or '0'
+    if xnaiPos == '0' then
+      out = kv .. '\n\n' .. out
+    else
+      out = out .. '\n\n' .. kv
     end
-    for sceneIndex, desc in ipairs(item.xnai and item.xnai.scenes or {}) do
-      table.insert(hist_scenes, renderHistoryScene(desc, '씬 #' .. sceneIndex, item.chatIndex, sceneIndex))
-    end
-
-    if #hist_scenes == 0 then
-      hist_scenes = { h.div['lb-xnai-collection-empty'] { '표시할 씬이 없어요' } }
-    end
-
-    table.insert(stack_es, h.details['lb-xnai-hist-entry'] {
-      open = true,
-      h.summary['lb-xnai-hist-summary'] {
-        h.span['lb-xnai-hist-index'] { '#' .. item.chatIndex },
-        h.button['lb-xnai-delete-btn'] {
-          popovertarget = id,
-          risu_btn = 'lb-xnai-delete/' .. item.chatIndex,
-          type = 'button',
-          h.lb_trash_icon { closed = true },
-        },
-      },
-      h.div['lb-xnai-hist-scenes'](hist_scenes),
-    })
   end
 
-  if #stack_es == 0 then
-    stack_es = { h.div['lb-xnai-collection-empty'] { '저장된 기록이 없어요' } }
-  end
-
-  local pinned_es = {}
-  for _, p in ipairs(pinned) do
-    local prompt = buildRawPrompt(p.desc)
-    local inlay = (p.desc.inlay and p.desc.inlay ~= '') and p.desc.inlay or nil
-    local inlayWrapped = nil
-    if inlay then
-      inlayWrapped = h.div['lb-xnai-collection-inlay'] { inlay }
-    end
-    table.insert(pinned_es, h.details['lb-xnai-pinned-item'] {
-      h.summary['lb-xnai-pinned-head'] {
-        h.span['lb-xnai-pinned-title'] { p.label },
-        h.button['lb-xnai-pin-btn'] {
-          risu_btn = 'lb-xnai-pin/' .. p.chatIndex .. '_' .. p.sceneIndex,
-          type = 'button',
-          h.lb_pin_icon { closed = true, pinned = true },
-        },
-      },
-      h.div['lb-xnai-pinned-body'] {
-        h.pre['lb-xnai-prompt'] { prompt },
-        inlayWrapped,
-      },
-    })
-  end
-
-  local pinned_section = #pinned > 0 and h.div['lb-xnai-pinned'] {
-    h.div['lb-xnai-pinned-header'] { '고정' },
-    h.div['lb-xnai-pinned-list'](pinned_es),
-  } or nil
-
-  return tostring(h.div['lb-module-root'] {
-    data_id = 'lb-xnai',
-    h.button['lb-xnai-opener'] {
-      popovertarget = id,
-      type = 'button',
-      '삽화 모아보기',
-    },
-    h.dialog['lb-dialog lb-xnai-dialog'] {
-      id = id,
-      popover = '',
-      h.header['lb-xnai-header'] {
-        h.span '삽화 모아보기',
-        stackItem.chatIndex and h.button['lb-xnai-genall-btn'] {
-          popovertarget = id,
-          risu_btn = 'lb-xnai-genall/' .. stackItem.chatIndex,
-          type = 'button',
-          '전체 생성',
-        } or nil,
-        h.button['lb-reroll'] {
-          popovertarget = id,
-          risu_btn = 'lb-reroll__lb-xnai',
-          type = 'button',
-          h.lb_reroll_icon { closed = true },
-        },
-      },
-      h.ul['lb-xnai-list'](current_es),
-      h.details['lb-xnai-history'] {
-        open = true,
-        h.summary['lb-xnai-history-summary'] { '지난 기록' },
-        pinned_section,
-        h.div['lb-xnai-history-content'](stack_es),
-      },
-      h.button['lb-xnai-close'] {
-        popovertarget = id,
-        type = 'button',
-        "닫기",
-      }
-    },
-  })
+  return out
 end
 
 listenEdit(
@@ -414,132 +315,42 @@ listenEdit(
   function(tid, data, meta)
     setTriggerId(tid)
 
-    if meta and meta.index ~= nil then
-      local position = meta.index - getChatLength(triggerId)
-      if position < -5 then
-        return data
-      end
+    if not meta or not meta.index then
+      return data
     end
 
-    ---@type XNAIState
-    local fullState = getState(triggerId, 'lb-xnai-data') or {}
-
-    local out = data
-    local nodes = prelude.queryNodes('lb-xnai', out)
-    if #nodes > 0 then
-      local node = nodes[#nodes]
-      local before = out:sub(1, node.rangeStart - 1)
-      local after = out:sub(node.rangeEnd + 1)
-
-      ---@type XNAIStackItem?
-      local stackItem = nil
-      for _, item in ipairs(fullState.stack or {}) do
-        if item.chatIndex == (tonumber(node.attributes.of) or meta.index) then
-          stackItem = item
-          break
-        end
-      end
-
-      local success, result = pcall(renderCollection, stackItem, fullState)
-      if success then
-        out = before .. after .. result
-      else
-        print("[LightBoard] XNAI collection render failed:", tostring(result))
-      end
+    local chatLength = getChatLength(triggerId)
+    local position = meta.index - chatLength
+    if position < -5 then
+      return data
     end
 
-    for _, item in ipairs(fullState.stack or {}) do
+    ---@type XNAIStackItem[]
+    local fullState = getState(triggerId, 'lb-xnai-stack') or {}
+
+    ---@type XNAIStackItem?
+    local stackItem = nil
+    for _, item in ipairs(fullState) do
       if item.chatIndex == meta.index then
-        local success, result = pcall(renderInline, item.xnai, out, item.chatIndex, fullState.pinned or {})
-        if success then
-          return result
-        else
-          print("[LightBoard] XNAI inline render failed:", tostring(result))
-        end
+        stackItem = item
         break
       end
     end
 
-    return out
+    local success, result = pcall(renderInline, data, meta.index, chatLength, stackItem)
+    if success then
+      return result
+    end
+
+    print("[LightBoard] Illustration inline render failed:", tostring(result))
+    return data
   end
 )
 
 onButtonClick = async(function(tid, code)
   setTriggerId(tid)
 
-  local pinPrefix = 'lb%-xnai%-pin/'
-  local _, pinPrefixEnd = string.find(code, pinPrefix)
-
-  if pinPrefixEnd then
-    local body = code:sub(pinPrefixEnd + 1)
-    if body == '' then
-      return
-    end
-
-    local parts = prelude.split(body, '_')
-    if #parts < 2 then
-      return
-    end
-
-    local chatIndex = tonumber(parts[1])
-    local sceneIndex = tonumber(parts[2])
-
-    if not chatIndex or not sceneIndex then
-      return
-    end
-
-    ---@type XNAIState
-    local xnaiState = getState(triggerId, 'lb-xnai-data') or {}
-    local stack = xnaiState.stack or {}
-    local pinned = xnaiState.pinned or {}
-
-    local pinnedIndex = getPinnedIndex(pinned, chatIndex, sceneIndex)
-    if pinnedIndex then
-      table.remove(pinned, pinnedIndex)
-    else
-      local targetItem = nil
-      for _, item in ipairs(stack) do
-        if item.chatIndex == chatIndex then
-          targetItem = item
-          break
-        end
-      end
-
-      if not targetItem or not targetItem.xnai then
-        return
-      end
-
-      local desc = nil
-      local label = nil
-      if sceneIndex == 0 then
-        desc = targetItem.xnai.keyvis
-        label = '#' .. chatIndex .. '-KV'
-      else
-        desc = targetItem.xnai.scenes and targetItem.xnai.scenes[sceneIndex]
-        label = '#' .. chatIndex .. '-씬' .. sceneIndex
-      end
-
-      if not desc then
-        return
-      end
-
-      table.insert(pinned, {
-        chatIndex = chatIndex,
-        sceneIndex = sceneIndex,
-        label = label,
-        desc = desc,
-      })
-    end
-
-    setState(triggerId, 'lb-xnai-data', {
-      pinned = pinned,
-      stack = stack,
-    })
-    reloadChat(triggerId, chatIndex)
-    reloadChat(triggerId, chatIndex + 1)
-    return
-  end
-
+  -- lb-xnai-delete/{chatIndex}_{slot}
   local deletePrefix = 'lb%-xnai%-delete/'
   local _, deletePrefixEnd = string.find(code, deletePrefix)
 
@@ -555,135 +366,153 @@ onButtonClick = async(function(tid, code)
     end
 
     local chatIndex = tonumber(parts[1])
-    local sceneIndex = parts[2] and tonumber(parts[2]) or nil
+    local slot = parts[2] and tonumber(parts[2])
 
-    if not chatIndex then
+    if not chatIndex or not slot then
       return
     end
 
-    local confirmMsg = sceneIndex and '정말 이 씬을 지우시겠습니까?' or (chatIndex .. '번 채팅의 모든 씬을 지우시겠습니까?')
+    local confirmMsg = '정말 이 씬을 지우시겠습니까?'
     local confirmed = alertConfirm(tid, confirmMsg):await()
     if not confirmed then
       return
     end
 
-    ---@type XNAIState
-    local xnaiState = getState(triggerId, 'lb-xnai-data') or {}
-    local stack = xnaiState.stack or {}
+    ---@type XNAIStackItem[]
+    local fullState = getState(triggerId, 'lb-xnai-stack') or {}
 
-    if sceneIndex then
-      for _, item in ipairs(stack) do
-        if item.chatIndex == chatIndex and item.xnai then
-          if sceneIndex == 0 then
-            item.xnai.keyvis = nil
-          elseif item.xnai.scenes then
-            table.remove(item.xnai.scenes, sceneIndex)
-          end
-          break
-        end
+    ---@type XNAIStackItem?
+    local stackItem = nil
+    for _, item in ipairs(fullState) do
+      if item.chatIndex == chatIndex then
+        stackItem = item
+        break
       end
-    else
-      local newStack = {}
-      for _, item in ipairs(stack) do
-        if item.chatIndex ~= chatIndex then
-          table.insert(newStack, item)
-        end
-      end
-      xnaiState.stack = newStack
     end
 
-    setState(triggerId, 'lb-xnai-data', {
-      pinned = xnaiState.pinned or {},
-      stack = xnaiState.stack or {},
-    })
-    reloadChat(triggerId, chatIndex)
-    reloadChat(triggerId, chatIndex + 1)
+    if stackItem and stackItem.data.scenes[slot] then
+      stackItem.data.scenes[slot] = nil
+    end
+
+    setState(triggerId, 'lb-xnai-stack', fullState)
+
+    local targetChat = getChat(triggerId, chatIndex)
+    local targetNode = prelude.queryNodes('lb-xnai', targetChat.data, { of = tostring(slot), scene = 'true' })
+
+    if #targetNode > 1 then
+      setChat(triggerId, chatIndex, t_concat({
+        targetChat.data:sub(1, targetNode[1].rangeStart - 1),
+        targetChat.data:sub(targetNode[1].rangeEnd + 1),
+      }))
+      return
+    else
+      reloadChat(triggerId, chatIndex)
+    end
+
     return
   end
 
-  -- lb-xnai-gen/{chatIndex}_{sceneIndex}, lb-xnai-genall/{chatIndex}
+  -- lb-xnai-gen/{chatIndex}_{slot}
   local genPrefix = 'lb%-xnai%-gen/'
-  local genAllPrefix = 'lb%-xnai%-genall/'
   local _, genPrefixEnd = string.find(code, genPrefix)
-  local _, genAllPrefixEnd = string.find(code, genAllPrefix)
 
-  if not genPrefixEnd and not genAllPrefixEnd then
+  if not genPrefixEnd then
     return
   end
 
-  local chatIndex, sceneIndex
+  local chatIndex, slot
 
-  if genAllPrefixEnd then
-    local body = code:sub(genAllPrefixEnd + 1)
-    chatIndex = tonumber(body)
-    sceneIndex = nil
-  else
-    local body = code:sub(genPrefixEnd + 1)
-    local parts = prelude.split(body, '_')
-    chatIndex = tonumber(parts[1])
-    sceneIndex = tonumber(parts[2])
-  end
+  local body = code:sub(genPrefixEnd + 1)
+  local parts = prelude.split(body, '_')
+  chatIndex = tonumber(parts[1])
+  slot = parts[2]
 
   if not chatIndex then
     return
   end
 
-  ---@type XNAIState
-  local xnaiState = getState(triggerId, 'lb-xnai-data') or {}
-  local stack = xnaiState.stack or {}
+  ---@type XNAIStackItem[]
+  local fullState = getState(triggerId, 'lb-xnai-stack') or {}
 
   ---@type XNAIStackItem?
-  local targetItem = nil
-  for _, item in ipairs(stack) do
+  local stackItem = nil
+  for _, item in ipairs(fullState) do
     if item.chatIndex == chatIndex then
-      targetItem = item
+      stackItem = item
       break
     end
   end
 
-  if not targetItem or not targetItem.xnai then
+  local forKeyvis = slot == '-1'
+
+  if not stackItem or (slot ~= nil and (forKeyvis and not stackItem.data.keyvis) and not stackItem.data.scenes[slot]) then
+    alertNormal(triggerId, '이미지 생성 데이터가 사라졌어요. 오래된 이미지의 데이터는 유지하지 않습니다. 저장 개수 토글을 늘리세요.')
     return
   end
 
+  ---@type table<number, XNAIDescriptor>
   local descriptors = {}
-  if sceneIndex then
-    local desc = sceneIndex == 0 and targetItem.xnai.keyvis or
-        (targetItem.xnai.scenes and targetItem.xnai.scenes[sceneIndex])
+  local count = 0
+  if slot then
+    local desc = forKeyvis and stackItem.data.keyvis or stackItem.data.scenes[slot]
     if desc then
-      table.insert(descriptors, desc)
+      count = count + 1
+      descriptors[slot] = desc
     end
   else
-    if targetItem.xnai.keyvis then
-      table.insert(descriptors, targetItem.xnai.keyvis)
+    if stackItem.data.keyvis then
+      count = count + 1
+      descriptors['-1'] = stackItem.data.keyvis
     end
-    for _, desc in ipairs(targetItem.xnai.scenes or {}) do
-      table.insert(descriptors, desc)
+    for _, desc in pairs(stackItem.data.scenes or {}) do
+      count = count + 1
+      descriptors[tostring(desc.slot)] = desc
     end
   end
 
-  if #descriptors == 0 then
+  if count == 0 then
     return
   end
 
-  addChat(tid, 'user',
-    '<lb-rerolling><div class="lb-pending lb-rerolling"><span class="lb-pending-note">이미지 생성 중, 채팅을 보내거나 다른 작업을 하지 마세요...</span></div></lb-rerolling>')
+  local message = [[---
+[LBDATA START]
+<lb-rerolling><div class="lb-pending lb-rerolling"><span class="lb-pending-note">이미지 생성 중, 채팅을 보내거나 다른 작업을 하지 마세요...</span></div></lb-rerolling>
+[LBDATA END]
+---]]
+  addChat(tid, 'user', message)
 
-  local generate = prelude.import(triggerId, 'lb-xnai.gen')
-  for _, desc in ipairs(descriptors) do
-    local success, data = pcall(generate, triggerId, desc)
+  local gen = prelude.import(triggerId, 'lb-xnai.gen')
+  for _, desc in pairs(descriptors) do
+    local success, data = pcall(gen.generate, triggerId, desc)
     if success then
       desc.inlay = data
     else
       alertNormal(tid, '이미지 생성 중 오류가 발생했습니다.\n' .. tostring(data))
+      removeChat(tid, -1)
+      return
     end
   end
 
-  setState(triggerId, 'lb-xnai-data', {
-    pinned = xnaiState.pinned or {},
-    stack = stack,
-  })
+  local out = getChat(triggerId, chatIndex).data
+  local allTargetNodes = prelude.queryNodes('lb-xnai', out)
 
-  reloadChat(triggerId, chatIndex)
-  reloadChat(triggerId, chatIndex + 1)
+  -- reverse order to not mess up ranges
+  for i = #allTargetNodes, 1, -1 do
+    local node = allTargetNodes[i]
+    local isKeyvis = node.attributes.kv == 'true'
+    local targetNodeSlot = isKeyvis and '-1' or node.attributes.scene
+
+    if descriptors[targetNodeSlot] and descriptors[targetNodeSlot].inlay then
+      local attribute = isKeyvis and 'kv' or t_concat({ 'scene="', targetNodeSlot, '"' })
+
+      out = t_concat({
+        out:sub(1, node.rangeStart - 1),
+        t_concat({ '<lb-xnai ', attribute, '>', descriptors[targetNodeSlot].inlay, '</lb-xnai>' }),
+        out:sub(node.rangeEnd + 1),
+      })
+    end
+  end
+
+  setChat(triggerId, chatIndex, out)
   removeChat(tid, -1)
 end)

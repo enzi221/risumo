@@ -4,6 +4,7 @@
 --- @field authorsNote boolean
 --- @field charDesc boolean
 --- @field identifier string
+--- @field insertOrder number
 --- @field lazy boolean
 --- @field loreBooks boolean
 --- @field maxCtx number?
@@ -12,7 +13,8 @@
 --- @field multilingual boolean
 --- @field personaDesc boolean
 --- @field rerollBehavior 'preserve-prev'|'remove-prev'
+--- @field sideEffect boolean
 --- @field onInput (fun (triggerId: string, input: string, index: number): string)?
---- @field onOutput (fun (triggerId: string, output: string): string)?
+--- @field onOutput (fun (triggerId: string, output: string, fullChatContent: string?, chatIndex: number?): string)?
 --- @field onMutation (fun (triggerId: string, action: string, output: string): string)?
 --- @field onValidate (fun (triggerId: string, output: string): boolean)?

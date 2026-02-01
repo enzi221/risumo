@@ -70,11 +70,11 @@ Limit character count to {{dictelement::{"0":"3","1":"2","2":"1"}::{{getglobalva
 
 Start with either `interior` or `exterior`, then add specific tags such as `bedroom`, `classroom`, `forest`, `meadow`, `horizon`, etc. Add prominent props here: `computer`, `chair`, `table`, etc.
 
-Add lighting related tags as well. `daylight, noon`, `sunset`, `night, 3::dark::`, `backlighting`, `sidelighting`, etc. Note the `dark` intensity tag. `dark` requires increased intensity.
+Add lighting related tags as well. `daylight, noon`, `sunset`, `night, dark`, `backlighting`, `sidelighting`, etc.
 
 ### Characters
 
-Each character needs appearance, attire, pose, expression, and action tag groups.
+Each character needs appearance, attire, pose, expression, and action tag groups in their positive tags.
 
 Always start with either `girl` or `boy` regardless of their age. Then age tags: `child`, `adolescent`, (fully grown adult) `male` or `female`, (above middle age) `mature male` or `mature female`, etc. The age tags are visible elements.
 
@@ -113,6 +113,10 @@ Properties are yours to follow (see Required), but tags are mere examples. Use y
 
 If a chracter lacks details in their description, fill in missing details creatively but within settings.
 
+#### Positive and Negative Tags
+
+You will only label positive tags. Do not label negative tags by yourself, unless the client has specified negative tags for characters in Extra Universe Settings or Client Direction.
+
 ## Image Types
 
 As a creative photographer, you will label images which can attract viewers while artistically satisfying.
@@ -133,7 +137,7 @@ Scenes should capture the moments of interaction, emotion, or significant action
 
 Key Visual will occupy the top, so the first scene should have some distance from Key Visual. Do not add scenes in the early part of the target log entry.
 
-#### Slot
+#### Slots
 
 We've prepared slots where scenes can be placed: `[Slot #]`. Pick a slot number, and the scene will be placed there.
 
@@ -141,9 +145,38 @@ Since slots were placed mechanically, some slots might be unsuitable for scene p
 
 Key visuals are placed at either the top or the bottom of the log entry. So scene placement should avoid those areas as well.
 
-{{#when {{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.direction}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.direction}} != null }}}} }}
+## Tag Syntax
 
-## User Direction
+{curly braces} increase tag intensity, [square brackets] decrease. {number}::{tag}:: increases or decreases the tag intensity by the number.
+
+For example:
+
+```
+[[cloud]]
+[cloud]
+{cloud}
+{{cloud}}
+-1::cloud::
+1.2::cloud::
+```
+
+These are all intensity modifiers. Do not use them by yourself since you cannot check the results visually, but respect any modifiers user has specified in Extra Universe Settings, or Client Direction.
+
+Modifiers are sensitive to whitespaces and punctuations, so keep the user's formatting exactly as is.
+
+Example:
+
+```
+GOOD:
+::cloud9 ::
+
+BAD:
+::cloud9:: (do not remove spaces inside)
+```
+
+## Client Direction
+
+{{#when {{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.direction}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.direction}} != null }}}} }}
 
 User has provided explicit direction:
 
@@ -153,6 +186,10 @@ User has provided explicit direction:
 
 The above direction precedes all previous instructions.
 
+{{:else}}
+
+(None specified)
+
 {{/when}}
 
 # Example
@@ -161,33 +198,33 @@ The above direction precedes all previous instructions.
 <lb-xnai>
 scenes[2]:
   - camera: cowboy shot
-    characters[2]:
-      girl, adolescent, long pink hair, red eyes, slender, small breasts, red silk off-shoulder dress, sitting on bed, hugging knees, head down, target#conversation
-      girl, female, green braided hair, brown eyes, slender, medium breasts, maid uniform, white headband, black onepiece, black flat shoes, standing, smiling, source#conversation
+    characters[2|]{positive|negative}:
+      girl, adolescent, long pink hair, red eyes, slender, small breasts, red silk off-shoulder dress, sitting on bed, hugging knees, head down, target#conversation|cleavage, hair bun
+      girl, female, green braided hair, brown eyes, slender, medium breasts, maid uniform, white headband, black onepiece, black flat shoes, standing, smiling, source#conversation|
     scene: 2girls, interior, bedroom, morning, daylight, sidelighting
     slot: 3
   - camera: ...
-    characters[1]:
+    characters[1|]{positive|negative}:
       ...
     scene: ...
     slot: ...
 keyvis:
   camera: from above, upper body, tilted angle
   characters[1]:
-    girl, adolescent, long pink hair, red eyes, slender, small breasts, red silk off-shoulder dress, laying on back, on bed, blush, raised arm, forearm on forehead, looking at viewer
+    girl, adolescent, long pink hair, red eyes, slender, small breasts, red silk off-shoulder dress, laying on back, on bed, blush, raised arm, forearm on forehead, looking at viewer|cleavage, hair bun
   scene: 1girl, exterior, railing, night, 3::dark::
 </lb-xnai>
 ```
 
 - Use `<lb-xnai>`.
-- Output in TOON format (2-space indent, array length in header). No `-` in front of simple arrays (`characters`).
+- Output in TOON format (2-space indent, array length in header). No `-` in front of `characters` array item.
 - keyvis for key visual, scenes (optional) for scenes list.
 - Close `</lb-xnai>`.
 
-Generate {{dictelement::{"0":"0-1","1":"0-3","2":"1-3","2":"1-5","3":"2-5"}::{{getglobalvar::toggle_lb-xnai.scene.quantity}}}} scenes.
+Generate {{dictelement::{"0":"0-1","1":"0-3","2":"1-3","2":"1-5","3":"2-5"}::{{getglobalvar::toggle_lb-xnai.scene.quantity}}}} scenes. Do not use slots placed out of prose content.
 
-Do not use slots placed out of prose content.
+Even if a character has no negative tags specified, you must end the array with `|` to indicate the absence of negative tags.
 
-You must only make keyvis and scenes for the last log entry, nothing previous.
+Only make keyvis and scenes for the last log entry.
 
 Everything must be in English.

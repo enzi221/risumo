@@ -107,9 +107,11 @@ end
 ---@field tagName string
 
 ---Extracts all nodes.
+---@param tagNameRaw string
 ---@param text string
+---@param attributes table<string, string>?
 ---@return Node[]
-local function queryNodes(tagNameRaw, text)
+local function queryNodes(tagNameRaw, text, attributes)
   local results = {}
   local i = 1
 
@@ -164,16 +166,29 @@ local function queryNodes(tagNameRaw, text)
         -- Check if self-closing
         local isSelfClosing = openTagContent:match("/%s*$")
 
+        -- Check if attributes match the filter
+        local matchesFilter = true
+        if attributes then
+          for filterKey, filterVal in pairs(attributes) do
+            if attrs[filterKey] ~= filterVal then
+              matchesFilter = false
+              break
+            end
+          end
+        end
+
         if isSelfClosing then
           -- Self-closing tag: no content, rangeEnd is the closing >
-          t_insert(results, {
-            attributes = attrs,
-            content    = "",
-            openTag    = text:sub(startIdx, tagEnd),
-            rangeEnd   = tagEnd,
-            rangeStart = startIdx,
-            tagName    = tagNameRaw,
-          })
+          if matchesFilter then
+            t_insert(results, {
+              attributes = attrs,
+              content    = "",
+              openTag    = text:sub(startIdx, tagEnd),
+              rangeEnd   = tagEnd,
+              rangeStart = startIdx,
+              tagName    = tagNameRaw,
+            })
+          end
           i = tagEnd + 1
         else
           -- Find closing tag
@@ -186,14 +201,16 @@ local function queryNodes(tagNameRaw, text)
             -- Extract inner content
             local contentOnly = text:sub(tagEnd + 1, closeStart - 1)
 
-            t_insert(results, {
-              attributes = attrs,
-              content    = contentOnly,
-              openTag    = text:sub(startIdx, tagEnd),
-              rangeEnd   = closeEnd,
-              rangeStart = startIdx,
-              tagName    = tagNameRaw,
-            })
+            if matchesFilter then
+              t_insert(results, {
+                attributes = attrs,
+                content    = contentOnly,
+                openTag    = text:sub(startIdx, tagEnd),
+                rangeEnd   = closeEnd,
+                rangeStart = startIdx,
+                tagName    = tagNameRaw,
+              })
+            end
 
             i = closeEnd + 1
           end
@@ -319,6 +336,33 @@ local function getPriorityLoreBook(triggerId, name)
   return books[1]
 end
 
+---Locates the target chat index for sideEffect operations.
+---@param fullChat Chat[]
+---@return number? jsIndex (0-based for setChat)
+local function locateTargetChat(fullChat)
+  local targetIndex = nil
+
+  for i = #fullChat, 1, -1 do
+    local chat = fullChat[i]
+    if trim(chat.data) ~= '' and chat.role == 'char' then
+      local stripped, count = chat.data:gsub('%-%-%-\n%[LBDATA START%].-LBDATA END%]\n%-%-%-', '')
+
+      if count > 0 then
+        targetIndex = i - 1 -- Lua 1-based -> JS 0-based
+        stripped, _ = trim(stripped)
+
+        if stripped == '' then
+          targetIndex = targetIndex - 1 -- Skip this one; LBDATA-only, content located above
+        end
+
+        break
+      end
+    end
+  end
+
+  return targetIndex
+end
+
 ---@param str string
 ---@param sep string
 ---@return string[]
@@ -435,6 +479,7 @@ _ENV.prelude = {
   getFlagToggle = getFlagToggle,
   getPriorityLoreBook = getPriorityLoreBook,
   import = import,
+  locateTargetChat = locateTargetChat,
   queryNodes = queryNodes,
   removeAllNodes = removeAllNodes,
   split = split,

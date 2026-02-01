@@ -35,18 +35,12 @@ function onInput(tid, input, meta)
     if not targetIndexCache then
       targetIndexCache = gen.locateTargetChat(fullChatCache)
     end
-    if meta.index == targetIndexCache then
+    if meta.index == targetIndexCache + 1 --[[JS to Lua index]] then
       input = gen.insertSlots(input)
     end
   end
 
-  local node = prelude.queryNodes('lb-xnai', input)[1]
-  if not node then
-    return input
-  end
-
-  input = input:sub(1, node.rangeStart - 1) .. input:sub(node.rangeEnd + 1)
-  return input
+  return prelude.removeAllNodes(input)
 end
 
 return onInput

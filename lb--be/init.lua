@@ -244,7 +244,7 @@ local function runPipeline(man, fullChat, options)
           man.identifier .. ' but max retries reached: ' .. tostring(validationError))
       end
 
-      if man.onOutput and result then
+      if man.onOutput and result and not man.sideEffect then
         local success, modifiedOutput = pcall(man.onOutput, triggerId, result)
         if success and modifiedOutput and modifiedOutput ~= '' then
           result = modifiedOutput
@@ -302,20 +302,56 @@ end
 --- @type fun(man: Manifest, chatContext: Chat[], options: PipelineOptions): Promise<string?>
 local runPipelineAsync = async(runPipeline)
 
+--- Runs sideEffect onOutput with proper signature.
+--- @param man Manifest
+--- @param pipelineResult string
+--- @param chatContent string
+--- @param chatIndex number
+--- @return string modifiedChatContent, string? lbdataContent
+local function runSideEffectOnOutput(man, pipelineResult, chatContent, chatIndex)
+  if not man.onOutput then
+    print('[LightBoard Backend] Warning: sideEffect manifest ' .. man.identifier .. ' has no onOutput callback')
+    return chatContent, nil
+  end
+
+  local success, modifiedOutput, lbdataOutput = pcall(man.onOutput, triggerId, pipelineResult, chatContent, chatIndex)
+  if success and modifiedOutput and prelude.trim(modifiedOutput) ~= '' then
+    return modifiedOutput, lbdataOutput
+  else
+    local reason = success and 'nil 또는 빈 문자열 반환' or tostring(modifiedOutput)
+    error('sideEffect 출력 처리 실패(onOutput). ' .. reason)
+  end
+end
+
 --- @param manifests Manifest[]
 local main = async(function(manifests)
   local fullChat = getFullChat(triggerId)
 
+  -- Separate normal and sideEffect manifests
+  local normalManifests = {}
+  local sideEffectManifests = {}
+
+  for _, man in ipairs(manifests) do
+    if man.sideEffect then
+      table.insert(sideEffectManifests, man)
+    else
+      table.insert(normalManifests, man)
+    end
+  end
+
+  print('normal', #normalManifests, 'sideeffect', #sideEffectManifests)
+
+  -- Phase 1: Run normal manifests in parallel and assemble LBDATA
   local allProcessedResults = {}
   local maxConcurrent = math.min(5, math.max(1, tonumber(getGlobalVar(triggerId, "toggle_lightboard.concurrent")) or 1))
 
-  for i = 1, #manifests, maxConcurrent do
+  for i = 1, #normalManifests, maxConcurrent do
     --- @type Promise<string>[]
     local currentChunkPromises = {}
-    local chunkEndIndex = math.min(i + maxConcurrent - 1, #manifests)
+    local chunkEndIndex = math.min(i + maxConcurrent - 1, #normalManifests)
 
     for j = i, chunkEndIndex do
-      local man = manifests[j]
+      local man = normalManifests[j]
       table.insert(currentChunkPromises, runPipelineAsync(man, fullChat, {
         type = 'generation',
         lazy = man.lazy
@@ -335,17 +371,18 @@ local main = async(function(manifests)
     end
   end
 
-  if #allProcessedResults > 0 then
-    -- Get the latest full chat again in case other scripts modified it
-    local fullChatNewest = getFullChat(triggerId)
-    local lastCharChatIdx = findLastCharChat(fullChatNewest, 0, 5)
-    local lastCharChat = lastCharChatIdx and fullChatNewest[lastCharChatIdx].data or ''
+  -- Get the latest full chat again in case other scripts modified it
+  local fullChatNewest = getFullChat(triggerId)
+  local lastCharChatIdx = findLastCharChat(fullChatNewest, 0, 5)
+  local lastCharChat = lastCharChatIdx and fullChatNewest[lastCharChatIdx].data or ''
 
+  if #allProcessedResults > 0 then
     local contents = table.concat(allProcessedResults, '\n\n')
     local updated = replaceLBDATA(lastCharChat, contents)
 
     if updated then
       setChat(triggerId, lastCharChatIdx ~= nil and (lastCharChatIdx - 1) or -1, updated)
+      lastCharChat = updated
     else
       -- Fallback: if a placeholder block wasn't found (unexpected), keep old behavior.
       local header = '---\n[LBDATA START]'
@@ -360,10 +397,96 @@ local main = async(function(manifests)
         local finalMessage = position == '1' and assembled .. '\n\n' .. lastCharChat or
             lastCharChat .. '\n\n' .. assembled
         setChat(triggerId, lastCharChatIdx ~= nil and (lastCharChatIdx - 1) or -1, finalMessage)
+        lastCharChat = finalMessage
       end
     end
   else
-    print("[LightBoard] All manifests processed. No new content to add.")
+    print("[LightBoard] All normal manifests processed. No new content to add.")
+  end
+
+  -- Phase 2: Run sideEffect manifests sequentially
+  if #sideEffectManifests > 0 then
+    local sideEffectResults = {}
+
+    for i = 1, #sideEffectManifests, maxConcurrent do
+      local currentChunkPromises = {}
+      local chunkEndIndex = math.min(i + maxConcurrent - 1, #sideEffectManifests)
+
+      for j = i, chunkEndIndex do
+        local man = sideEffectManifests[j]
+        table.insert(currentChunkPromises, runPipelineAsync(man, fullChat, {
+          type = 'generation',
+          lazy = man.lazy
+        }))
+      end
+
+      local chunkResults = Promise.all(currentChunkPromises):await()
+      if chunkResults then
+        for idx, chunkResult in ipairs(chunkResults) do
+          local manIdx = i + idx - 1
+          sideEffectResults[manIdx] = chunkResult
+        end
+      end
+    end
+
+    fullChatNewest = getFullChat(triggerId)
+    local targetIdx = prelude.locateTargetChat(fullChatNewest)
+    if not targetIdx then
+      print('[LightBoard Backend] locateTargetChat returned nil')
+      return
+    end
+
+    local currentChatContent = fullChatNewest[targetIdx + 1].data -- JS 0-based -> Lua 1-based
+    local lazyPlaceholders = {}
+    local lbdataContents = {}
+
+    for i, man in ipairs(sideEffectManifests) do
+      local pipelineResult = sideEffectResults[i]
+      if pipelineResult and type(pipelineResult) == "string" and pipelineResult ~= "" then
+        if pipelineResult:match('^%s*<lb%-lazy') then
+          table.insert(lazyPlaceholders, pipelineResult)
+        else
+          local success, result, lbdata = pcall(
+            runSideEffectOnOutput,
+            man,
+            pipelineResult,
+            currentChatContent,
+            targetIdx)
+          if success and result then
+            currentChatContent = result
+            if lbdata and prelude.trim(lbdata) ~= '' then
+              table.insert(lbdataContents, lbdata)
+            end
+          else
+            print("[LightBoard Backend] sideEffect onOutput failed for " ..
+              man.identifier .. ": " .. tostring(result))
+          end
+        end
+      end
+    end
+
+    local appendToLBDATA = {}
+    for _, v in ipairs(lazyPlaceholders) do table.insert(appendToLBDATA, v) end
+    for _, v in ipairs(lbdataContents) do table.insert(appendToLBDATA, v) end
+
+    if #appendToLBDATA > 0 then
+      local appendContent = table.concat(appendToLBDATA, '\n\n')
+      local existingLBDATA = currentChatContent:match('%[LBDATA START%](.-)%[LBDATA END%]') or ''
+      local newInner = prelude.trim(existingLBDATA)
+      if newInner ~= '' then
+        newInner = newInner .. '\n\n' .. appendContent
+      else
+        newInner = appendContent
+      end
+      local updatedWithAppend = replaceLBDATA(currentChatContent, newInner)
+      if updatedWithAppend then
+        currentChatContent = updatedWithAppend
+      else
+        currentChatContent = fallbackInsert(currentChatContent, appendContent)
+      end
+    end
+
+    setChat(triggerId, targetIdx, currentChatContent)
   end
 end)
 
@@ -425,13 +548,25 @@ local function reroll(identifier, blockID)
 
   local originalContent = targetChat.data
   local withoutLazy, lazyPos = removeNode(originalContent, 'lb-lazy', { id = identifier })
-  local withoutSelf, prevPos = removeNode(withoutLazy, identifier, blockID and { id = blockID } or nil)
+
+  local withoutSelf = withoutLazy
+  local prevPos = nil
+  while true do
+    local removed, pos = removeNode(withoutSelf, identifier, blockID and { id = blockID } or nil)
+    if removed == withoutSelf then break end
+    withoutSelf = removed
+    if not prevPos then prevPos = pos end
+  end
 
   setChat(triggerId, -1, withoutLazy)
   -- TODO: Move out of reroll
-  addChat(triggerId, 'user',
-    '<lb-rerolling><div class="lb-pending lb-rerolling"><span class="lb-pending-note">' ..
-    identifier .. ' 재생성 중, 채팅을 보내거나 다른 모듈을 재생성하지 마세요...</span></div></lb-rerolling>')
+  local message = [[---
+[LBDATA START]
+<lb-rerolling><div class="lb-pending lb-rerolling"><span class="lb-pending-note">%s 재생성 중, 채팅을 보내거나 다른 모듈을 재생성하지 마세요...</span></div></lb-rerolling>
+[LBDATA END]
+---]]
+
+  addChat(triggerId, 'user', message:format(identifier))
 
   -- Use the later position if both exist (adjust pos1 if lazy node came first)
   local targetPosition = nil
@@ -472,14 +607,49 @@ local function reroll(identifier, blockID)
   end
 
   local finalChat
-  if targetPosition then
-    finalChat = insertAtPosition(withoutSelf, targetPosition, result)
-  else
-    finalChat = fallbackInsert(withoutSelf, result)
-  end
 
-  setChat(triggerId, targetChatIdx,
-    man.onMutation and man.onMutation(triggerId, 'reroll', finalChat) or finalChat)
+  if man.sideEffect then
+    local latestChat = getFullChat(triggerId)
+    local sideEffectTargetIdx = prelude.locateTargetChat(latestChat)
+    if not sideEffectTargetIdx then
+      alertError(triggerId, '[LightBoard] sideEffect 리롤 실패. 대상 채팅을 찾을 수 없습니다.')
+      return
+    end
+
+    local sideEffectOriginalContent = latestChat[sideEffectTargetIdx + 1].data -- JS 0-based -> Lua 1-based
+    local cleanedContent = removeNode(sideEffectOriginalContent, identifier, blockID and { id = blockID } or nil)
+
+    local onOutputSuccess, modifiedContent, lbdataContent = pcall(
+      runSideEffectOnOutput,
+      man,
+      result,
+      cleanedContent,
+      sideEffectTargetIdx)
+    if not onOutputSuccess or not modifiedContent then
+      setChat(triggerId, sideEffectTargetIdx, sideEffectOriginalContent)
+      alertError(triggerId, '[LightBoard] sideEffect onOutput 실패. ' .. tostring(modifiedContent))
+      return
+    end
+
+    finalChat = modifiedContent
+    if lbdataContent and prelude.trim(lbdataContent) ~= '' then
+      local existingLBDATA = finalChat:match('%[LBDATA START%](.-)%[LBDATA END%]') or ''
+      local newInner = prelude.trim(existingLBDATA)
+      newInner = newInner ~= '' and (newInner .. '\n\n' .. lbdataContent) or lbdataContent
+      finalChat = replaceLBDATA(finalChat, newInner) or fallbackInsert(finalChat, lbdataContent)
+    end
+    setChat(triggerId, sideEffectTargetIdx,
+      man.onMutation and man.onMutation(triggerId, 'reroll', finalChat) or finalChat)
+  else
+    if targetPosition then
+      finalChat = insertAtPosition(withoutSelf, targetPosition, result)
+    else
+      finalChat = fallbackInsert(withoutSelf, result)
+    end
+
+    setChat(triggerId, targetChatIdx,
+      man.onMutation and man.onMutation(triggerId, 'reroll', finalChat) or finalChat)
+  end
 end
 
 --- @class InteractionMod
@@ -593,7 +763,46 @@ Action: `%s`
 
   local finalChat
 
-  if modifiers.preserve then
+  if man.sideEffect then
+    -- sideEffect: use locateTargetChat and apply onOutput with full content replacement
+    local latestChat = getFullChat(triggerId)
+    local sideEffectTargetIdx = prelude.locateTargetChat(latestChat)
+    if not sideEffectTargetIdx then
+      alertError(triggerId, '[LightBoard] sideEffect 상호작용 실패. 대상 채팅을 찾을 수 없습니다.')
+      return
+    end
+
+    local sideEffectOriginalContent = latestChat[sideEffectTargetIdx + 1].data -- JS 0-based -> Lua 1-based
+    local cleanedContent = removeNode(sideEffectOriginalContent, identifier,
+      modifiers.blockID and { id = modifiers.blockID } or nil)
+
+    local onOutputSuccess, modifiedContent, lbdataContent = pcall(
+      runSideEffectOnOutput,
+      man,
+      result,
+      cleanedContent,
+      sideEffectTargetIdx)
+    if not onOutputSuccess or not modifiedContent then
+      setChat(triggerId, sideEffectTargetIdx, sideEffectOriginalContent)
+      alertError(triggerId, '[LightBoard] sideEffect onOutput 실패. ' .. tostring(modifiedContent))
+      return
+    end
+
+    finalChat = modifiedContent
+    if lbdataContent and prelude.trim(lbdataContent) ~= '' then
+      local existingLBDATA = finalChat:match('%[LBDATA START%](.-)%[LBDATA END%]') or ''
+      local newInner = prelude.trim(existingLBDATA)
+      newInner = newInner ~= '' and (newInner .. '\n\n' .. lbdataContent) or lbdataContent
+      finalChat = replaceLBDATA(finalChat, newInner) or fallbackInsert(finalChat, lbdataContent)
+    end
+
+    if man.onMutation then
+      finalChat = man.onMutation(triggerId, 'interaction', finalChat)
+    end
+
+    setChat(triggerId, sideEffectTargetIdx, finalChat)
+    return
+  elseif modifiers.preserve then
     -- Find last matching node and insert after it
     local existingNodes = prelude.queryNodes(identifier, originalContent)
     local targetNode = nil
@@ -701,9 +910,13 @@ onButtonClick = async(function(tid, code)
     print('[LightBoard Backend][VERBOSE] Interaction ' .. action .. ' of ' .. identifier .. ' initiated.')
 
     if modifiers.immediate then
-      addChat(tid, 'user',
-        '<lb-rerolling><div class="lb-pending lb-rerolling"><span class="lb-pending-note">' ..
-        identifier .. ' 상호작용 중, 채팅을 보내거나 다른 작업을 하지 마세요...</span></div></lb-rerolling>')
+      local message = [[---
+[LBDATA START]
+<lb-rerolling><div class="lb-pending lb-rerolling"><span class="lb-pending-note">%s 상호작용 중, 채팅을 보내거나 다른 작업을 하지 마세요...</span></div></lb-rerolling>
+[LBDATA END]
+---]]
+
+      addChat(tid, 'user', message:format(identifier))
 
       local fullChat = getFullChat(tid)
       -- #fullChat = pending message, #fullChat-1 = last char chat to modify
@@ -715,9 +928,13 @@ onButtonClick = async(function(tid, code)
 
       removeChat(tid, -1)
     else
-      addChat(tid, 'user',
-        '<lb-interaction-identifier>' ..
-        identifier .. '</lb-interaction-identifier>\n<lb-interaction-action>' .. action .. '</lb-interaction-action>')
+      local message = [[---
+[LBDATA START]
+<lb-interaction-identifier>%s</lb-interaction-identifier>
+<lb-interaction-action>%s</lb-interaction-action>
+[LBDATA END]
+---]]
+      addChat(tid, 'user', message:format(identifier, action))
     end
   end
 end)

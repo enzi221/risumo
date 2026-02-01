@@ -28,23 +28,35 @@ function onValidate(triggerId, output)
     error('InvalidOutput: Invalid TOON format. ' .. tostring(content))
   end
 
-  --- @type XNAIData
-  local xnaiContent = content
+  --- @type XNAIResponse
+  local response = content
   local errors = {}
 
-  for index, desc in ipairs(xnaiContent.scenes) do
+  for index, desc in ipairs(response.scenes or {}) do
     local errIndex = index - 1
 
     if not desc.camera or type(desc.camera) ~= 'string' or desc.camera == '' then
       table.insert(errors, 'Scene ' .. errIndex .. ' has no camera field. Parsed type: ' .. type(desc.camera))
     end
     if not desc.characters or type(desc.characters) ~= 'table' or #desc.characters == 0 then
-      table.insert(errors, 'Scene ' .. errIndex .. ' has no character or is not a valid array. Parsed type: ' .. type(desc.characters))
+      table.insert(errors,
+        'Scene ' .. errIndex .. ' has no character or is not a valid array. Parsed type: ' .. type(desc.characters))
     end
     for cIndex, character in ipairs(desc.characters) do
       local charErrIndex = cIndex - 1
-      if type(character) ~= 'string' or character == '' then
-        table.insert(errors, 'Scene ' .. errIndex .. ', character ' .. charErrIndex .. ' is not a valid string. Parsed type: ' .. type(character))
+      if type(character) ~= 'table' then
+        table.insert(errors,
+          'Scene ' .. errIndex .. ', character ' .. charErrIndex .. ' is not a valid object. Did you forget the trailing `|`? Parsed type: ' .. type(character))
+      end
+      if type(character.positive) ~= 'string' or character.positive == '' then
+        table.insert(errors,
+          'Scene ' ..
+          errIndex .. ', character ' .. charErrIndex .. ' (positive) is not a valid string. Parsed type: ' .. type(character.positive))
+      end
+      if type(character.negative) ~= 'string' then
+        table.insert(errors,
+          'Scene ' ..
+          errIndex .. ', character ' .. charErrIndex .. ' (negative) is not a valid string. Parsed type: ' .. type(character.negative))
       end
     end
     if not desc.scene or type(desc.scene) ~= 'string' or desc.scene == '' then
@@ -53,6 +65,28 @@ function onValidate(triggerId, output)
     if not desc.slot or type(desc.slot) ~= 'number' then
       table.insert(errors, 'Scene ' .. errIndex .. ' has invalid slot field. Parsed type: ' .. type(desc.slot))
     end
+  end
+
+  if response.keyvis then
+    for cIndex, character in ipairs(response.keyvis) do
+      local charErrIndex = cIndex - 1
+      if type(character) ~= 'table' then
+        table.insert(errors,
+          'Keyvis character ' .. charErrIndex .. ' is not a valid object. Did you forget the trailing `|`? Parsed type: ' .. type(character))
+      end
+      if type(character.positive) ~= 'string' or character.positive == '' then
+        table.insert(errors,
+          'Keyvis character ' .. charErrIndex .. ' (positive) is not a valid string. Parsed type: ' .. type(character.positive))
+      end
+      if type(character.negative) ~= 'string' then
+        table.insert(errors,
+          'Keyvis character ' .. charErrIndex .. ' (negative) is not a valid string. Parsed type: ' .. type(character.negative))
+      end
+    end
+  end
+
+  if #errors > 0 then
+    error('InvalidOutput: Malformed data. Aggregated errors:\n\n' .. table.concat(errors, '\n'))
   end
 end
 

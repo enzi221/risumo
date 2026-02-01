@@ -42,8 +42,10 @@ describe('queryNodes', function()
       {
         attributes = {},
         content = "content",
+        openTag = "<test>",
         rangeStart = 1,
-        rangeEnd = 20
+        rangeEnd = 20,
+        tagName = "test"
       }
     }, "simple node extraction")
   end)
@@ -55,8 +57,10 @@ describe('queryNodes', function()
       {
         attributes = { id = "test" },
         content = "",
+        openTag = "<lb-lazy id='test' />",
         rangeStart = 1,
-        rangeEnd = 21
+        rangeEnd = 21,
+        tagName = "lb-lazy"
       }
     }, "self-closing tag extraction")
   end)
@@ -69,16 +73,20 @@ describe('queryNodes', function()
       {
         attributes = {},
         content = "",
+        openTag = "<br />",
         rangeStart = 1,
-        rangeEnd = 6
+        rangeEnd = 6,
+        tagName = "br"
       }
     }, "br tag")
     assertDeepEquals(nodesHr, {
       {
         attributes = { class = "divider" },
         content = "",
+        openTag = "<hr class='divider' />",
         rangeStart = 7,
-        rangeEnd = 28
+        rangeEnd = 28,
+        tagName = "hr"
       }
     }, "hr tag with attribute")
   end)
@@ -139,6 +147,41 @@ describe('queryNodes', function()
     local nodes = prelude.queryNodes("lb-stage", text)
     assertEquals(#nodes, 1, "should match only exact tag name")
     assertEquals(nodes[1].content, "real", "content should correspond to exact tag")
+  end)
+
+  it("filters by single attribute", function()
+    local text = '<item type="a">1</item><item type="b">2</item><item type="a">3</item>'
+    local nodes = prelude.queryNodes("item", text, { type = "a" })
+    assertEquals(#nodes, 2, "should find 2 nodes with type=a")
+    assertEquals(nodes[1].content, "1", "first matched content")
+    assertEquals(nodes[2].content, "3", "second matched content")
+  end)
+
+  it("filters by multiple attributes", function()
+    local text =
+    '<div class="box" id="main">A</div><div class="box" id="side">B</div><div class="card" id="main">C</div>'
+    local nodes = prelude.queryNodes("div", text, { class = "box", id = "main" })
+    assertEquals(#nodes, 1, "should find 1 node matching both attrs")
+    assertEquals(nodes[1].content, "A", "matched content")
+  end)
+
+  it("returns empty when no attributes match", function()
+    local text = '<item type="a">1</item><item type="b">2</item>'
+    local nodes = prelude.queryNodes("item", text, { type = "c" })
+    assertEquals(#nodes, 0, "should find no nodes")
+  end)
+
+  it("filters self-closing tags by attribute", function()
+    local text = '<br class="small" /><br class="large" /><br />'
+    local nodes = prelude.queryNodes("br", text, { class = "large" })
+    assertEquals(#nodes, 1, "should find 1 self-closing tag")
+    assertEquals(nodes[1].attributes.class, "large", "matched attribute")
+  end)
+
+  it("returns all nodes when filterAttrs is nil", function()
+    local text = '<item type="a">1</item><item type="b">2</item>'
+    local nodes = prelude.queryNodes("item", text, nil)
+    assertEquals(#nodes, 2, "should find all nodes when filter is nil")
   end)
 end)
 
@@ -231,7 +274,7 @@ describe('trim', function()
     -- NBSP, Ideographic Space, ZWSP
     local input = "\194\160\227\128\128\226\128\139hello\194\160"
     assertEquals(prelude.trim(input), "hello", "trims unicode spaces")
-    
+
     local empty_unicode = "\194\160\227\128\128"
     assertEquals(prelude.trim(empty_unicode), "", "returns empty for unicode spaces only")
   end)

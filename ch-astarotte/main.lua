@@ -87,11 +87,6 @@ local function printDeck()
     '<tarot-deck length="' .. #spread .. '">' .. table.concat(shuffledDeck, ',') .. '</tarot-deck>')
 end
 
-onOutput = async(function(tid)
-  setTriggerId(tid)
-  printDeck()
-end)
-
 local function renderDeck(data, length)
   local state = getState(triggerId, 'tarotSelections') or {}
 

@@ -263,7 +263,7 @@ local function makePrompt(triggerId, man, fullChat, type, extras)
     if userChatsAllowed or fullChat[originalIndex].role ~= 'user' then
       local text = prelude.removeAllNodes(fullChat[originalIndex].data, { identifier })
       if man.onInput then
-        local success, modifiedText = pcall(man.onInput, triggerId, text, { index = --[[Lua to JS]] originalIndex - 1, type = type })
+        local success, modifiedText = pcall(man.onInput, triggerId, text, { index = originalIndex, type = type })
         if success then
           text = modifiedText
         else

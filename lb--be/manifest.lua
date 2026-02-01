@@ -52,6 +52,7 @@ local function getManifests(triggerId)
 
         tbl.mode = getGlobalVar(triggerId, prefix .. "mode")
         if tbl.mode ~= '0' then
+          tbl.insertOrder                       = item.insertorder or 0
           tbl.maxCtx                            = tonumber(tbl.maxCtx) or
               tonumber(getGlobalVar(triggerId, prefix .. "maxCtx"))
           tbl.maxLogs                           = tonumber(tbl.maxLogs) or
@@ -63,6 +64,7 @@ local function getManifests(triggerId)
           tbl.lazy                              = resolveConfig(triggerId, tbl.lazy, id, "lazy", false)
           tbl.multilingual                      = resolveConfig(triggerId, tbl.multilingual, id, "multilingual", true)
           tbl.personaDesc                       = resolveConfig(triggerId, tbl.personaDesc, id, "personaDesc", false)
+          tbl.sideEffect                        = resolveConfig(triggerId, tbl.sideEffect, id, "sideEffect", false)
 
           tbl.onInput                           = loadCallback(triggerId, id, 'onInput')
           tbl.onOutput                          = loadCallback(triggerId, id, 'onOutput')
@@ -74,6 +76,10 @@ local function getManifests(triggerId)
       end
     end
   end
+
+  table.sort(parsedManifests, function(a, b)
+    return (a.insertOrder or 0) > (b.insertOrder or 0)
+  end)
 
   return parsedManifests
 end

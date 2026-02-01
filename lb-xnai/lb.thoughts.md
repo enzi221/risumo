@@ -1,4 +1,4 @@
-Think step-by-step for final data, but keep minimal draft per step.
+Think step-by-step for final data, but keep minimal draft per step (invisible to the user).
 
 Follow this steps and output each step explicitly without omission:
 

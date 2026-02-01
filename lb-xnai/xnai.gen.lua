@@ -1,3 +1,4 @@
+---@param desc XNAIDescriptor
 local function buildPresetPrompt(triggerId, desc)
   local lead = {}
   if desc.camera and desc.camera ~= '' then
@@ -59,18 +60,21 @@ local function buildPresetPrompt(triggerId, desc)
   end
 
   if #chars > 0 then
-    local charText = table.concat(chars, ' | ')
-    if positive ~= '' then
-      positive = positive .. ' | ' .. charText
-    else
-      positive = charText
+    local charP = { positive }
+    local charN = { negative }
+
+    for _, char in ipairs(chars) do
+      table.insert(charP, char.positive)
+      table.insert(charN, char.negative)
     end
+
+    positive = table.concat(charP, ' | ')
+    negative = table.concat(charN, ' | ')
   end
 
   return {
     positive = positive:gsub('%(', '\\('):gsub('%)', '\\)'),
-    negative = negative:gsub('%(', '\\('):gsub('%)',
-      '\\)')
+    negative = negative,
   }
 end
 

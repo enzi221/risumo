@@ -1,15 +1,11 @@
 IN: (?:<lb-lazy id="lb-xnai"\s*\/>)|(?:<lb-lazy id="lb-xnai"\s*>(.\*?)<\/lb-lazy>)\n?
 OUT:
 {{#when::{{chat_index}}::>=::{{lastmessageid}}}}
-
-<div class="lb-module-root" data-id="lb-xnai">
-<button class="lb-xnai-opener" risu-btn="lb-reroll__lb-xnai">
-<span class="lb-xnai-opener-item">
-주석 붙이기
-</span>
+<div class="lb-xnai-placeholder-wrapper">
+<button class="lb-xnai-placeholder" risu-btn="lb-reroll__lb-xnai">
+✦ 삽화 그리기
 </button>
 </div>
-
 {{/when}}
 
 ---
