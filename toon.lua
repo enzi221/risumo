@@ -25,23 +25,20 @@ local function tableToString(t, indent)
 end
 
 local x = [[scenes[2]:
-  - camera: cowboy shot
-    characters[2]:
-      girl, adolescent, black eyes, choppy bangs, medium straight black hair, slender, small breasts, white shirt, red neck ribbon, messy clothes, gray pencil skirt, lifted skirt, blush, sweat, trembling, hands on stomach, target#holding waist, looking away, panting
-      boy, male, black hair, undercut, glasses, white shirt, standing, source#holding waist, mutual#kissing
-    locator: 동맥이 뛰는 박동.
-    scene: nsfw, 1girl, 1boy, interior, public restroom, tile wall, fluorescent light, afternoon
+  - camera: upper body, straight-on
+    characters[1|]{positive|negative}:
+      girl, adolescent, shoulder-length straight black hair, dark eyes, slender, small breasts, oversized navy hoodie, heart-shaped face, silver necklace, sitting, hands on lap, staring, looking away, indifferent, blank stare|
+    scene: 1girl, interior, convenience store, night, fluorescent lighting, table, window
+    slot: 3
   - camera: upper body, from side
-    characters[2]:
-      girl, adolescent, black eyes, choppy bangs, medium straight black hair, messy hair, wet lips, blush, mutual#kissing, closed eyes, leaning on shoulder
-      boy, male, black hair, undercut, glasses, white shirt, mutual#kissing, leaning against wall
-    locator: 타일을 통해 번져 나간다.
-    scene: nsfw, 1girl, 1boy, interior, public restroom, close-up, steam
+    characters[1|]{positive|negative}:
+      girl, adolescent, shoulder-length straight black hair, dark eyes, slender, small breasts, oversized navy hoodie, pouting, annoyed, looking away, glaring, sitting, arms crossed|
+    scene: 1girl, interior, convenience store, night, artificial lighting, microwave in background
+    slot: 10
 keyvis:
-  camera: cowboy shot, from side
-  characters[2]:
-    girl, adolescent, black eyes, choppy bangs, medium straight black hair, white shirt, red neck ribbon, gray pencil skirt, lifted skirt, bottomless, thighs, blush, sweat, closed eyes, leaning against wall, mutual#kissing
-    boy, male, black hair, undercut, glasses, white shirt, pants down, mutual#kissing, source#holding waist
-  scene: nsfw, 1girl, 1boy, interior, public restroom, tile wall, handrail, fluorescent light, evening, ::dark::2]]
+  camera: cowboy shot, from side, dutch angle
+  characters[1|]{positive|negative}:
+      girl, adolescent, shoulder-length straight black hair, dark eyes, slender, small breasts, oversized navy hoodie, blue jeans, black sneakers, heart-shaped face, silver necklace, sitting at counter, pouting, tucking hair behind ear, looking away, embarrassed|
+  scene: 1girl, interior, convenience store, night, fluorescent lighting, plastic table, glass window, reflection]]
 
 print(tableToString(toon.decode(x)))

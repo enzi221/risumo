@@ -67,7 +67,16 @@ function onValidate(triggerId, output)
     end
   end
 
-  if response.keyvis then
+  if not response.keyvis then
+    table.insert(errors, 'Keyvis data is missing.')
+  else
+    if not response.keyvis.camera or type(response.keyvis.camera) ~= 'string' or response.keyvis.camera == '' then
+      table.insert(errors, 'Keyvis has no camera field. Parsed type: ' .. type(response.keyvis.camera))
+    end
+    if not response.keyvis.scene or type(response.keyvis.scene) ~= 'string' or response.keyvis.scene == '' then
+      table.insert(errors, 'Keyvis has no scene field. Parsed type: ' .. type(response.keyvis.scene))
+    end
+
     for cIndex, character in ipairs(response.keyvis) do
       local charErrIndex = cIndex - 1
       if type(character) ~= 'table' then

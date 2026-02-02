@@ -1,7 +1,3 @@
---! Copyright (c) 2026 amonamona
---! CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
---! LightBoard XNAI
-
 local t_concat = table.concat
 local triggerId = ''
 
@@ -21,8 +17,7 @@ end
 
 ---@class XNAIDescriptor
 ---@field camera string
----@field characters { positive: string; negative: string }[]
----@field inlay? string
+---@field characters XNAIPromptSet[]
 ---@field scene string
 ---@field slot? number
 
@@ -38,14 +33,8 @@ end
 ---@field chatIndex number
 ---@field data XNAIStackData
 
----@class XNAIPinnedItem
----@field chatIndex number
----@field sceneIndex number
----@field label string
----@field desc XNAIDescriptor
-
 ---@param desc XNAIDescriptor
----@return { positive: string, negative: string }
+---@return XNAIPromptSet
 local function buildRawPrompt(desc)
   local lead = {}
   if desc.scene and desc.scene ~= '' then
@@ -63,7 +52,7 @@ local function buildRawPrompt(desc)
   local negativeParts = {
     ''
   }
-  
+
   if desc.characters then
     for _, character in ipairs(desc.characters) do
       table.insert(positiveParts, character.positive)
@@ -140,6 +129,12 @@ local function renderInline(data, chatIndex, chatLength, stackItem)
               title = '프롬프트 확인',
               h.lb_comment_icon { closed = true }
             } or nil,
+            inStack and h.button['lb-xnai-toolbar-btn'] {
+              popovertarget = fullsizePop and popID or nil,
+              risu_btn = t_concat({ 'lb-xnai-edit/', chatIndex, '_', slot }),
+              title = '프롬프트 편집',
+              h.lb_xnai_edit_icon { closed = true }
+            } or nil,
           }
         end
 
@@ -201,7 +196,7 @@ local function renderInline(data, chatIndex, chatLength, stackItem)
             type = 'button',
             h.lb_xnai_ff_icon { closed = true },
           } or nil,
-          chatIndex == chatLength - 1 and h.button['lb-xnai-toolbar-btn'] {
+          chatIndex >= chatLength - 3 and h.button['lb-xnai-toolbar-btn'] {
             risu_btn = 'lb-reroll__lb-xnai',
             title = '전체 프롬프트 재생성',
             type = 'button',
@@ -237,7 +232,7 @@ local function renderInline(data, chatIndex, chatLength, stackItem)
               type = 'button',
               h.lb_xnai_ff_icon { closed = true },
             } or nil,
-            chatIndex == chatLength - 1 and h.button['lb-xnai-toolbar-btn'] {
+            chatIndex >= chatLength - 3 and h.button['lb-xnai-toolbar-btn'] {
               popovertarget = fullsizePop and popID or nil,
               risu_btn = 'lb-reroll__lb-xnai',
               title = '전체 프롬프트 재생성',
@@ -248,6 +243,12 @@ local function renderInline(data, chatIndex, chatLength, stackItem)
               htmlFor = promptID,
               title = '프롬프트 확인',
               h.lb_comment_icon { closed = true }
+            } or nil,
+            inStack and h.button['lb-xnai-toolbar-btn'] {
+              popovertarget = fullsizePop and popID or nil,
+              risu_btn = t_concat({ 'lb-xnai-edit/', chatIndex, '_-1' }),
+              title = '프롬프트 편집',
+              h.lb_xnai_edit_icon { closed = true }
             } or nil,
           }
         end
@@ -347,6 +348,15 @@ listenEdit(
   end
 )
 
+---@type XNAIDeleteHandler
+local deleteHandler = require('./xnai_deleteHandler')
+
+---@type XNAIEditHandler
+local editHandler = require('./xnai_editHandler')
+
+---@type XNAIRegenHandler
+local regenHandler = require('./xnai_regenHandler')
+
 onButtonClick = async(function(tid, code)
   setTriggerId(tid)
 
@@ -366,68 +376,66 @@ onButtonClick = async(function(tid, code)
     end
 
     local chatIndex = tonumber(parts[1])
-    local slot = parts[2] and tonumber(parts[2])
+    local slot = parts[2]
 
     if not chatIndex or not slot then
       return
     end
 
-    local confirmMsg = '정말 이 씬을 지우시겠습니까?'
-    local confirmed = alertConfirm(tid, confirmMsg):await()
-    if not confirmed then
-      return
-    end
-
-    ---@type XNAIStackItem[]
-    local fullState = getState(triggerId, 'lb-xnai-stack') or {}
-
-    ---@type XNAIStackItem?
-    local stackItem = nil
-    for _, item in ipairs(fullState) do
-      if item.chatIndex == chatIndex then
-        stackItem = item
-        break
-      end
-    end
-
-    if stackItem and stackItem.data.scenes[slot] then
-      stackItem.data.scenes[slot] = nil
-    end
-
-    setState(triggerId, 'lb-xnai-stack', fullState)
-
-    local targetChat = getChat(triggerId, chatIndex)
-    local targetNode = prelude.queryNodes('lb-xnai', targetChat.data, { of = tostring(slot), scene = 'true' })
-
-    if #targetNode > 1 then
-      setChat(triggerId, chatIndex, t_concat({
-        targetChat.data:sub(1, targetNode[1].rangeStart - 1),
-        targetChat.data:sub(targetNode[1].rangeEnd + 1),
-      }))
-      return
-    else
-      reloadChat(triggerId, chatIndex)
-    end
-
-    return
+    return deleteHandler.deleteScene(tid, chatIndex, slot)
   end
 
-  -- lb-xnai-gen/{chatIndex}_{slot}
+  -- lb-xnai-gen/{chatIndex}_{slot?}
   local genPrefix = 'lb%-xnai%-gen/'
   local _, genPrefixEnd = string.find(code, genPrefix)
 
-  if not genPrefixEnd then
+  if genPrefixEnd then
+    local body = code:sub(genPrefixEnd + 1)
+    local parts = prelude.split(body, '_')
+    local chatIndex = tonumber(parts[1])
+    local slot = parts[2]
+
+    if not chatIndex then
+      return
+    end
+
+    return regenHandler.regenerate(tid, chatIndex, slot)
+  end
+
+  -- lb-xnai-edit/{chatIndex}_{slot}
+  local editPrefix = 'lb%-xnai%-edit/'
+  local _, editPrefixEnd = string.find(code, editPrefix)
+
+  if editPrefixEnd then
+    local body = code:sub(editPrefixEnd + 1)
+    local parts = prelude.split(body, '_')
+    local chatIndex = tonumber(parts[1])
+    local slot = parts[2]
+
+    if not chatIndex or not slot then
+      return
+    end
+
+    return editHandler.edit(tid, chatIndex, slot)
+  end
+end)
+
+onStart = function(tid)
+  setTriggerId(tid)
+
+  local fullChat = getFullChat(triggerId)
+  local lastChat = fullChat[#fullChat]
+  local secondLastChat = fullChat[#fullChat - 1]
+
+  local promptNode = prelude.queryNodes('lb-xnai-editing', secondLastChat.data)
+  if #promptNode == 0 then
     return
   end
 
-  local chatIndex, slot
+  local chatIndex = tonumber(promptNode[1].attributes.chatIndex)
+  local slot = promptNode[1].attributes.slot
 
-  local body = code:sub(genPrefixEnd + 1)
-  local parts = prelude.split(body, '_')
-  chatIndex = tonumber(parts[1])
-  slot = parts[2]
-
-  if not chatIndex then
+  if not chatIndex or not slot or slot == '' then
     return
   end
 
@@ -444,75 +452,51 @@ onButtonClick = async(function(tid, code)
   end
 
   local forKeyvis = slot == '-1'
-
-  if not stackItem or (slot ~= nil and (forKeyvis and not stackItem.data.keyvis) and not stackItem.data.scenes[slot]) then
-    alertNormal(triggerId, '이미지 생성 데이터가 사라졌어요. 오래된 이미지의 데이터는 유지하지 않습니다. 저장 개수 토글을 늘리세요.')
+  if not stackItem or ((forKeyvis and not stackItem.data.keyvis) and not stackItem.data.scenes[slot]) then
     return
   end
 
-  ---@type table<number, XNAIDescriptor>
-  local descriptors = {}
-  local count = 0
-  if slot then
-    local desc = forKeyvis and stackItem.data.keyvis or stackItem.data.scenes[slot]
-    if desc then
-      count = count + 1
-      descriptors[slot] = desc
-    end
+  stopChat(triggerId)
+
+  local camera = lastChat.data:match("%[Camera%]%s*(.-)%s*%[Scene%]")
+  local scene = lastChat.data:match("%[Scene%]%s*(.-)%s*%[CharP%]")
+  local charP = lastChat.data:match("%[CharP%]%s*(.-)%s*%[CharN%]")
+  local charN = lastChat.data:match("%[CharN%]%s*(.*)")
+
+  camera = camera and prelude.trim(camera) or ''
+  scene = scene and prelude.trim(scene) or ''
+  charP = charP and prelude.trim(charP) or ''
+  charN = charN and prelude.trim(charN) or ''
+
+  local charPParts = prelude.split(charP, '|')
+  local charNParts = prelude.split(charN, '|')
+  ---@type XNAIPromptSet[]
+  local characters = {}
+  local maxLen = math.max(#charPParts, #charNParts)
+  for i = 1, maxLen do
+    table.insert(characters, {
+      positive = prelude.trim(charPParts[i] or ''),
+      negative = prelude.trim(charNParts[i] or ''),
+    })
+  end
+
+  if forKeyvis then
+    stackItem.data.keyvis = {
+      camera = camera,
+      scene = scene,
+      characters = characters,
+    }
   else
-    if stackItem.data.keyvis then
-      count = count + 1
-      descriptors['-1'] = stackItem.data.keyvis
-    end
-    for _, desc in pairs(stackItem.data.scenes or {}) do
-      count = count + 1
-      descriptors[tostring(desc.slot)] = desc
-    end
+    stackItem.data.scenes[slot] = {
+      camera = camera,
+      characters = characters,
+      scene = scene,
+      slot = tonumber(slot),
+    }
   end
 
-  if count == 0 then
-    return
-  end
-
-  local message = [[---
-[LBDATA START]
-<lb-rerolling><div class="lb-pending lb-rerolling"><span class="lb-pending-note">이미지 생성 중, 채팅을 보내거나 다른 작업을 하지 마세요...</span></div></lb-rerolling>
-[LBDATA END]
----]]
-  addChat(tid, 'user', message)
-
-  local gen = prelude.import(triggerId, 'lb-xnai.gen')
-  for _, desc in pairs(descriptors) do
-    local success, data = pcall(gen.generate, triggerId, desc)
-    if success then
-      desc.inlay = data
-    else
-      alertNormal(tid, '이미지 생성 중 오류가 발생했습니다.\n' .. tostring(data))
-      removeChat(tid, -1)
-      return
-    end
-  end
-
-  local out = getChat(triggerId, chatIndex).data
-  local allTargetNodes = prelude.queryNodes('lb-xnai', out)
-
-  -- reverse order to not mess up ranges
-  for i = #allTargetNodes, 1, -1 do
-    local node = allTargetNodes[i]
-    local isKeyvis = node.attributes.kv == 'true'
-    local targetNodeSlot = isKeyvis and '-1' or node.attributes.scene
-
-    if descriptors[targetNodeSlot] and descriptors[targetNodeSlot].inlay then
-      local attribute = isKeyvis and 'kv' or t_concat({ 'scene="', targetNodeSlot, '"' })
-
-      out = t_concat({
-        out:sub(1, node.rangeStart - 1),
-        t_concat({ '<lb-xnai ', attribute, '>', descriptors[targetNodeSlot].inlay, '</lb-xnai>' }),
-        out:sub(node.rangeEnd + 1),
-      })
-    end
-  end
-
-  setChat(triggerId, chatIndex, out)
-  removeChat(tid, -1)
-end)
+  setState(triggerId, 'lb-xnai-stack', fullState)
+  reloadChat(triggerId, chatIndex)
+  removeChat(triggerId, -2)
+  removeChat(triggerId, -1)
+end

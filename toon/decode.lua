@@ -212,6 +212,13 @@ local function parseTabularRows(lines, startIdx, targetDepth, headerInfo)
   local arr = {}
   local idx = startIdx
 
+  -- Check for incorrect indentation (deeper than expected)
+  if idx <= #lines and lines[idx].depth > targetDepth then
+    error(string.format(
+      "Indentation error after array header: expected depth %d but found %d. Content: %s",
+      targetDepth, lines[idx].depth, lines[idx].content:sub(1, 40)))
+  end
+
   while idx <= #lines and lines[idx].depth >= targetDepth do
     if lines[idx].depth == targetDepth then
       local rowLine = lines[idx]
@@ -421,6 +428,13 @@ function decodeValue(lines, startIdx, targetDepth, config, parentDelimiter, expe
     end
 
     local idx = startIdx + 1
+    -- Check for incorrect indentation (deeper than expected)
+    if idx <= #lines and lines[idx].depth > targetDepth + 1 then
+      error(string.format(
+        "Indentation error after array header: expected depth %d but found %d. Content: %s",
+        targetDepth + 1, lines[idx].depth, lines[idx].content:sub(1, 40)))
+    end
+
     while idx <= #lines and lines[idx].depth == targetDepth + 1 do
       local item, nextIdx = decodeValue(lines, idx, targetDepth + 1, config, headerInfo.delimiter, false, true)
       table.insert(arr, item)

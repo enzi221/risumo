@@ -78,8 +78,8 @@ local function removeNode(text, tagName, attrs)
 
   if not targetNode then return text, nil end
 
-  local prefix = text:sub(1, targetNode.rangeStart - 1):gsub("\n+$", "")
-  local suffix = text:sub(targetNode.rangeEnd + 1):gsub("^\n+", "")
+  local prefix = text:sub(1, targetNode.rangeStart - 1):gsub("\n?$", "")
+  local suffix = text:sub(targetNode.rangeEnd + 1):gsub("^\n?", "")
 
   -- Return position adjusted for the new text (after prefix + newline)
   return prefix .. '\n' .. suffix, #prefix + 2

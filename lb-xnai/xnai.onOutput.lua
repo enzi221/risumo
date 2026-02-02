@@ -66,21 +66,25 @@ function onOutput(tid, output, fullChatContent, index)
 
     local shouldGenerateNow = getGlobalVar(triggerId, 'toggle_lb-xnai.generation') == '0'
 
+    ---@type table<string, string>
+    local inlays = {}
+
     if shouldGenerateNow then
       if response.keyvis then
         local ok, inlay = pcall(gen.generate, triggerId, response.keyvis)
         if ok and inlay then
-          response.keyvis.inlay = inlay
+          inlays['-1'] = inlay
         end
       end
     end
 
     for _, scene in ipairs(response.scenes or {}) do
-      stackItem.data.scenes[tostring(scene.slot)] = scene
+      local slot = tostring(scene.slot)
+      stackItem.data.scenes[slot] = scene
       if shouldGenerateNow then
         local ok, inlay = pcall(gen.generate, triggerId, scene)
         if ok and inlay then
-          scene.inlay = inlay
+          inlays[slot] = inlay
         end
       end
     end
@@ -93,13 +97,15 @@ function onOutput(tid, output, fullChatContent, index)
     end
 
     local slotted = gen.insertSlots(fullChatContent)
+
     for _, scene in ipairs(response.scenes or {}) do
-      if scene.inlay and scene.inlay ~= '' then
-        slotted = slotted:gsub(table.concat({ '%[Slot%s+', tostring(scene.slot), '%]' }),
-          table.concat({ '<lb-xnai scene="', tostring(scene.slot), '">', scene.inlay, '</lb-xnai>' }))
+      local slot = tostring(scene.slot)
+      if inlays[slot] then
+        slotted = slotted:gsub(table.concat({ '%[Slot%s+', slot, '%]' }),
+          table.concat({ '<lb-xnai scene="', slot, '">', inlays[slot], '</lb-xnai>' }))
       else
-        slotted = slotted:gsub(table.concat({ '%[Slot%s+', tostring(scene.slot), '%]' }),
-          table.concat({ '<lb-xnai scene="', tostring(scene.slot), '" />' }))
+        slotted = slotted:gsub(table.concat({ '%[Slot%s+', slot, '%]' }),
+          table.concat({ '<lb-xnai scene="', slot, '" />' }))
       end
     end
 
@@ -107,8 +113,8 @@ function onOutput(tid, output, fullChatContent, index)
     slotted = slotted:gsub('\n%[Slot%s+%d+%]\n', '')
     setState(triggerId, 'lb-xnai-stack', xnaiState)
 
-    if response.keyvis and response.keyvis.inlay and response.keyvis.inlay ~= '' then
-      return slotted, table.concat({ '<lb-xnai kv>', response.keyvis.inlay, '</lb-xnai>' })
+    if inlays['-1'] then
+      return slotted, table.concat({ '<lb-xnai kv>', inlays['-1'], '</lb-xnai>' })
     end
 
     return slotted, '<lb-xnai kv />'

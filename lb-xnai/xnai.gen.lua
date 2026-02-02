@@ -1,4 +1,9 @@
+---@class XNAIPromptSet
+---@field positive string
+---@field negative string
+
 ---@param desc XNAIDescriptor
+---@return XNAIPromptSet?
 local function buildPresetPrompt(triggerId, desc)
   local lead = {}
   if desc.camera and desc.camera ~= '' then

@@ -70,7 +70,7 @@
     border-radius: 0.5em;
     box-sizing: content-box;
     display: block;
-    margin: {{#when::toggle::lb-xnai.kv.align}}0 auto 0 0{{:else}}0 auto{{/when}};
+    margin: 0 auto;
     {{#when {{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.kv.width}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.kv.width}} != null }}}}}}
       max-width: min(100cqw, {{getglobalvar::toggle_lb-xnai.kv.width}}px);
     {{:else}}
@@ -271,11 +271,13 @@
     top: auto;
     transform: translateY(3em);
     transition: opacity 0.2s var(--ease-out-quart), transform 0.2s var(--ease-out-quart);
+    visibility: hidden;
     white-space: pre-wrap;
   }
   :checked ~ .lb-xnai-fullsize-prompt {
     opacity: 1;
     transform: translateY(0);
+    visibility: visible;
   }
 
   .lb-xnai-fullsize-actions {
@@ -378,5 +380,10 @@
   .lb-xnai-placeholder:hover {
     border: 1px dashed oklch(from var(--lb-xnai-accent) calc(l + 0.2) c h / 0.5);
     color: var(--lb-xnai-fg);
+  }
+
+  .lb-xnai-prompt-current b {
+    color: var(--FontColorQuote2);
+    font-family: inherit;
   }
 </style>

@@ -68,7 +68,7 @@ Limit character count to {{dictelement::{"0":"3","1":"2","2":"1"}::{{getglobalva
 
 #### Location and Lighting
 
-Start with either `interior` or `exterior`, then add specific tags such as `bedroom`, `classroom`, `forest`, `meadow`, `horizon`, etc. Add prominent props here: `computer`, `chair`, `table`, etc.
+Start with either `interior` or `exterior`, then add narrowing tags such as `bedroom`, `forest`, `meadow`, `horizon`, etc. Add prominent props here: `computer`, `chair`, `table`, etc. Tag genericity rule still applies: Don't use specific names such as `association lobby`. Use visualizable tags.
 
 Add lighting related tags as well. `daylight, noon`, `sunset`, `night, dark`, `backlighting`, `sidelighting`, etc.
 
@@ -115,7 +115,7 @@ If a chracter lacks details in their description, fill in missing details creati
 
 #### Positive and Negative Tags
 
-You will only label positive tags. Do not label negative tags by yourself, unless the client has specified negative tags for characters in Extra Universe Settings or Client Direction.
+You will ONLY label positive tags. Do not label negative tags by yourself, unless the client has EXPLICITLY specified negative tags for characters in EITHER Extra Universe Settings or Client Direction. IGNORE ALL OTHER SECTIONS, INCLUDING THE CHARACTER DESCRIPTIONS ITSELF.
 
 ## Image Types
 
@@ -127,13 +127,15 @@ Important note: You are to describe the LAST LOG ENTRY OF THE ASSISTANT (Log #N)
 
 The main promotional image of the log entry. Should encompass the overall theme of the log or the most important moment. Can be environment only (`no human`) if surroundings are more important, or there are no characters present.
 
-Key Visual should be boldly produced like a magazine cover. It should be distinct from all other Scenes, in composition, characters, environment, or anything.
+Key Visual should be boldly produced like a magazine cover or an album cover. It should be distinct from all other Scenes, in composition, characters, environment, or anything.
 
 ### Scene
 
-An individual image within the log entry. Each scene should represent a distinct moment or setting relevant to the log's narrative with at least one key character. Prefer closer shots (cowboy shot, upper or lower body) rather than wide shots.
+An individual image within the log entry.
 
-Scenes should capture the moments of interaction, emotion, or significant actions of the characters.
+Each scene should represent a fragment of an event, a distinct moment of log's narrative with at least one key character. It must capture the moments and center points of interaction, emotion, or significant actions.
+
+Prefer closer shots (focused close-up, cowboy shot, upper or lower body) around the subject rather than wide shots.
 
 Key Visual will occupy the top, so the first scene should have some distance from Key Visual. Do not add scenes in the early part of the target log entry.
 
@@ -199,7 +201,7 @@ The above direction precedes all previous instructions.
 scenes[2]:
   - camera: cowboy shot
     characters[2|]{positive|negative}:
-      girl, adolescent, long pink hair, red eyes, slender, small breasts, red silk off-shoulder dress, sitting on bed, hugging knees, head down, target#conversation|cleavage, hair bun
+      girl, adolescent, long pink hair, red eyes, slender, small breasts, red silk off-shoulder dress, sitting on bed, hugging knees, head down, target#conversation|freckles
       girl, female, green braided hair, brown eyes, slender, medium breasts, maid uniform, white headband, black onepiece, black flat shoes, standing, smiling, source#conversation|
     scene: 2girls, interior, bedroom, morning, daylight, sidelighting
     slot: 3
@@ -211,7 +213,7 @@ scenes[2]:
 keyvis:
   camera: from above, upper body, tilted angle
   characters[1]:
-    girl, adolescent, long pink hair, red eyes, slender, small breasts, red silk off-shoulder dress, laying on back, on bed, blush, raised arm, forearm on forehead, looking at viewer|cleavage, hair bun
+    girl, adolescent, long pink hair, red eyes, slender, small breasts, red silk off-shoulder dress, laying on back, on bed, blush, raised arm, forearm on forehead, looking at viewer|freckles
   scene: 1girl, exterior, railing, night, 3::dark::
 </lb-xnai>
 ```
@@ -223,7 +225,7 @@ keyvis:
 
 Generate {{dictelement::{"0":"0-1","1":"0-3","2":"1-3","2":"1-5","3":"2-5"}::{{getglobalvar::toggle_lb-xnai.scene.quantity}}}} scenes. Do not use slots placed out of prose content.
 
-Even if a character has no negative tags specified, you must end the array with `|` to indicate the absence of negative tags.
+Even if a character has no negative tags specified, you must end the array with `|` to indicate the absence of negative tags. Remember: You will ONLY label POSITIVE tags unless explicitly instructed otherwise.
 
 Only make keyvis and scenes for the last log entry.
 

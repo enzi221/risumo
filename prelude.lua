@@ -163,10 +163,8 @@ local function queryNodes(tagNameRaw, text, attributes)
           end
         end
 
-        -- Check if self-closing
         local isSelfClosing = openTagContent:match("/%s*$")
 
-        -- Check if attributes match the filter
         local matchesFilter = true
         if attributes then
           for filterKey, filterVal in pairs(attributes) do
