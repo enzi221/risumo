@@ -25,20 +25,20 @@ local function tableToString(t, indent)
 end
 
 local x = [[scenes[2]:
-  - camera: upper body, straight-on
+  - camera: upper body
     characters[1|]{positive|negative}:
-      girl, adolescent, shoulder-length straight black hair, dark eyes, slender, small breasts, oversized navy hoodie, heart-shaped face, silver necklace, sitting, hands on lap, staring, looking away, indifferent, blank stare|
-    scene: 1girl, interior, convenience store, night, fluorescent lighting, table, window
-    slot: 3
-  - camera: upper body, from side
+      girl, adolescent, chin-length blue hair, asymmetric bangs, turquoise eyes, fair skin, blush, black newsboy cap, black hairpins, charcoal gray mini one-piece, white shirt, teal belt, standing, earnest, holding object, hands together, offering cassette tape, looking at viewer|
+    scene: 1girl, exterior, city, city square, daylight, afternoon
+    slot: 5
+  - camera: cowboy shot
     characters[1|]{positive|negative}:
-      girl, adolescent, shoulder-length straight black hair, dark eyes, slender, small breasts, oversized navy hoodie, pouting, annoyed, looking away, glaring, sitting, arms crossed|
-    scene: 1girl, interior, convenience store, night, artificial lighting, microwave in background
-    slot: 10
+      girl, female, short dark brown hair, gray eyes, tan skin, athletic, black tactical jacket, orange armband, gray cropped turtleneck, cargo pants, utility belt, holster, standing, walking, cynical, indifferent, looking at other|
+    scene: 1girl, exterior, city, city square, daylight, afternoon
+    slot: 12
 keyvis:
-  camera: cowboy shot, from side, dutch angle
+  camera: cowboy shot
   characters[1|]{positive|negative}:
-      girl, adolescent, shoulder-length straight black hair, dark eyes, slender, small breasts, oversized navy hoodie, blue jeans, black sneakers, heart-shaped face, silver necklace, sitting at counter, pouting, tucking hair behind ear, looking away, embarrassed|
-  scene: 1girl, interior, convenience store, night, fluorescent lighting, plastic table, glass window, reflection]]
+      girl, adolescent, chin-length blue hair, asymmetric bangs, turquoise eyes, fair skin, blush, black newsboy cap, black hairpins, charcoal gray mini one-piece, white shirt, teal belt, standing, nervous, looking at other, clutching cassette tape|
+  scene: 1girl, exterior, city, city square, public square, concrete buildings, daylight, shadow, 1.2::depth of field::]]
 
 print(tableToString(toon.decode(x)))

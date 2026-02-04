@@ -594,4 +594,36 @@ describe("escaped quotes outside quoted strings", function()
   end)
 end)
 
+describe("deep indentation tolerance", function()
+  it("treats excess indentation in array values as leading spaces", function()
+    local toon_str = "items[2]:\n  value1\n    value2"
+    assertDeepEquals(toon.decode(toon_str), { items = { "value1", "  value2" } },
+      "excess indent becomes leading spaces")
+  end)
+
+  it("treats excess indentation in tabular rows as leading spaces", function()
+    local toon_str = "items[2]{a,b}:\n  x,y\n    z,w"
+    assertDeepEquals(toon.decode(toon_str), { items = { { a = "x", b = "y" }, { a = "  z", b = "w" } } },
+      "excess indent in tabular becomes leading spaces")
+  end)
+
+  it("handles multiple levels of excess indentation", function()
+    local toon_str = "items[3]:\n  a\n    b\n      c"
+    assertDeepEquals(toon.decode(toon_str), { items = { "a", "  b", "    c" } },
+      "multiple excess indent levels")
+  end)
+
+  it("handles excess indentation with colons in value", function()
+    local toon_str = "items[2]:\n  a::b\n    c::d"
+    assertDeepEquals(toon.decode(toon_str), { items = { "a::b", "  c::d" } },
+      "excess indent with colons in value")
+  end)
+
+  it("respects custom indent size for excess space calculation", function()
+    local toon_str = "items[2]:\n    value1\n        value2"
+    assertDeepEquals(toon.decode(toon_str, { indent = 4 }), { items = { "value1", "    value2" } },
+      "custom indent size with excess indent")
+  end)
+end)
+
 test.printSummary()

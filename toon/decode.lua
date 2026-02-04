@@ -208,42 +208,41 @@ end
 
 local decodeValue
 
-local function parseTabularRows(lines, startIdx, targetDepth, headerInfo)
+local function parseTabularRows(lines, startIdx, targetDepth, headerInfo, config)
   local arr = {}
   local idx = startIdx
 
-  -- Check for incorrect indentation (deeper than expected)
-  if idx <= #lines and lines[idx].depth > targetDepth then
-    error(string.format(
-      "Indentation error after array header: expected depth %d but found %d. Content: %s",
-      targetDepth, lines[idx].depth, lines[idx].content:sub(1, 40)))
-  end
-
   while idx <= #lines and lines[idx].depth >= targetDepth do
-    if lines[idx].depth == targetDepth then
-      local rowLine = lines[idx]
+    local rowLine = lines[idx]
+    local actualDepth = rowLine.depth
+    local rowContent = rowLine.content
 
-      if rowLine.content:sub(1, 2) == "- " then
+    -- If indentation is deeper than expected, include excess spaces in content
+    if actualDepth > targetDepth then
+      local excessSpaces = string.rep(" ", (actualDepth - targetDepth) * config.indent)
+      rowContent = excessSpaces .. rowContent
+    end
+
+    if actualDepth == targetDepth then
+      if rowContent:sub(1, 2) == "- " then
         break
       end
 
-      local delimPos = findUnquotedChar(rowLine.content, headerInfo.delimiter)
-      local colonPos = findUnquotedChar(rowLine.content, ":")
+      local delimPos = findUnquotedChar(rowContent, headerInfo.delimiter)
+      local colonPos = findUnquotedChar(rowContent, ":")
 
       if not delimPos and colonPos then
         break
       end
-
-      local tokens = splitValues(rowLine.content, headerInfo.delimiter)
-      local obj = {}
-      for i, field in ipairs(headerInfo.fields) do
-        obj[field] = parseValue(tokens[i] or "")
-      end
-      table.insert(arr, obj)
-      idx = idx + 1
-    else
-      break
     end
+
+    local tokens = splitValues(rowContent, headerInfo.delimiter)
+    local obj = {}
+    for i, field in ipairs(headerInfo.fields) do
+      obj[field] = parseValue(tokens[i] or "")
+    end
+    table.insert(arr, obj)
+    idx = idx + 1
   end
 
   return arr, idx
@@ -339,7 +338,7 @@ local function decodeListItem(lines, startIdx, targetDepth, config, parentDelimi
 
     if keyHeaderInfo.fields then
       local tabularArr
-      tabularArr, idx = parseTabularRows(lines, startIdx + 1, targetDepth + 1, keyHeaderInfo)
+      tabularArr, idx = parseTabularRows(lines, startIdx + 1, targetDepth + 1, keyHeaderInfo, config)
       for _, row in ipairs(tabularArr) do
         table.insert(arr, row)
       end
@@ -424,21 +423,35 @@ function decodeValue(lines, startIdx, targetDepth, config, parentDelimiter, expe
     end
 
     if headerInfo.fields then
-      return parseTabularRows(lines, startIdx + 1, targetDepth + 1, headerInfo)
+      return parseTabularRows(lines, startIdx + 1, targetDepth + 1, headerInfo, config)
     end
 
     local idx = startIdx + 1
-    -- Check for incorrect indentation (deeper than expected)
-    if idx <= #lines and lines[idx].depth > targetDepth + 1 then
-      error(string.format(
-        "Indentation error after array header: expected depth %d but found %d. Content: %s",
-        targetDepth + 1, lines[idx].depth, lines[idx].content:sub(1, 40)))
-    end
+    local expectedDepth = targetDepth + 1
 
-    while idx <= #lines and lines[idx].depth == targetDepth + 1 do
-      local item, nextIdx = decodeValue(lines, idx, targetDepth + 1, config, headerInfo.delimiter, false, true)
-      table.insert(arr, item)
-      idx = nextIdx
+    -- Check if it's a list array (items start with "- ")
+    if idx <= #lines and lines[idx].depth == expectedDepth and lines[idx].content:sub(1, 2) == "- " then
+      while idx <= #lines and lines[idx].depth == expectedDepth and lines[idx].content:sub(1, 2) == "- " do
+        local item, nextIdx = decodeValue(lines, idx, expectedDepth, config, headerInfo.delimiter)
+        table.insert(arr, item)
+        idx = nextIdx
+      end
+    else
+      -- Non-list array: elements are values on each line
+      while idx <= #lines and lines[idx].depth >= expectedDepth do
+        local lineDepth = lines[idx].depth
+        local lineContent = lines[idx].content
+
+        -- If indentation is deeper than expected, include excess spaces in content
+        if lineDepth > expectedDepth then
+          local excessSpaces = string.rep(" ", (lineDepth - expectedDepth) * config.indent)
+          lineContent = excessSpaces .. lineContent
+        end
+
+        local item = parseValue(lineContent)
+        table.insert(arr, item)
+        idx = idx + 1
+      end
     end
 
     return arr, idx

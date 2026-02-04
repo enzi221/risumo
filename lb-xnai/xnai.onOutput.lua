@@ -101,11 +101,11 @@ function onOutput(tid, output, fullChatContent, index)
     for _, scene in ipairs(response.scenes or {}) do
       local slot = tostring(scene.slot)
       if inlays[slot] then
-        slotted = slotted:gsub(table.concat({ '%[Slot%s+', slot, '%]' }),
-          table.concat({ '<lb-xnai scene="', slot, '">', inlays[slot], '</lb-xnai>' }))
+        slotted = slotted:gsub('%[Slot%s+' .. slot .. '%]',
+          '<lb-xnai scene="' .. slot .. '">' .. inlays[slot] .. '</lb-xnai>')
       else
-        slotted = slotted:gsub(table.concat({ '%[Slot%s+', slot, '%]' }),
-          table.concat({ '<lb-xnai scene="', slot, '" />' }))
+        slotted = slotted:gsub('%[Slot%s+' .. slot .. '%]',
+          '<lb-xnai scene="' .. slot .. '" />')
       end
     end
 
@@ -114,10 +114,10 @@ function onOutput(tid, output, fullChatContent, index)
     setState(triggerId, 'lb-xnai-stack', xnaiState)
 
     if inlays['-1'] then
-      return slotted, table.concat({ '<lb-xnai kv>', inlays['-1'], '</lb-xnai>' })
+      return slotted .. '\n\n<lb-xnai kv>' .. inlays['-1'] .. '</lb-xnai>', '<lb-lazy id="lb-xnai" />'
     end
 
-    return slotted, '<lb-xnai kv />'
+    return slotted.. '\n\n<lb-xnai kv />', '<lb-lazy id="lb-xnai" />'
   end
 
   return nil, '<lb-lazy id="lb-xnai" />'

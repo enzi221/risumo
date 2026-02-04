@@ -63,6 +63,27 @@ local function buildRawPrompt(desc)
   return { positive = t_concat(positiveParts, ' | '), negative = t_concat(negativeParts, ' | ') }
 end
 
+---@param popID string
+---@param inlay string
+---@param promptPreview any?
+---@param toolbarItems any[]
+---@return any
+local function createFullsizePop(popID, inlay, promptPreview, toolbarItems)
+  return h.dialog['lb-xnai-fullsize-pop'] {
+    id = popID,
+    popover = '',
+    h.div['lb-xnai-fullsize-pop-body'] {
+      h.button {
+        popovertarget = popID,
+        type = 'button',
+        inlay,
+      },
+      promptPreview,
+      h.div['lb-xnai-fullsize-actions'] { table.unpack(toolbarItems) },
+    }
+  }
+end
+
 ---@param data string
 ---@param chatIndex number
 ---@param chatLength number
@@ -152,19 +173,7 @@ local function renderInline(data, chatIndex, chatLength, stackItem)
           }
         } or nil
 
-        local fullsizePop = h.dialog['lb-xnai-fullsize-pop'] {
-          id = popID,
-          popover = '',
-          h.div['lb-xnai-fullsize-pop-body'] {
-            h.button {
-              popovertarget = popID,
-              type = 'button',
-              inlay,
-            },
-            promptPreview,
-            h.div['lb-xnai-fullsize-actions'] { table.unpack(createToolbar(true)) },
-          }
-        }
+        local fullsizePop = createFullsizePop(popID, inlay, promptPreview, createToolbar(true))
 
         local inlineImage = h.button {
           popovertarget = popID,
@@ -184,23 +193,18 @@ local function renderInline(data, chatIndex, chatLength, stackItem)
       end
     else
       -- kv
-      -- not generated yet and has data in the stack: can generate new
-      if inlay == '' and stackItem and stackItem.data.keyvis then
+      local inStack = stackItem and stackItem.data.keyvis
+
+      if inlay == '' and inStack then
         local placeholder = h.button['lb-xnai-placeholder'] {
           risu_btn = t_concat({ 'lb-xnai-gen/', chatIndex, '_-1' }),
           type = 'button',
           '✦ 키 비주얼 생성',
-          stackItem and stackItem.data.keyvis and h.button['lb-xnai-toolbar-btn'] {
+          inStack and h.button['lb-xnai-toolbar-btn'] {
             risu_btn = t_concat({ 'lb-xnai-gen/', chatIndex }),
             title = '전체 생성',
             type = 'button',
             h.lb_xnai_ff_icon { closed = true },
-          } or nil,
-          chatIndex >= chatLength - 3 and h.button['lb-xnai-toolbar-btn'] {
-            risu_btn = 'lb-reroll__lb-xnai',
-            title = '전체 프롬프트 재생성',
-            type = 'button',
-            h.lb_reroll_icon { closed = true },
           } or nil,
         }
 
@@ -213,11 +217,8 @@ local function renderInline(data, chatIndex, chatLength, stackItem)
           out:sub(imageNode.rangeEnd + 1),
         })
       elseif inlay ~= '' then
-        local inStack = stackItem and stackItem.data.keyvis
-
         local function createToolbar(fullsizePop)
           return {
-            -- generated and has data in the stack: can regenerate
             inStack and h.button['lb-xnai-toolbar-btn'] {
               popovertarget = fullsizePop and popID or nil,
               risu_btn = t_concat({ 'lb-xnai-gen/', chatIndex, '_-1' }),
@@ -231,13 +232,6 @@ local function renderInline(data, chatIndex, chatLength, stackItem)
               title = '전체 재생성',
               type = 'button',
               h.lb_xnai_ff_icon { closed = true },
-            } or nil,
-            chatIndex >= chatLength - 3 and h.button['lb-xnai-toolbar-btn'] {
-              popovertarget = fullsizePop and popID or nil,
-              risu_btn = 'lb-reroll__lb-xnai',
-              title = '전체 프롬프트 재생성',
-              type = 'button',
-              h.lb_reroll_icon { closed = true },
             } or nil,
             fullsizePop and inStack and h.label['lb-xnai-toolbar-btn'] {
               htmlFor = promptID,
@@ -267,19 +261,7 @@ local function renderInline(data, chatIndex, chatLength, stackItem)
           }
         } or nil
 
-        local fullsizePop = h.dialog['lb-xnai-fullsize-pop'] {
-          id = popID,
-          popover = '',
-          h.div['lb-xnai-fullsize-pop-body'] {
-            h.button {
-              popovertarget = popID,
-              type = 'button',
-              inlay,
-            },
-            promptPreview,
-            h.div['lb-xnai-fullsize-actions'] { table.unpack(createToolbar(true)) },
-          }
-        }
+        local fullsizePop = createFullsizePop(popID, inlay, promptPreview, createToolbar(true))
 
         kv = tostring(h.div['lb-xnai-kv-wrapper'] {
           h.div['lb-xnai-kv-actions'] { table.unpack(createToolbar()) },
@@ -301,10 +283,28 @@ local function renderInline(data, chatIndex, chatLength, stackItem)
 
   if kv then
     local xnaiPos = getGlobalVar(triggerId, 'toggle_lb-xnai.kv.position') or '0'
+    local lbdataAtTop = out:match('^%s*%-%-%-\n%[LBDATA START%]')
+    local lbdataAtBottom = out:match('%[LBDATA END%]%s*\n%-%-%-\n?%s*$')
+
     if xnaiPos == '0' then
-      out = kv .. '\n\n' .. out
+      if lbdataAtTop then
+        local lbdataEndPos = out:find('%[LBDATA END%]%s*\n%-%-%-')
+        local insertPos = out:find('\n', out:find('%-%-%-', lbdataEndPos))
+        if insertPos then
+          out = out:sub(1, insertPos) .. '\n' .. kv .. out:sub(insertPos + 1)
+        else
+          out = out .. '\n\n' .. kv
+        end
+      else
+        out = kv .. '\n\n' .. out
+      end
     else
-      out = out .. '\n\n' .. kv
+      local lbdataStartPos = lbdataAtBottom and out:find('%-%-%-\n%[LBDATA START%]')
+      if lbdataStartPos then
+        out = out:sub(1, lbdataStartPos - 1) .. kv .. '\n\n' .. out:sub(lbdataStartPos)
+      else
+        out = out .. '\n\n' .. kv
+      end
     end
   end
 
