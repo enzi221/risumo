@@ -46,14 +46,14 @@ function onValidate(triggerId, output)
       local charErrIndex = cIndex - 1
       if type(character) ~= 'table' then
         table.insert(errors,
-          'Scene ' .. errIndex .. ', character ' .. charErrIndex .. ' is not a valid object. Did you forget the trailing `|`? Parsed type: ' .. type(character))
+          'Scene ' .. errIndex .. ', character ' .. charErrIndex .. ' is not a valid object. Parsed type: ' .. type(character))
       end
       if type(character.positive) ~= 'string' or character.positive == '' then
         table.insert(errors,
           'Scene ' ..
-          errIndex .. ', character ' .. charErrIndex .. ' (positive) is not a valid string. Parsed type: ' .. type(character.positive))
+          errIndex .. ', character ' .. charErrIndex .. ' (positive) is empty or not a valid string. Parsed type: ' .. type(character.positive))
       end
-      if type(character.negative) ~= 'string' then
+      if character.negative and type(character.negative) ~= 'string' then
         table.insert(errors,
           'Scene ' ..
           errIndex .. ', character ' .. charErrIndex .. ' (negative) is not a valid string. Parsed type: ' .. type(character.negative))
@@ -81,13 +81,13 @@ function onValidate(triggerId, output)
       local charErrIndex = cIndex - 1
       if type(character) ~= 'table' then
         table.insert(errors,
-          'Keyvis character ' .. charErrIndex .. ' is not a valid object. Did you forget the trailing `|`? Parsed type: ' .. type(character))
+          'Keyvis character ' .. charErrIndex .. ' is not a valid object. Parsed type: ' .. type(character))
       end
       if type(character.positive) ~= 'string' or character.positive == '' then
         table.insert(errors,
-          'Keyvis character ' .. charErrIndex .. ' (positive) is not a valid string. Parsed type: ' .. type(character.positive))
+          'Keyvis character ' .. charErrIndex .. ' (positive) is empty or not a valid string. Parsed type: ' .. type(character.positive))
       end
-      if type(character.negative) ~= 'string' then
+      if character.negative and type(character.negative) ~= 'string' then
         table.insert(errors,
           'Keyvis character ' .. charErrIndex .. ' (negative) is not a valid string. Parsed type: ' .. type(character.negative))
       end

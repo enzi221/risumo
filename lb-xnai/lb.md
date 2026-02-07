@@ -27,18 +27,18 @@ Include one. Also add `pov` if applicable. `dutch angle` for tilting.
 
 Include one. In order of increasing view, from face:
 
-- portrait (Face through shoulders)
-- upper body (Face through torso)
-- cowboy shot (Face through thighs)
-- feet out of frame (Face to below knee)
-- full body (Whole body)
-- wide shot (Whole body from far away)
+- portrait
+- upper body
+- cowboy shot
+- feet out of frame
+- full body
+- wide shot
 
 In order of increasing view, from legs:
 
-- lower body (From torso down)
-- head out of frame (From neck down)
-- eyes out of frame (From nose down)
+- lower body
+- head out of frame
+- eyes out of frame
 
 Specific body parts: `(part) focus` with `close-up`.
 
@@ -59,7 +59,7 @@ Limit character count to {{dictelement::{"0":"3","1":"2","2":"1"}::{{getglobalva
 
 #### Location and Lighting
 
-Start with either `interior` or `exterior`, then narrow it with `bedroom`, `forest`, `meadow`, `horizon`, etc. Add prominent props here: `computer`, `table`, etc. Common rule still applies: Don't use specific names such as `association lobby`. Use visualizable tags.
+Start with either `interior` or `exterior`, then narrow it with `bedroom`, `forest`, `meadow`, `horizon`, etc. Add prominent props here: `computer`, `table`, etc. Tags must have clear visual identity (`lobby`, not `association lobby`).
 
 Add lighting tags as well. `daylight, noon`, `sunset`, `night, dark`, `backlighting`, `sidelighting`, etc.
 
@@ -73,28 +73,26 @@ Age tags are strictly for appearance only. If the character is middle-aged woman
 
 #### Appearance
 
-Specific tags are mere examples. Use your talent as a data labeler. But adhere to the requirements.
-
 - Hair
   - Required: Length (very long to short; hair bun is an exception), color, style. Include bangs as well (mandatory, unless head/eye out of frame). `long straight blue hair`, `white single hair bun`, `medium black wavy hair` combined with `choppy bangs`, `swept bangs`
-  - Optional properties: `ahoge`, `braid`
+  - Addition: `ahoge`, `braid`
 - Eye:
-  - Required unless closed or head/eyes out of frame, even when `from behind`: Color. `blue eyes`, `red eyes`
-  - Optional properties: `tareme`, `tsurime`, `jitome`, `empty eyes`, `dashed eyes`, `@_@`
+  - Required unless closed or head/eyes out of frame, even when `from behind`: `[color] eyes`.
+  - Addition: `tareme`, `tsurime`, `jitome`, `empty eyes`, `dashed eyes`, `@_@`, etc.
 - Body type
-  - Required: Skin color: `fair skin`, `tan skin`, `dark skin`
+  - Required: Skin color.
   - Recommended: `slim`, `slender`, `chubby`, `muscular` or `toned`, `fat`
   - Required if female: Breast size: `small/medium/large/huge breasts`
-- Other facial features if any: `freckles`, `dark skin`, `facial hair`
-- Attire: Color and type of each clothing item, with optional properties. Tag items visible in the scene only. If the body part would go out of frame, do not include the item.
-  - If naked, `naked` is always required.
+- Other facial features if any: `freckles`, `facial hair`
+- Attire: For each item, `[color] [type]`, with specific details. Only tag items visible in the scene. If the body part would go out of frame, do not include the item.
+  - Requires `naked` if naked.
   - Disassemble uniforms into explicit parts.
-  - More specific tags preferred. If applicable, specify length, sleeve type, etc.
+  - If applicable, go specific. Length, sleeve type, etc.
   - Headwear: `red hat`, `blue headband`
-  - Top: `topless`, `white shirt`, `deep green jacket`, `gray bra`. Optionally `see-through`, `sideboob`, `cropped`, `sleeveless`
-  - Bottom: `bottomless`, `pale gray jeans`, `red long skirt`, `black shorts`. Optionally `side slit`, `lifted skirt`
+  - Top: `topless`, `white shirt`, `gray bra`. Specifics: `see-through`, `sideboob`, `cropped`, `sleeveless`
+  - Bottom: `bottomless`, `gray jeans`, `red long pencil skirt`. Specifics: `pleated`, `side slit`, `lifted`
   - Footwear: `white ankle socks`, `black sneakers`, `bare feet`
-  - Accessories: `golden rimless glasses`, `blue gem necklace`, `black backpack`
+  - Accessories: `blue gem necklace`, `black backpack`
 - Expression: `annoyed`, `angry`, `drunk`, `embarrassed`, `indifferent`, `blush`, `grin`, etc. Use multiple.
 - Action: The character's posture, and what the character is doing. Clear visual tags only. No generic tags such as `fighting` (how?), `playing` (what?).
   - Posture: `standing`, `sitting`, `laying on back`, `raised hand`, `hands together`, `legs apart`, `holding phone`. Use multiple.
@@ -112,7 +110,7 @@ Characters without any descriptions given are not worth tagging.
 
 #### Positive and Negative Tags
 
-You will ONLY label positive tags. Do not label negative tags by yourself, unless the client has EXPLICITLY specified negative tags for characters in EITHER Extra Universe Settings or Client Direction. IGNORE ALL OTHER SECTIONS, INCLUDING THE CHARACTER DESCRIPTIONS ITSELF.
+You will ONLY label positive tags. Do not label negative tags by yourself, unless the client has EXPLICITLY specified negative tags for characters in EITHER Instructions Override or Client Direction. IGNORE ALL OTHER SECTIONS, INCLUDING THE CHARACTER DESCRIPTIONS ITSELF.
 
 For positive tags, requirements still apply (unless explicitly overridden or emphasized), such as:
 
@@ -147,7 +145,7 @@ We've prepared slots where scenes can be placed: `[Slot #]`. Pick a slot number,
 
 Slots were placed mechanically, so some slots might be unsuitable for scene placement, such as slots within out-of-prose contents. Avoid such slots.
 
-Key visuals are placed at either the top or the bottom of the log entry. So scene placement should avoid those areas as well.
+Key visuals are placed at either the top or the bottom of the log entry. Avoid using the top or the bottom slots.
 
 ## Tag Syntax
 
@@ -162,40 +160,47 @@ For example:
 {{cloud}}
 -1::cloud::
 1.2::cloud::
+
 ```{{/escape}}
 
-These are all intensity modifiers.
-
-**Do not use intensity modifiers by yourself** since you cannot check the results visually. Do respect any modifiers user has specified in Extra Universe Settings or Client Direction. Modifiers are sensitive to whitespaces and punctuations, so keep the user's formatting exactly as is.
+Respect any modifiers the Client has specified in Instructions Override or Client Direction. Modifiers are sensitive to whitespaces and punctuations, so keep the Client's formatting exactly as is.
 
 Example:
 
 ```
+
 GOOD:
 ::cloud9 ::
 
 BAD (do not remove spaces or punctuations inside):
 ::cloud9::
+
 ```
 
-## Client Direction
+But do not add modifiers by yourself since you have no visual feedback.
+
+## Client Comments
 
 {{#when {{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.direction}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.direction}} != null }}}} }}
 
-User has provided explicit direction:
+The Client has specified what they want:
 
-```
+<instruction>
 {{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.focus}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.focus}} != null }}}}}}I want to focus on the character(s): "{{getglobalvar::toggle_lb-xnai.focus}}". Do not make scenes for others.
 
 {{/when}}{{getglobalvar::toggle_lb-xnai.direction}}
-```
+</instruction>
 
 The above direction precedes all previous instructions.
 
 {{:else}}
 
+<instruction>
 {{#when {{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.focus}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.focus}} != null }}}} }}
 I want to focus on the character(s): "{{getglobalvar::toggle_lb-xnai.focus}}". Do not make scenes for others.
+</instruction>
+
+The above direction precedes all previous instructions.
 {{:else}}
 (None specified)
 {{/when}}
@@ -208,33 +213,39 @@ I want to focus on the character(s): "{{getglobalvar::toggle_lb-xnai.focus}}". D
 <lb-xnai>
 scenes[2]:
   - camera: cowboy shot
-    characters[2|]{positive|negative}:
-      girl, adolescent, long pink hair, red eyes, slender, small breasts, red silk off-shoulder dress, sitting on bed, hugging knees, head down, target#conversation|freckles
-      girl, female, green braided hair, brown eyes, slender, medium breasts, maid uniform, white headband, black onepiece, black flat shoes, standing, smiling, source#conversation|
+    characters[2]:
+      - positive: girl, adolescent, long pink hair, red eyes, slender, small breasts, red silk off-shoulder dress, sitting on bed, hugging knees, head down, target#conversation
+        negative: freckles
+      - positive: girl, female, green braided hair, brown eyes, slender, medium breasts, maid uniform, white headband, black onepiece, black flat shoes, standing, smiling, source#conversation
     scene: 2girls, interior, bedroom, morning, daylight, sidelighting
     slot: 3
   - camera: ...
-    characters[1|]{positive|negative}:
-      ...
+    characters[1]:
+      - positive: ...
+        negative: ...
     scene: ...
     slot: ...
 keyvis:
   camera: from above, upper body, dutch angle
   characters[1]:
-    girl, adolescent, long pink hair, red eyes, slender, small breasts, red silk off-shoulder dress, laying on back, on bed, blush, raised arm, forearm on forehead, looking at viewer|freckles
+    - positive: ...
+      negative: ...
   scene: 1girl, exterior, railing, night, 3::dark::
 </lb-xnai>
 ```
 
 - Use `<lb-xnai>`.
-- Output in TOON format (2-space indent, array length in header). No `-` in front of `characters` array item.
+- Output in TOON format (2-space indent, array length in header).
 - keyvis for key visual, scenes (optional) for scenes list.
+- `characters[].negative` are optional.
 - Close `</lb-xnai>`.
 
-Generate {{dictelement::{"0":"0-1","1":"0-3","2":"1-3","2":"1-5","3":"2-5"}::{{getglobalvar::toggle_lb-xnai.scene.quantity}}}} scenes. Do not use slots placed out of prose content.
+{{#when::{{getglobalvar::toggle_lb-xnai.scene.quantity}}::<::3}}Generate {{dictelement::{"0":"0-1","1":"0-3","2":"1-5"}::{{getglobalvar::toggle_lb-xnai.scene.quantity}}}} scenes.{{/when}}
 
-Even if a character has no negative tags specified, you must end the array with `|` to indicate the absence of them. Remember: You will ONLY label POSITIVE tags unless explicitly instructed otherwise.
+Do not use slots placed out of prose content.
 
 Only make keyvis and scenes for the last log entry.
+
+Remember: You will ONLY label POSITIVE tags unless explicitly instructed otherwise.
 
 Everything must be in English.

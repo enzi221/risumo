@@ -15,6 +15,79 @@ local function setTriggerId(tid)
   prelude.import(triggerId, 'toon.decode')
 end
 
+---Strips all XML nodes from text, returning stripped text and a restore function.
+---@param text string
+---@return string stripped
+---@return fun(s: string): string restore
+local function stripXMLNodes(text)
+  local saved = {}
+  local sections = {}
+  local position = 1
+
+  while true do
+    local tagStart = text:find("<", position)
+    if not tagStart then break end
+
+    local tagEnd = text:find(">", tagStart)
+    if not tagEnd then
+      position = tagStart + 1
+    else
+      local openTagContent = text:sub(tagStart + 1, tagEnd - 1)
+      local foundTagName = openTagContent:match("^([%w%-%_]+)")
+
+      if not foundTagName then
+        position = tagEnd + 1
+      else
+        local isSelfClosing = openTagContent:match("/%s*$")
+
+        if isSelfClosing then
+          local idx = #saved + 1
+          saved[idx] = text:sub(tagStart, tagEnd)
+          sections[#sections + 1] = { start = tagStart, finish = tagEnd, idx = idx }
+          position = tagEnd + 1
+        else
+          local closePattern = "</" .. prelude.escMatch(foundTagName) .. ">"
+          local closeStart, closeEnd = text:find(closePattern, tagEnd)
+
+          if not closeStart then
+            position = tagEnd + 1
+          else
+            local idx = #saved + 1
+            saved[idx] = text:sub(tagStart, closeEnd)
+            sections[#sections + 1] = { start = tagStart, finish = closeEnd, idx = idx }
+            position = closeEnd + 1
+          end
+        end
+      end
+    end
+  end
+
+  if #sections == 0 then
+    return text, function(s) return s end
+  end
+
+  local parts = {}
+  local lastPos = 1
+
+  for _, section in ipairs(sections) do
+    parts[#parts + 1] = text:sub(lastPos, section.start - 1)
+    parts[#parts + 1] = '\0XMLR_' .. section.idx .. '\0'
+    lastPos = section.finish + 1
+  end
+
+  parts[#parts + 1] = text:sub(lastPos)
+
+  local stripped = table.concat(parts)
+
+  local function restore(s)
+    return (s:gsub('\0XMLR_(%d+)\0', function(i)
+      return saved[tonumber(i)]
+    end))
+  end
+
+  return stripped, restore
+end
+
 ---@param tid string
 ---@param output string
 ---@param fullChatContent string
@@ -96,7 +169,8 @@ function onOutput(tid, output, fullChatContent, index)
       table.remove(xnaiState, 1)
     end
 
-    local slotted = gen.insertSlots(fullChatContent)
+    local stripped, restoreNodes = stripXMLNodes(fullChatContent)
+    local slotted = gen.insertSlots(stripped)
 
     for _, scene in ipairs(response.scenes or {}) do
       local slot = tostring(scene.slot)
@@ -111,13 +185,14 @@ function onOutput(tid, output, fullChatContent, index)
 
     -- remove unreplaced [Slot #] tags
     slotted = slotted:gsub('\n%[Slot%s+%d+%]\n', '')
+    slotted = restoreNodes(slotted)
     setState(triggerId, 'lb-xnai-stack', xnaiState)
 
     if inlays['-1'] then
       return slotted .. '\n\n<lb-xnai kv>' .. inlays['-1'] .. '</lb-xnai>', '<lb-lazy id="lb-xnai" />'
     end
 
-    return slotted.. '\n\n<lb-xnai kv />', '<lb-lazy id="lb-xnai" />'
+    return slotted .. '\n\n<lb-xnai kv />', '<lb-lazy id="lb-xnai" />'
   end
 
   return nil, '<lb-lazy id="lb-xnai" />'

@@ -25,20 +25,23 @@ local function tableToString(t, indent)
 end
 
 local x = [[scenes[2]:
-  - camera: upper body
-    characters[1|]{positive|negative}:
-      girl, adolescent, chin-length blue hair, asymmetric bangs, turquoise eyes, fair skin, blush, black newsboy cap, black hairpins, charcoal gray mini one-piece, white shirt, teal belt, standing, earnest, holding object, hands together, offering cassette tape, looking at viewer|
-    scene: 1girl, exterior, city, city square, daylight, afternoon
-    slot: 5
-  - camera: cowboy shot
-    characters[1|]{positive|negative}:
-      girl, female, short dark brown hair, gray eyes, tan skin, athletic, black tactical jacket, orange armband, gray cropped turtleneck, cargo pants, utility belt, holster, standing, walking, cynical, indifferent, looking at other|
-    scene: 1girl, exterior, city, city square, daylight, afternoon
-    slot: 12
+  - camera: straight-on, upper body
+    characters[1]:
+      - positive: girl, female, young adult, long brown straight hair, sidelocks, ahoge, brown eyes, tareme, fair skin, large breasts, black jacket, open jacket, white shirt, black pencil skirt, black tie, sitting, hands together, holding cup, looking away, relaxed, focused
+        negative: 
+    scene: 1girl, interior, cafe, round table, daylight, noon, sidelighting, tea, pouch, pen
+    slot: 1
+  - camera: pov, from slightly above, upper body
+    characters[1]:
+      - positive: girl, female, young adult, long brown straight hair, sidelocks, ahoge, brown eyes, tareme, fair skin, large breasts, black jacket, open jacket, white shirt, black pencil skirt, black tie, sitting, holding fork, hands forward, pushing plate, blush, embarrassed, smiling, looking at viewer, source#offering food
+        negative: 
+    scene: 1girl, interior, cafe, round table, daylight, noon, cheesecake, tea, cake fork
+    slot: 7
 keyvis:
-  camera: cowboy shot
-  characters[1|]{positive|negative}:
-      girl, adolescent, chin-length blue hair, asymmetric bangs, turquoise eyes, fair skin, blush, black newsboy cap, black hairpins, charcoal gray mini one-piece, white shirt, teal belt, standing, nervous, looking at other, clutching cassette tape|
-  scene: 1girl, exterior, city, city square, public square, concrete buildings, daylight, shadow, 1.2::depth of field::]]
+  camera: pov, from above, upper body
+  characters[1]:
+    - positive: girl, female, young adult, long brown straight hair, sidelocks, ahoge, brown eyes, tareme, fair skin, large breasts, black jacket, open jacket, white shirt, black pencil skirt, black tie, sitting, holding fork, hands forward, blush, looking at viewer, source#offering food
+      negative: 
+  scene: 1girl, interior, cafe, round table, daylight, noon, cheesecake, tea, focus on intimacy]]
 
 print(tableToString(toon.decode(x)))

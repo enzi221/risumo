@@ -269,9 +269,15 @@ local function collectSiblings(obj, lines, startIdx, targetDepth, delimiter, con
       local sibParsedKey = assertKeyNotNil(parseValue(siblingLine.content:sub(1, sibColonPos - 1)))
 
       if sibValue == "" then
-        local child
-        child, idx = decodeValue(lines, idx + 1, targetDepth + 1, config, delimiter)
-        obj[sibParsedKey] = child or {}
+        local nextLine = lines[idx + 1]
+        if nextLine and nextLine.depth > targetDepth then
+          local child
+          child, idx = decodeValue(lines, idx + 1, targetDepth + 1, config, delimiter)
+          obj[sibParsedKey] = child or {}
+        else
+          obj[sibParsedKey] = ""
+          idx = idx + 1
+        end
       else
         obj[sibParsedKey] = parseValue(sibValue)
         idx = idx + 1
@@ -353,8 +359,14 @@ local function decodeListItem(lines, startIdx, targetDepth, config, parentDelimi
 
     obj[keyHeaderInfo.key] = arr
   elseif value == "" then
-    obj[parsedKey], idx = decodeValue(lines, startIdx + 1, targetDepth + 2, config, delimiter)
-    obj[parsedKey] = obj[parsedKey] or {}
+    local nextLine = lines[startIdx + 1]
+    if nextLine and nextLine.depth > targetDepth + 1 then
+      obj[parsedKey], idx = decodeValue(lines, startIdx + 1, targetDepth + 2, config, delimiter)
+      obj[parsedKey] = obj[parsedKey] or {}
+    else
+      obj[parsedKey] = ""
+      idx = startIdx + 1
+    end
   else
     obj[parsedKey] = parseValue(value)
     idx = startIdx + 1
@@ -470,9 +482,12 @@ function decodeValue(lines, startIdx, targetDepth, config, parentDelimiter, expe
     local nextLine = lines[startIdx + 1]
     if nextLine and nextLine.depth == targetDepth + 1 and nextLine.content:sub(1, 2) == "- " then
       obj[parsedKey], startIdx = parseListArray(lines, startIdx + 1, targetDepth + 1, config, delimiter)
-    else
+    elseif nextLine and nextLine.depth > targetDepth then
       obj[parsedKey], startIdx = decodeValue(lines, startIdx + 1, targetDepth + 1, config, delimiter)
       obj[parsedKey] = obj[parsedKey] or {}
+    else
+      obj[parsedKey] = ""
+      startIdx = startIdx + 1
     end
   else
     obj[parsedKey] = parseValue(value)
@@ -544,9 +559,12 @@ local function decode(text, options)
           local nextLine = lines[idx + 1]
           if nextLine and nextLine.depth == 1 and nextLine.content:sub(1, 2) == "- " then
             obj[parsedKey], idx = parseListArray(lines, idx + 1, 1, config, ",")
-          else
+          elseif nextLine and nextLine.depth >= 1 then
             obj[parsedKey], idx = decodeValue(lines, idx + 1, 1, config, ",")
             obj[parsedKey] = obj[parsedKey] or {}
+          else
+            obj[parsedKey] = ""
+            idx = idx + 1
           end
         else
           obj[parsedKey] = parseValue(value)

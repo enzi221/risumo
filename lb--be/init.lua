@@ -46,8 +46,6 @@ local function findLastCharChat(fullChat, startOffset, range)
   return nil, nil
 end
 
-local runPipelineAsync = pipeline.runPipelineAsync
-
 --- @param manifests Manifest[]
 local main = async(function(manifests)
   local fullChat = getFullChat(triggerId)
@@ -75,7 +73,7 @@ local main = async(function(manifests)
 
     for j = i, chunkEndIndex do
       local man = normalManifests[j]
-      table.insert(currentChunkPromises, runPipelineAsync(triggerId, man, fullChat, {
+      table.insert(currentChunkPromises, pipeline.runPipelineAsync(triggerId, man, fullChat, {
         type = 'generation',
         lazy = man.lazy
       }))
@@ -263,7 +261,7 @@ local function reroll(identifier, blockID)
   local contextSlice = { table.unpack(fullChat, 1, targetIdx) }
 
   local success, result = pcall(function()
-    return runPipelineAsync(triggerId, man, contextSlice, { type = 'reroll', lazy = false }):await()
+    return pipeline.runPipelineAsync(triggerId, man, contextSlice, { type = 'reroll', lazy = false }):await()
   end)
 
   if not success or not result then
@@ -284,7 +282,13 @@ local function reroll(identifier, blockID)
       result = result,
       identifier = identifier,
       blockID = blockID,
-      onError = function(msg) alertError(triggerId, msg) end,
+      onError = function(msg)
+        setChat(triggerId, targetJsIdx, originalTargetContent)
+        if isSeparated then
+          setChat(triggerId, lbdataJsIdx, originalLbdataContent)
+        end
+        alertError(triggerId, msg)
+      end,
     })
   else
     if targetPosition then
@@ -386,7 +390,7 @@ Action: `%s`
 
   local contextSlice = { table.unpack(fullChat, 1, idx) }
   local success, result = pcall(function()
-    return runPipelineAsync(triggerId, man, contextSlice, {
+    return pipeline.runPipelineAsync(triggerId, man, contextSlice, {
       type = 'interaction',
       extras = extraPrompt
     }):await()

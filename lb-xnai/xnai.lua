@@ -56,7 +56,7 @@ local function buildRawPrompt(desc)
   if desc.characters then
     for _, character in ipairs(desc.characters) do
       table.insert(positiveParts, character.positive)
-      table.insert(negativeParts, character.negative)
+      table.insert(negativeParts, character.negative or '')
     end
   end
 
@@ -169,7 +169,7 @@ local function renderInline(data, chatIndex, chatLength, stackItem)
             h.br { void = true },
             h.br { void = true },
             '[Negative]\n',
-            prompts.negative,
+            prompts.negative or '',
           }
         } or nil
 
@@ -257,7 +257,7 @@ local function renderInline(data, chatIndex, chatLength, stackItem)
             h.br { void = true },
             h.br { void = true },
             '[Negative]\n',
-            prompts.negative,
+            prompts.negative or '',
           }
         } or nil
 

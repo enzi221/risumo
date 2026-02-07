@@ -1,6 +1,6 @@
 ---@class XNAIPromptSet
 ---@field positive string
----@field negative string
+---@field negative string?
 
 ---@param desc XNAIDescriptor
 ---@return XNAIPromptSet?
