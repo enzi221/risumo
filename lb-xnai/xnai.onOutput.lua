@@ -33,7 +33,7 @@ local function stripXMLNodes(text)
       position = tagStart + 1
     else
       local openTagContent = text:sub(tagStart + 1, tagEnd - 1)
-      local foundTagName = openTagContent:match("^([%w%-%_]+)")
+      local foundTagName = prelude.extractTagName(openTagContent)
 
       if not foundTagName then
         position = tagEnd + 1

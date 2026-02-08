@@ -207,17 +207,25 @@ local function reroll(identifier, blockID)
 
   local cleanedLbdata, lazyPos = removeNode(originalLbdataContent, 'lb-lazy', { id = identifier })
 
-  local cleanedTarget = isSeparated and originalTargetContent or cleanedLbdata
+  -- Pure modules: nodes in LBDATA chat. SideEffect modules: nodes in target chat.
+  local removalBase = (isSeparated and man.sideEffect) and originalTargetContent or cleanedLbdata
   local prevPos = nil
   while true do
-    local removed, pos = removeNode(cleanedTarget, identifier, blockID and { id = blockID } or nil)
-    if removed == cleanedTarget then break end
-    cleanedTarget = removed
+    local removed, pos = removeNode(removalBase, identifier, blockID and { id = blockID } or nil)
+    if removed == removalBase then break end
+    removalBase = removed
     if not prevPos then prevPos = pos end
   end
 
-  if not isSeparated then
-    cleanedLbdata = cleanedTarget
+  local cleanedTarget
+  if isSeparated and man.sideEffect then
+    cleanedTarget = removalBase
+  elseif isSeparated then
+    cleanedTarget = originalTargetContent
+    cleanedLbdata = removalBase
+  else
+    cleanedTarget = removalBase
+    cleanedLbdata = removalBase
   end
 
   setChat(triggerId, lbdataJsIdx, cleanedLbdata)
@@ -291,13 +299,17 @@ local function reroll(identifier, blockID)
       end,
     })
   else
-    if targetPosition then
-      finalChat = insertAtPosition(cleanedTarget, targetPosition, result)
+    local insertBase = isSeparated and cleanedLbdata or cleanedTarget
+    local writeIdx = isSeparated and lbdataJsIdx or targetJsIdx
+    local insertPos = isSeparated and (prevPos or lazyPos) or targetPosition
+
+    if insertPos then
+      finalChat = insertAtPosition(insertBase, insertPos, result)
     else
-      finalChat = lbdata.fallbackInsert(cleanedTarget, result)
+      finalChat = lbdata.fallbackInsert(insertBase, result)
     end
 
-    setChat(triggerId, targetJsIdx,
+    setChat(triggerId, writeIdx,
       man.onMutation and man.onMutation(triggerId, 'reroll', finalChat) or finalChat)
   end
 end
@@ -423,9 +435,16 @@ Action: `%s`
       onError = function(msg) alertError(triggerId, msg) end,
     })
     return
-  elseif modifiers.preserve then
-    -- Find last matching node and insert after it
-    local existingNodes = prelude.queryNodes(identifier, originalContent)
+  end
+
+  -- Pure modules in separated mode: nodes live in the LBDATA chat, not the target chat.
+  local lbdataJsIdx = lbdata.findLastLBDATAChat(fullChat)
+  local isSeparated = lbdataJsIdx ~= nil and lbdataJsIdx ~= jsIndex
+  local workContent = isSeparated and fullChat[lbdataJsIdx + 1].data or originalContent
+  local workJsIdx = isSeparated and lbdataJsIdx or jsIndex
+
+  if modifiers.preserve then
+    local existingNodes = prelude.queryNodes(identifier, workContent)
     local targetNode = nil
 
     if modifiers.blockID and #existingNodes > 0 then
@@ -440,14 +459,13 @@ Action: `%s`
     end
 
     if targetNode then
-      finalChat = originalContent:sub(1, targetNode.rangeEnd) ..
-          '\n' .. result .. originalContent:sub(targetNode.rangeEnd + 1)
+      finalChat = workContent:sub(1, targetNode.rangeEnd) ..
+          '\n' .. result .. workContent:sub(targetNode.rangeEnd + 1)
     else
-      finalChat = lbdata.fallbackInsert(originalContent, result)
+      finalChat = lbdata.fallbackInsert(workContent, result)
     end
   else
-    -- Remove node and insert at its position
-    local baseContent, targetPosition = removeNode(originalContent, identifier,
+    local baseContent, targetPosition = removeNode(workContent, identifier,
       modifiers.blockID and { id = modifiers.blockID } or nil)
 
     if targetPosition then
@@ -461,7 +479,7 @@ Action: `%s`
     finalChat = man.onMutation(triggerId, 'interaction', finalChat)
   end
 
-  setChat(triggerId, jsIndex, finalChat)
+  setChat(triggerId, workJsIdx, finalChat)
 end
 
 onButtonClick = async(function(tid, code)

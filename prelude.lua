@@ -98,6 +98,14 @@ local function getFlagToggle(triggerId, flagName)
   return getGlobalVar(triggerId, 'toggle_' .. flagName) == '1'
 end
 
+---@param openTagContent string
+---@return string?
+local function extractTagName(openTagContent)
+  local name = openTagContent:match("^([%w%-%_]+)")
+  if not name or name:match("^%d") then return nil end
+  return name
+end
+
 ---@class Node
 ---@field attributes table<string, string>
 ---@field content string
@@ -247,7 +255,7 @@ local function removeAllNodes(text, tagsToKeep)
       position = tagStart + 1
     else
       local openTagContent = text:sub(tagStart + 1, tagEnd - 1)
-      local foundTagName = openTagContent:match("^([%w%-%_]+)")
+      local foundTagName = extractTagName(openTagContent)
 
       if not foundTagName then
         position = tagEnd + 1
@@ -473,6 +481,7 @@ end
 _ENV.prelude = {
   escEntities = escEntities,
   escMatch = escMatch,
+  extractTagName = extractTagName,
   extractNodes = queryNodes,
   getFlagToggle = getFlagToggle,
   getPriorityLoreBook = getPriorityLoreBook,

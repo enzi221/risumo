@@ -9,3 +9,11 @@ Commenting is not for chatting with the user, or for teaching the user. User kno
 Only add comments to significant hot path codes that are also potentially confusing or ambiguous. Or, for important but complex logic blocks, you may describe the logic with comments (possibly with bullet lists or ASCII diagrams)---but only at the beginning of such logic.
 
 When do adding comments, write in English.
+
+# Naming Policy
+
+Acronyms should be capitalized. "LLM", "XML", "JS". If you meet an acronym that is not capitalized and is within your range of editing, change it.
+
+# Documentation Policy
+
+If each package has a file named README.md, read it first. After your edits, if anything in README.md is affected, update it accordingly.
