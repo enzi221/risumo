@@ -6,7 +6,7 @@ local M = {}
 --- @param text string
 --- @param tagName string
 --- @param attrs table<string, string>?
---- @return string modifiedText, number? removedPosition
+--- @return string modifiedText, number? removedPosition, number? removedLength
 function M.removeNode(text, tagName, attrs)
   if not text then return '', nil end
 
@@ -37,7 +37,33 @@ function M.removeNode(text, tagName, attrs)
   local prefix = text:sub(1, targetNode.rangeStart - 1):gsub("\n?$", "")
   local suffix = text:sub(targetNode.rangeEnd + 1):gsub("^\n?", "")
 
-  return prefix .. '\n' .. suffix, #prefix + 2
+  local result = prefix .. '\n' .. suffix
+  return result, #prefix + 2, #text - #result
+end
+
+--- Removes all instances of a matching node from text.
+--- @param text string
+--- @param tagName string
+--- @param attrs table<string, string>?
+--- @return string strippedText, number? firstRemovedPos
+function M.stripAllNodes(text, tagName, attrs)
+  local firstPos = nil
+  while true do
+    local removed, pos = M.removeNode(text, tagName, attrs)
+    if removed == text then break end
+    text = removed
+    if not firstPos then firstPos = pos end
+  end
+  return text, firstPos
+end
+
+--- Inserts content at position.
+--- @param text string
+--- @param position number
+--- @param newContent string
+--- @return string
+function M.insertAtPosition(text, position, newContent)
+  return text:sub(1, position - 1) .. newContent .. '\n' .. text:sub(position)
 end
 
 --- Inserts content before [LBDATA END] marker, or appends if not found.

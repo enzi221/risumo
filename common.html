@@ -10,6 +10,41 @@
     }
   }
 
+  /* new opener style */
+  .lb-module-opener-root {
+    align-items: center;
+    display: inline-flex;
+    gap: 0.3em;
+    margin: 0.5rem;
+    margin-left: 0;
+  }
+
+  .lb-module-opener {
+    appearance: none;
+    background: oklch(from var(--bg) l c h / 0.8);
+    border: 1px dashed oklch(from var(--accent) l c h / 0.5);
+    border-radius: 0.4em;
+    color: var(--fg-2);
+    cursor: pointer;
+    height: 3em;
+    font-size: 0.85em;
+    padding: 0.4em 0.7em;
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+
+  .lb-module-opener::before {
+    content: var(--icon);
+  }
+  .lb-module-opener[data-lazy]::after {
+    content: '⧖';
+  }
+
+  .lb-module-opener:hover {
+    border: 1px dashed oklch(from var(--accent) calc(l + 0.2) c h / 0.5);
+    color: var(--fg);
+  }
+  /* end new opener style */
+
   .lb-module-root {
     align-items: flex-start;
     color: var(--fg, #f8f8f2);

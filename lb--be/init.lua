@@ -1,3 +1,7 @@
+--! Copyright (c) 2025-2026 amonamona
+--! CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+--! LightBoard Backend
+
 ---@diagnostic disable: lowercase-global
 
 local manifest = require('./manifest')
@@ -18,17 +22,6 @@ local function setTriggerId(tid)
   load(source[1].content, '@prelude', 't')()
 end
 
---- Inserts content at position.
---- @param text string
---- @param position number
---- @param newContent string
---- @return string
-local function insertAtPosition(text, position, newContent)
-  return text:sub(1, position - 1) .. newContent .. '\n' .. text:sub(position)
-end
-
-local removeNode = lbdata.removeNode
-
 --- Finds the last chat index with `char` role within a range.
 --- @param fullChat Chat[]
 --- @param startOffset number (e.g., -1, -2, ...)
@@ -44,6 +37,51 @@ local function findLastCharChat(fullChat, startOffset, range)
     end
   end
   return nil, nil
+end
+
+--- @param identifier string
+--- @return Manifest
+local function requireActiveManifest(identifier)
+  if not prelude.getFlagToggle(triggerId, 'lightboard.active') then
+    error('리롤 전에 백엔드를 활성화해주세요.')
+  end
+  local man = manifest.get(triggerId, identifier)
+  if not man then
+    error('이 모듈을 찾을 수 없습니다. 프론트엔드의 모드 토글이 설정돼있나요?')
+  end
+  return man
+end
+
+--- @param identifier string
+--- @param note string
+--- @return string
+local function pendingMessage(identifier, note)
+  return string.format([[---
+[LBDATA START]
+<lb-rerolling><div class="lb-pending lb-rerolling"><span class="lb-pending-note">%s %s</span></div></lb-rerolling>
+[LBDATA END]
+---]], identifier, note)
+end
+
+--- @param base string
+--- @param position number?
+--- @param content string
+--- @return string
+local function insertResult(base, position, content)
+  if position then
+    return lbdata.insertAtPosition(base, position, content)
+  end
+  return lbdata.fallbackInsert(base, content)
+end
+
+--- Applies onMutation (if any) and writes to chat.
+--- @param jsIdx number
+--- @param content string
+--- @param man Manifest
+--- @param action string
+local function writeResult(jsIdx, content, man, action)
+  local final = man.onMutation and man.onMutation(triggerId, action, content) or content
+  setChat(triggerId, jsIdx, final)
 end
 
 --- @param manifests Manifest[]
@@ -171,17 +209,7 @@ end)
 ---@param identifier string module identifier
 ---@param blockID string? for rerolling specific block
 local function reroll(identifier, blockID)
-  local active = prelude.getFlagToggle(triggerId, 'lightboard.active')
-  if not active then
-    error('리롤 전에 백엔드를 활성화해주세요.')
-    return
-  end
-
-  local man = manifest.get(triggerId, identifier)
-  if not man then
-    error('이 모듈을 찾을 수 없습니다. 프론트엔드의 모드 토글이 설정돼있나요?')
-    return
-  end
+  local man = requireActiveManifest(identifier)
 
   local fullChat = getFullChat(triggerId)
   local resolved = lbdata.resolveTargets(fullChat)
@@ -205,27 +233,24 @@ local function reroll(identifier, blockID)
   local originalLbdataContent = resolved.lbdataContent or ''
   local originalTargetContent = resolved.targetContent or ''
 
-  local cleanedLbdata, lazyPos = removeNode(originalLbdataContent, 'lb-lazy', { id = identifier })
+  local cleanedLbdata, lazyPos = lbdata.removeNode(originalLbdataContent, 'lb-lazy', { id = identifier })
 
-  -- Pure modules: nodes in LBDATA chat. SideEffect modules: nodes in target chat.
-  local removalBase = (isSeparated and man.sideEffect) and originalTargetContent or cleanedLbdata
-  local prevPos = nil
-  while true do
-    local removed, pos = removeNode(removalBase, identifier, blockID and { id = blockID } or nil)
-    if removed == removalBase then break end
-    removalBase = removed
-    if not prevPos then prevPos = pos end
-  end
+  -- Pure modules: strip from LBDATA content. SideEffect in separated mode: strip from target.
+  local stripBase = (isSeparated and man.sideEffect) and originalTargetContent or cleanedLbdata
+  local stripped, prevPos = lbdata.stripAllNodes(stripBase, identifier, blockID and { id = blockID } or nil)
+
+  -- Total bytes removed by identifier stripping (for position offset in non-separated mode)
+  local totalStripped = #stripBase - #stripped
 
   local cleanedTarget
   if isSeparated and man.sideEffect then
-    cleanedTarget = removalBase
+    cleanedTarget = stripped
   elseif isSeparated then
     cleanedTarget = originalTargetContent
-    cleanedLbdata = removalBase
+    cleanedLbdata = stripped
   else
-    cleanedTarget = removalBase
-    cleanedLbdata = removalBase
+    cleanedTarget = stripped
+    cleanedLbdata = stripped
   end
 
   setChat(triggerId, lbdataJsIdx, cleanedLbdata)
@@ -233,27 +258,15 @@ local function reroll(identifier, blockID)
     setChat(triggerId, targetJsIdx, cleanedTarget)
   end
 
-  -- TODO: Move out of reroll
-  local message = [[---
-[LBDATA START]
-<lb-rerolling><div class="lb-pending lb-rerolling"><span class="lb-pending-note">%s 재생성 중, 채팅을 보내거나 다른 모듈을 재생성하지 마세요...</span></div></lb-rerolling>
-[LBDATA END]
----]]
-  addChat(triggerId, 'user', message:format(identifier))
+  addChat(triggerId, 'user', pendingMessage(identifier, '재생성 중, 채팅을 보내거나 다른 모듈을 재생성하지 마세요...'))
 
   local targetPosition = nil
   if not isSeparated then
     if prevPos and lazyPos then
-      if prevPos < lazyPos then
-        local removed = originalLbdataContent:sub(prevPos, prevPos + (cleanedTarget:len() - cleanedLbdata:len()))
-        targetPosition = lazyPos - removed:len()
-      else
-        targetPosition = lazyPos
-      end
-    elseif lazyPos then
-      targetPosition = lazyPos
-    elseif prevPos then
-      targetPosition = prevPos
+      -- If identifier nodes were before lazy marker, adjust for removed bytes
+      targetPosition = prevPos < lazyPos and (lazyPos - totalStripped) or lazyPos
+    else
+      targetPosition = lazyPos or prevPos
     end
   else
     targetPosition = prevPos
@@ -281,8 +294,6 @@ local function reroll(identifier, blockID)
     return
   end
 
-  local finalChat
-
   if man.sideEffect then
     sideeffect.handleSideEffectResult(triggerId, {
       man = man,
@@ -303,14 +314,7 @@ local function reroll(identifier, blockID)
     local writeIdx = isSeparated and lbdataJsIdx or targetJsIdx
     local insertPos = isSeparated and (prevPos or lazyPos) or targetPosition
 
-    if insertPos then
-      finalChat = insertAtPosition(insertBase, insertPos, result)
-    else
-      finalChat = lbdata.fallbackInsert(insertBase, result)
-    end
-
-    setChat(triggerId, writeIdx,
-      man.onMutation and man.onMutation(triggerId, 'reroll', finalChat) or finalChat)
+    writeResult(writeIdx, insertResult(insertBase, insertPos, result), man, 'reroll')
   end
 end
 
@@ -359,17 +363,7 @@ end
 ---@param action string
 ---@param direction string
 local function interact(fullChat, identifier, action, direction)
-  local active = prelude.getFlagToggle(triggerId, 'lightboard.active')
-  if not active then
-    error('리롤 전에 백엔드를 활성화해주세요.')
-    return
-  end
-
-  local man = manifest.get(triggerId, identifier)
-  if not man then
-    error('이 모듈을 찾을 수 없습니다. 프론트엔드의 모드 토글이 설정돼있나요?')
-    return
-  end
+  local man = requireActiveManifest(identifier)
 
   -- #fullChat = direction, #fullChat-1 = identifier+action, #fullChat-2 = last char chat to modify)
   local idx, targetChat = findLastCharChat(fullChat, -1, 5)
@@ -465,21 +459,13 @@ Action: `%s`
       finalChat = lbdata.fallbackInsert(workContent, result)
     end
   else
-    local baseContent, targetPosition = removeNode(workContent, identifier,
+    local baseContent, targetPosition = lbdata.removeNode(workContent, identifier,
       modifiers.blockID and { id = modifiers.blockID } or nil)
 
-    if targetPosition then
-      finalChat = insertAtPosition(baseContent, targetPosition, result)
-    else
-      finalChat = lbdata.fallbackInsert(baseContent, result)
-    end
+    finalChat = insertResult(baseContent, targetPosition, result)
   end
 
-  if man.onMutation then
-    finalChat = man.onMutation(triggerId, 'interaction', finalChat)
-  end
-
-  setChat(triggerId, workJsIdx, finalChat)
+  writeResult(workJsIdx, finalChat, man, 'interaction')
 end
 
 onButtonClick = async(function(tid, code)
@@ -549,13 +535,7 @@ onButtonClick = async(function(tid, code)
     print('[LightBoard Backend][VERBOSE] Interaction ' .. action .. ' of ' .. identifier .. ' initiated.')
 
     if modifiers.immediate then
-      local message = [[---
-[LBDATA START]
-<lb-rerolling><div class="lb-pending lb-rerolling"><span class="lb-pending-note">%s 상호작용 중, 채팅을 보내거나 다른 작업을 하지 마세요...</span></div></lb-rerolling>
-[LBDATA END]
----]]
-
-      addChat(tid, 'user', message:format(identifier))
+      addChat(tid, 'user', pendingMessage(identifier, '상호작용 중, 채팅을 보내거나 다른 작업을 하지 마세요...'))
 
       local fullChat = getFullChat(tid)
       -- #fullChat = pending message, #fullChat-1 = last char chat to modify
@@ -712,17 +692,7 @@ dangerouslyCleanseWholeChat = async(function(tid)
   for i = 1, #fullChat do
     local chat = fullChat[i]
     if chat.role == 'char' then
-      local originalContent = chat.data
-      local modifiedContent = originalContent
-
-      while true do
-        local newContent, _ = removeNode(modifiedContent, cleanseTarget)
-        if newContent == modifiedContent then
-          break
-        end
-        modifiedContent = newContent
-      end
-      chat.data = modifiedContent
+      chat.data = lbdata.stripAllNodes(chat.data, cleanseTarget)
     end
     table.insert(cleansedChat, chat)
   end

@@ -49,6 +49,39 @@
     }
   }
 
+  .lb-xnai-placeholder-wrapper {
+    align-items: center;
+    display: inline-flex;
+    gap: 0.3em;
+    margin: 0.5rem;
+    margin-left: 0;
+  }
+
+  .lb-xnai-placeholder-wrapper .lb-xnai-toolbar-btn {
+    border: 1px dashed oklch(from var(--lb-xnai-accent) l c h / 0.5);
+    border-radius: 0.4em;
+    height: 3em;
+    width: 3em;
+  }
+
+  .lb-xnai-placeholder {
+    appearance: none;
+    background: transparent;
+    border: 1px dashed oklch(from var(--lb-xnai-accent) l c h / 0.5);
+    border-radius: 0.4em;
+    color: var(--lb-xnai-fg-2);
+    cursor: pointer;
+    height: 3em;
+    font-size: 0.85em;
+    padding: 0.4em 0.7em;
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+
+  .lb-xnai-placeholder:hover {
+    border: 1px dashed oklch(from var(--lb-xnai-accent) calc(l + 0.2) c h / 0.5);
+    color: var(--lb-xnai-fg);
+  }
+
   .lb-xnai-kv-wrapper {
     background-color: #000;
     border-radius: 0.5em;
@@ -161,6 +194,10 @@
     object-position: center 10% !important;
     width: 100% !important;
     max-height: 100% !important;
+  }
+
+  .lb-xnai-inlay-wraper {
+    container-type: inline-size;
   }
 
   .lb-xnai-inlay {
@@ -348,38 +385,6 @@
     font-size: 1em;
     height: 2.857em;
     width: 2.857em;
-  }
-
-  .lb-xnai-placeholder-wrapper {
-    align-items: center;
-    display: flex;
-    gap: 0.3em;
-    margin: 0.5rem 0;
-  }
-
-  .lb-xnai-placeholder-wrapper .lb-xnai-toolbar-btn {
-    border: 1px dashed oklch(from var(--lb-xnai-accent) l c h / 0.5);
-    border-radius: 0.4em;
-    height: 3em;
-    width: 3em;
-  }
-
-  .lb-xnai-placeholder {
-    appearance: none;
-    background: transparent;
-    border: 1px dashed oklch(from var(--lb-xnai-accent) l c h / 0.5);
-    border-radius: 0.4em;
-    color: var(--lb-xnai-fg-2);
-    cursor: pointer;
-    height: 3em;
-    font-size: 0.85em;
-    padding: 0.4em 0.7em;
-    transition: border-color 0.15s ease, color 0.15s ease;
-  }
-
-  .lb-xnai-placeholder:hover {
-    border: 1px dashed oklch(from var(--lb-xnai-accent) calc(l + 0.2) c h / 0.5);
-    color: var(--lb-xnai-fg);
   }
 
   .lb-xnai-prompt-current b {

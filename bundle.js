@@ -20,6 +20,7 @@ const OUTPUT_FILE = outputPath
 // 상태 관리
 const includedModules = new Set()
 const preloads = []
+const hoistedComments = []
 let totalInputBytes = 0
 
 const REQUIRE_REGEX = /require\s*\(?["']([^"']+)["']\)?/g
@@ -42,10 +43,14 @@ function smartMinify(content) {
   return content
     .replace(tokenRegex, (match, longComm, lcEq, shortComm) => {
       if (longComm || shortComm) {
-        // 한 줄 주석: --! 로 시작하면 유지
-        if (shortComm && match.startsWith('--!')) return match
-        // 블록 주석: --[[! 또는 --[=[! 처럼 내부에 !로 시작하면 유지
-        if (longComm && /^--\[(=*)\[!/.test(match)) return match
+        if (shortComm && match.startsWith('--!')) {
+          hoistedComments.push(match)
+          return ' '
+        }
+        if (longComm && /^--\[(=*)\[!/.test(match)) {
+          hoistedComments.push(match)
+          return ' '
+        }
 
         return ' '
       }
@@ -106,7 +111,8 @@ function bundle() {
 
   const mainMinified = smartMinify(mainRaw)
 
-  const finalOutput = preloads.join('\n') + '\n' + mainMinified
+  const hoisted = hoistedComments.length > 0 ? hoistedComments.join('\n') + '\n' : ''
+  const finalOutput = hoisted + preloads.join('\n') + '\n' + mainMinified
 
   const outputDir = path.dirname(OUTPUT_FILE)
   if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true })

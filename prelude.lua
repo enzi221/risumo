@@ -72,7 +72,6 @@ local ENTITIES = {
   ["'"] = "&#39;",
   ["‘"] = "&#39;",
   ["’"] = "&#39;",
-  ["\\n"] = "<br>"
 }
 
 ---@param str string
@@ -80,7 +79,8 @@ local ENTITIES = {
 local function escEntities(str)
   if not str then return "" end
   str = (str:gsub("[&<>\"“ ”'‘’]", ENTITIES))
-  str = str:gsub("\\n", ENTITIES["\\n"]) or str
+  str = str:gsub("\n", "<br>") or str
+  str = str:gsub("\\n", "<br>") or str
   return str
 end
 
