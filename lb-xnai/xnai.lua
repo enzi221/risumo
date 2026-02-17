@@ -86,10 +86,9 @@ end
 
 ---@param data string
 ---@param chatIndex number
----@param chatLength number
 ---@param stackItem XNAIStackItem?
 ---@return string
-local function renderInline(data, chatIndex, chatLength, stackItem)
+local function renderInline(data, chatIndex, stackItem)
   local imageNodes = prelude.queryNodes('lb-xnai', data)
   if #imageNodes == 0 then
     return data
@@ -312,7 +311,7 @@ local function renderInline(data, chatIndex, chatLength, stackItem)
 end
 
 listenEdit(
-  "editDisplay",
+  'editDisplay',
   function(tid, data, meta)
     setTriggerId(tid)
 
@@ -338,7 +337,7 @@ listenEdit(
       end
     end
 
-    local success, result = pcall(renderInline, data, meta.index, chatLength, stackItem)
+    local success, result = pcall(renderInline, data, meta.index, stackItem)
     if success then
       return result
     end

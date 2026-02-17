@@ -1,17 +1,4 @@
-local triggerId = ''
-
-local function setTriggerId(tid)
-  triggerId = tid
-  local source = getLoreBooks(triggerId, 'lightboard-prelude')
-  if not source or #source == 0 then
-    error('Failed to load lightboard-prelude.')
-  end
-  load(source[1].content, '@prelude', 't')()
-end
-
-function onOutput(tid, output)
-  setTriggerId(tid)
-
+local function main(tid, output)
   if not string.find(output, '<lb%-annot') then
     return nil
   end
@@ -25,7 +12,7 @@ function onOutput(tid, output)
     return prelude.removeAllNodes(output, { 'lb-annot' })
   end
 
-  local chats = getFullChat(triggerId)
+  local chats = getFullChat(tid)
   local targetIndex = nil
 
   for i = #chats, 1, -1 do
@@ -52,7 +39,7 @@ function onOutput(tid, output)
 
     if #annots > 0 then
       ---@type AnnotsState
-      local annotsState = getState(triggerId, 'lb-annot-data') or {}
+      local annotsState = getState(tid, 'lb-annot-data') or {}
       local stack = annotsState.stack or {}
 
       local newList = {}
@@ -78,22 +65,22 @@ function onOutput(tid, output)
         chatIndex = targetIndex,
       })
 
-      local maxSaves = tonumber(getGlobalVar(triggerId, 'toggle_lb-annot.maxSaves')) or 5
+      local maxSaves = tonumber(getGlobalVar(tid, 'toggle_lb-annot.maxSaves')) or 5
       while #newList > maxSaves do
         table.remove(newList, 1)
       end
 
       annotsState.stack = newList
 
-      setState(triggerId, 'lb-annot-data', {
+      setState(tid, 'lb-annot-data', {
         pinned = annotsState.pinned or {},
         stack = newList,
       })
-      reloadChat(triggerId, targetIndex)
+      reloadChat(tid, targetIndex)
     end
   end
 
   return '<lb-annot of="' .. targetIndex .. '" />'
 end
 
-return onOutput
+return main

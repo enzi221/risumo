@@ -1,20 +1,3 @@
-local triggerId = ''
-
-local function setTriggerId(tid)
-  triggerId = tid
-  if type(prelude) ~= 'nil' then
-    prelude.import(triggerId, 'toon.decode')
-    return
-  end
-  local source = getLoreBooks(triggerId, 'lightboard-prelude')
-  if not source or #source == 0 then
-    error('Failed to load lightboard-prelude.')
-  end
-  load(source[1].content, '@prelude', 't')()
-
-  prelude.import(triggerId, 'toon.decode')
-end
-
 -- Base64 encoding function (helper)
 local function base64Encode(data)
   local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
@@ -42,7 +25,7 @@ local function xor(str)
   return base64Encode(bytes)
 end
 
-local function main(output)
+local function main(_, output)
   if not string.find(output, '</lb%-stage>') then
     output = output .. '\n</lb-stage>'
   end
@@ -67,16 +50,4 @@ local function main(output)
   return '<lb-stage>' .. xor(body.content) .. '</lb-stage>'
 end
 
-function onOutput(triggerId, output)
-  setTriggerId(triggerId)
-
-  local success, result = pcall(main, output)
-  if success then
-    return result
-  else
-    print("[LightBoard] Stage output failed:", tostring(result))
-    return output
-  end
-end
-
-return onOutput
+return main

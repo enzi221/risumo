@@ -5,5 +5,7 @@
   "prettier.printWidth": 160,
   "[html]": {
     "editor.formatOnSave": false
-  }
+  },
+  "prettier.bracketSameLine": false,
+  "prettier.htmlWhitespaceSensitivity": "strict"
 }

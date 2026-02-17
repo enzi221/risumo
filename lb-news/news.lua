@@ -1,7 +1,6 @@
 --! Copyright (c) 2025-2026 amonamona
 --! CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
 --! LightBoard News
-
 local triggerId = ''
 
 local function setTriggerId(tid)
@@ -40,7 +39,7 @@ local function preprocessContent(content)
     return '<span class="lb-news-annot" data-annot="' .. annot .. '">' .. text .. '</span>'
   end)
 
-  processed = processed:gsub('\\n', '<br>')
+  processed = processed:gsub('\n', '<br>')
 
   return hraw(processed) or ''
 end
@@ -140,14 +139,12 @@ local function render(node)
   local boardTitle = node.attributes.name or "뉴스"
   local datetime = formatDate(node.attributes.datetime)
   local id = node.attributes.id or "0"
-  local html = h.div['lb-module-root'] {
+  local html = h.div['lb-module-opener-root'] {
     data_id = 'lb-news',
-    h.button['lb-collapsible'] {
+    h.button['lb-module-opener'] {
       popovertarget = 'lb-news' .. id,
       type = 'button',
-      h.span['lb-opener'] {
-        h.span { boardTitle },
-      },
+      boardTitle
     },
     h.dialog['lb-dialog lb-news-dialog'] {
       id = 'lb-news' .. id,
@@ -164,7 +161,12 @@ local function render(node)
             type = 'button',
             '다른 뉴스 보기 (새 창)'
           },
-        }
+        },
+        h.button['lb-reroll'] {
+          risu_btn = 'lb-reroll__lb-news#' .. id,
+          type = 'button',
+          h.lb_reroll_icon { closed = true }
+        },
       },
       h.div['lb-news-body'] {
         h.header['lb-news-header'] {
@@ -202,11 +204,6 @@ local function render(node)
         "닫기",
       }
     },
-    h.button['lb-reroll'] {
-      risu_btn = 'lb-reroll__lb-news#' .. id,
-      type = 'button',
-      h.lb_reroll_icon { closed = true }
-    },
   }
 
   return tostring(html)
@@ -228,22 +225,10 @@ local function main(data)
     return data
   end
 
-  local output = ''
-  local lastIndex = 1
-
-  for i = 1, #extractionResult do
-    local match = extractionResult[i]
-    if match.rangeStart > lastIndex then
-      output = output .. data:sub(lastIndex, match.rangeStart - 1)
-    end
-    if i == #extractionResult then
-      -- render lastResult in its original position
-      output = output .. render(lastResult)
-    end
-    lastIndex = match.rangeEnd + 1
-  end
-
-  return output .. data:sub(lastIndex)
+  local rendered = render(lastResult)
+  return data:sub(1, lastResult.rangeStart - 1)
+      .. rendered
+      .. data:sub(lastResult.rangeEnd + 1)
 end
 
 listenEdit(

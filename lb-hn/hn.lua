@@ -222,16 +222,12 @@ local function render(node, chatIndex)
   end
 
   local boardTitle = node.attributes.name or "헌터넷 게시판"
-  local html = h.div['lb-module-root'] {
+  local html = h.div['lb-module-opener-root'] {
     data_id = 'lb-hn',
-    h.button['lb-collapsible'] {
+    h.button['lb-module-opener'] {
       popovertarget = id,
       type = 'button',
-      h.span['lb-opener'] {
-        h.span {
-          boardTitle
-        }
-      },
+      boardTitle
     },
     h.dialog['lb-dialog lb-hn-dialog'] {
       id = id,
@@ -258,11 +254,16 @@ local function render(node, chatIndex)
             h.option { value = '50', '50개' },
             h.option { value = '100', '100개' }
           },
-          h.button['lb-hn-write-button'] {
+          h.button['lb-hn-btn'] {
             risu_btn = "lb-interaction__lb-hn__AddPost",
             type = "button",
             h.i '📝',
             ' 글쓰기'
+          },
+          h.button['lb-reroll lb-hn-btn'] {
+            risu_btn = 'lb-reroll__lb-hn',
+            type = 'button',
+            h.lb_reroll_icon { closed = true }
           }
         },
       },
@@ -289,11 +290,6 @@ local function render(node, chatIndex)
         "닫기",
       }
     },
-    h.button['lb-reroll'] {
-      risu_btn = 'lb-reroll__lb-hn',
-      type = 'button',
-      h.lb_reroll_icon { closed = true }
-    },
   }
 
   return tostring(html)
@@ -315,26 +311,14 @@ local function main(data, chatIndex)
     return data
   end
 
-  local output = ''
-  local lastIndex = 1
-
-  for i = 1, #extractionResult do
-    local match = extractionResult[i]
-    if match.rangeStart > lastIndex then
-      output = output .. data:sub(lastIndex, match.rangeStart - 1)
-    end
-    if i == #extractionResult then
-      -- render lastResult in its original position
-      output = output .. render(lastResult, chatIndex)
-    end
-    lastIndex = match.rangeEnd + 1
-  end
-
-  return output .. data:sub(lastIndex)
+  local rendered = render(lastResult, chatIndex)
+  return data:sub(1, lastResult.rangeStart - 1)
+      .. rendered
+      .. data:sub(lastResult.rangeEnd + 1)
 end
 
 listenEdit(
-  "editDisplay",
+  'editDisplay',
   function(tid, data, meta)
     setTriggerId(tid)
 
@@ -351,7 +335,7 @@ listenEdit(
     if success then
       return result
     else
-      print("[LightBoard] HN display failed:", tostring(result))
+      print('[LightBoard] HN display failed:', tostring(result))
       return data .. '<lb-lazy id="lb-hn">오류: ' .. result .. '</lb-lazy>'
     end
   end

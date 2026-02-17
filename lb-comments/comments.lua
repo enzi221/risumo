@@ -85,6 +85,7 @@ local function render(node, chatIndex)
     end
   end
 
+  local id = 'lb-comments-' .. math.random()
   local post_es = {}
 
   if #posts > 0 then
@@ -182,17 +183,30 @@ local function render(node, chatIndex)
     }
   end
 
-  local html = h.div['lb-module-root'] {
+  local html = h.div['lb-module-opener-root'] {
     data_id = 'lb-comments',
-    h.details['lb-collapsible'] {
-      name = 'lb-comments',
-      h.summary['lb-opener'] {
-        h.span '댓글',
+    h.button['lb-module-opener'] {
+      popovertarget = id,
+      type = 'button',
+      '댓글',
+    },
+    h.dialog['lb-dialog lb-comments-dialog'] {
+      id = id,
+      popover = '',
+      h.div['lb-comments-header'] {
+        h.b '댓글',
+        h.button['lb-reroll'] {
+          risu_btn = 'lb-reroll__lb-comments',
+          style = 'margin-left:auto',
+          type = 'button',
+          h.lb_reroll_icon { closed = true },
+        },
       },
-      h.div['lb-comment-container'] {
-        post_es,
-        h.div['lb-comment-card lb-comment-add-post-card'] {
-          style = 'animation-delay:' .. #post_es * 0.1 .. 's',
+      h.div['lb-comments-wrap'] {
+        h.div['lb-comment-container'] {
+          post_es,
+        },
+        h.div['lb-comment-add-post-card'] {
           h.button['lb-comment-add-post'] {
             risu_btn = "lb-interaction__lb-comments__AddPost",
             type = "button",
@@ -204,14 +218,12 @@ local function render(node, chatIndex)
               }
             },
           },
-        }
+        },
       },
-    },
-    h.button['lb-reroll'] {
-      risu_btn = 'lb-reroll__lb-comments',
-      type = 'button',
-      h.lb_reroll_icon {
-        closed = true
+      h.button['lb-comments-close'] {
+        popovertarget = id,
+        type = 'button',
+        "닫기",
       },
     },
   }
@@ -257,63 +269,39 @@ local function encodePosts(posts)
   return table.concat(lines, '\n')
 end
 
-local function main(data, meta)
-  if not data or data == "" then
-    return ""
-  end
-
-  local extractionSuccess, extractionResult = pcall(prelude.queryNodes, 'lb-comments', data)
-  if not extractionSuccess then
-    print("[LightBoard] Comments extraction failed:", tostring(extractionResult))
-    return data
-  end
-
-  local lastResult = extractionResult and extractionResult[#extractionResult] or nil
-  if not lastResult then
-    return data
-  end
-
-  local output = ''
-  local lastIndex = 1
-
-  for i = 1, #extractionResult do
-    local match = extractionResult[i]
-    if match.rangeStart > lastIndex then
-      output = output .. data:sub(lastIndex, match.rangeStart - 1)
-    end
-    if i == #extractionResult then
-      -- render lastResult in its original position
-      local processSuccess, processResult = pcall(render, lastResult, meta and meta.index or 0)
-      if processSuccess then
-        output = output .. processResult
-      else
-        output = output .. '<lb-lazy id="lb-comments">오류: ' .. tostring(processResult) .. '</lb-lazy>'
-      end
-    end
-    lastIndex = match.rangeEnd + 1
-  end
-
-  return output .. data:sub(lastIndex)
-end
-
 listenEdit(
-  "editDisplay",
+  'editDisplay',
   function(tid, data, meta)
     setTriggerId(tid)
 
-    if meta and meta.index ~= nil then
-      local position = meta.index - getChatLength(triggerId)
-      if position < -5 then
-        return data
-      end
+    if not data or data == '' then
+      return ''
     end
 
-    local success, result = pcall(main, data, meta)
-    if success then
-      return result
-    else
-      return data .. '<lb-lazy id="lb-comments">오류: ' .. tostring(result) .. '</lb-lazy>'
+    local position = meta.index - getChatLength(triggerId)
+    if position < -5 then
+      return data
     end
+
+    local extractionSuccess, extractionResult = pcall(prelude.queryNodes, 'lb-comments', data)
+    if not extractionSuccess then
+      print("[LightBoard] Comments extraction failed:", tostring(extractionResult))
+      return data
+    end
+
+    local lastResult = extractionResult and extractionResult[#extractionResult] or nil
+    if not lastResult then
+      return data
+    end
+
+    local processSuccess, processResult = pcall(render, lastResult, meta.index)
+    if not processSuccess then
+      processResult = '<lb-lazy id="lb-comments">오류: ' .. tostring(processResult) .. '</lb-lazy>'
+    end
+
+    return data:sub(1, lastResult.rangeStart - 1)
+        .. processResult
+        .. data:sub(lastResult.rangeEnd + 1)
   end
 )
 

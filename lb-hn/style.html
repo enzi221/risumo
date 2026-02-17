@@ -1,25 +1,11 @@
 <style>
   [data-id='lb-hn'] {
     --bg: #1a2533;
+    --fg: #ccc;
+    --border: #34465c;
+    --accent: #07f;
+    --icon: '💠';
   }
-
-  [data-id='lb-hn'] .lb-reroll {
-    border: 1px solid #34465c;
-  }
-
-  [data-id='lb-hn'] .lb-opener,
-  [data-id='lb-hn'] .lb-reroll {
-    border: 1px solid #34465c;
-    color: #07f;
-    transition: background 0.1s ease, color 0.1s ease;
-  }
-
-  [data-id='lb-hn'] .lb-opener:hover,
-  [data-id='lb-hn'] .lb-reroll:hover {
-    background: #1e293a;
-  }
-
-  /* #region shared */
 
   .lb-hn-text-sm {
     font-size: 11px;
@@ -31,14 +17,12 @@
     color: #888;
   }
   .lb-hn-text-light {
-    color: #ccc;
+    color: var(--fg);
   }
 
-  /* #endregion shared */
-
   .lb-hn-dialog:popover-open {
-    background-color: #1a2533;
-    border: 1px solid #34465c;
+    background-color: var(--bg);
+    border: 1px solid var(--border);
     border-radius: 4px;
     box-sizing: border-box;
     display: grid;
@@ -63,7 +47,7 @@
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
-    border-bottom: 2px solid #07f;
+    border-bottom: 2px solid var(--accent);
     padding-bottom: 8px;
   }
 
@@ -80,7 +64,7 @@
     transition: color 0.1s;
   }
   .lb-hn-nav span:hover {
-    color: #07f;
+    color: var(--accent);
     text-decoration: none;
   }
 
@@ -93,7 +77,7 @@
   }
   .lb-hn-options select {
     height: 28px;
-    border: 1px solid #34465c;
+    border: 1px solid var(--border);
     background-color: #1e293a;
     max-width: 70px;
     padding: 0 4px;
@@ -101,11 +85,11 @@
     margin-right: auto;
   }
 
-  .lb-hn-write-button {
-    border: 1px solid #07f;
+  .lb-hn-btn {
+    border: 1px solid var(--accent);
     padding: 5px 10px;
-    background: #1a2533;
-    color: #07f;
+    background: var(--bg);
+    color: var(--accent);
     text-decoration: none;
     font-size: 12px;
     font-style: normal;
@@ -116,10 +100,12 @@
     white-space: nowrap;
     border-radius: 3px;
     cursor: pointer;
-    transition: background 0.1s ease, color 0.1s ease;
+    transition:
+      background 0.1s ease,
+      color 0.1s ease;
   }
-  .lb-hn-write-button:hover {
-    background-color: #07f;
+  .lb-hn-btn:hover {
+    background-color: var(--accent);
     color: #121a24;
   }
 
@@ -135,7 +121,7 @@
   }
 
   .lb-hn-col-writer {
-    color: #ccc;
+    color: var(--fg);
     overflow: hidden;
     text-overflow: ellipsis;
   }
@@ -155,15 +141,15 @@
   }
 
   .lb-hn-list-container {
-    border-bottom: 1px solid #34465c;
+    border-bottom: 1px solid var(--border);
   }
 
   .lb-hn-view-header {
-    border-bottom: 1px solid #34465c;
+    border-bottom: 1px solid var(--border);
   }
 
   .lb-hn-list-header {
-    border-top: 1px solid #07f;
+    border-top: 1px solid var(--accent);
     color: #aaa;
     font-weight: 700;
     height: 40px;
@@ -176,7 +162,7 @@
   .lb-hn-list-header,
   .lb-hn-post-row {
     align-items: center;
-    border-bottom: 1px solid #34465c;
+    border-bottom: 1px solid var(--border);
     column-gap: 4px;
     display: grid;
     grid-template-columns: 45px 1fr 110px 50px 50px 50px;
@@ -195,7 +181,7 @@
   }
 
   .lb-hn-post-title-label {
-    color: #ccc;
+    color: var(--fg);
     display: block;
     font-size: 14px;
     text-align: left;
@@ -209,11 +195,11 @@
     white-space: nowrap;
   }
   .lb-hn-post-title-label:hover {
-    color: #07f;
+    color: var(--accent);
   }
 
   .lb-hn-post-item {
-    border-bottom: 1px solid #34465c;
+    border-bottom: 1px solid var(--border);
   }
   .lb-hn-post-item:last-child {
     border-bottom: none;
@@ -230,11 +216,11 @@
     display: block;
     padding: 20px 16px 16px;
     margin: 0;
-    border-top: 1px solid #34465c;
+    border-top: 1px solid var(--border);
   }
 
   .lb-hn-view-header {
-    border-bottom: 1px solid #34465c;
+    border-bottom: 1px solid var(--border);
     padding-bottom: 10px;
     margin-bottom: 15px;
   }
@@ -249,7 +235,7 @@
     color: #888;
   }
   .lb-hn-view-info .lb-hn-author {
-    color: #ccc;
+    color: var(--fg);
     font-weight: 700;
   }
   .lb-hn-view-info .lb-hn-separator {
@@ -261,7 +247,7 @@
     display: block;
     line-height: 1.6;
     font-size: 13px;
-    color: #ccc;
+    color: var(--fg);
     font-weight: 400;
     white-space: pre-wrap;
     word-wrap: break-word;
@@ -277,8 +263,8 @@
 
   .lb-hn-comment-item {
     align-items: baseline;
-    border-top: 1px dotted #34465c;
-    color: #ccc !important;
+    border-top: 1px dotted var(--border);
+    color: var(--fg) !important;
     display: grid;
     grid-template-columns: 120px 1fr auto;
     gap: 12px;
@@ -332,8 +318,8 @@
     background-color: rgba(255, 87, 34, 0.1);
   }
   .lb-hn-icon-semi {
-    color: #07f;
-    border-color: #07f;
+    color: var(--accent);
+    border-color: var(--accent);
     background-color: rgba(0, 119, 255, 0.1);
   }
   .lb-hn-comment-text {
@@ -341,7 +327,7 @@
     white-space: pre-wrap;
     font-family: 'Noto Sans KR', Roboto, sans-serif;
     font-size: 13px;
-    color: #ccc;
+    color: var(--fg);
     font-weight: 400;
   }
   .lb-hn-level {
@@ -371,18 +357,20 @@
 
   .lb-hn-btn {
     align-items: center;
-    background: #1a2533;
-    border: 1px solid #34465c;
+    background: var(--bg);
+    border: 1px solid var(--border);
     border-radius: 5px;
-    color: #ccc;
+    color: var(--fg);
     display: inline-flex;
     font-size: 12px;
     gap: 4px;
     padding: 4px 8px;
-    transition: background 0.1s ease, color 0.1s ease;
+    transition:
+      background 0.1s ease,
+      color 0.1s ease;
   }
   .lb-hn-btn:hover {
-    background: #07f;
+    background: var(--accent);
     color: #1e293a;
   }
   .lb-hn-btn > svg {
@@ -406,7 +394,7 @@
     transition: color 0.1s ease;
   }
   .lb-hn-icon-btn:hover {
-    color: #07f;
+    color: var(--accent);
   }
   .lb-hn-icon-btn > svg {
     display: block;
@@ -420,15 +408,17 @@
   }
 
   .lb-hn-close {
-    background: #1a2533;
-    border-top: 1px solid #07f;
-    color: #ccc;
+    background: var(--bg);
+    border-top: 1px solid var(--accent);
+    color: var(--fg);
     font-size: 14px;
     padding: 8px 24px;
-    transition: background 0.1s ease, color 0.1s ease;
+    transition:
+      background 0.1s ease,
+      color 0.1s ease;
   }
   .lb-hn-close:hover {
-    background-color: #07f;
+    background-color: var(--accent);
     color: #121a24;
   }
 

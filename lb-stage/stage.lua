@@ -18,7 +18,6 @@ local function setTriggerId(tid)
   prelude.import(tid, 'toon.decode')
 end
 
--- Base64 decoding function (helper)
 local function base64Decode(data)
   local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
   data = string.gsub(data, '[^' .. b .. '=]', '')
@@ -35,8 +34,6 @@ local function base64Decode(data)
   end))
 end
 
--- XOR decryption function
--- Decrypts a base64-encoded XOR-encrypted string back to original text
 local function xordecrypt(str)
   -- Decode from base64
   local decoded = base64Decode(str)
@@ -50,17 +47,7 @@ local function xordecrypt(str)
   return table.concat(result)
 end
 
-local function main(data)
-  if not data or data == "" then
-    return ""
-  end
-
-  local nodes = prelude.extractNodes('lb-stage', data)
-  if #nodes == 0 then
-    return data
-  end
-
-  local node = nodes[1]
+local function render(node)
   local content = prelude.toon.decode(xordecrypt(node.content))
 
   local objective = content.objective
@@ -70,133 +57,183 @@ local function main(data)
   local history = content.history == null and '' or content.history
 
   if not objective or not phase or not episodes then
-    return data
+    return nil
   end
 
   local nextEpisode = nil
-  local nextEpisode_e = nil
   local episodes_es = {}
+  local doneCount = 0
+  local trackIdx = 0
   for _, episode in ipairs(episodes) do
+    trackIdx = trackIdx + 1
+    if episode.state == 'done' or episode.state == 'skipped' then
+      doneCount = doneCount + 1
+    end
     if not nextEpisode and (episode.state == 'ongoing' or episode.state == 'pending') then
       nextEpisode = episode
-      nextEpisode_e = h.div {
-        h.h4 { episode.title },
-        h.p { episode.content },
-      }
     end
 
-    table.insert(episodes_es, h.div {
-      h.h4 {
-        '[' .. episode.stage .. '] ',
-        episode.title,
-        h.span {
-          ' (' .. episode.state .. ')'
-        }
-      },
-      h.p {
-        episode.content,
-      }
-    })
+    table.insert(episodes_es,
+      h.details['lb-stage-track' .. (episode == nextEpisode and ' lb-stage-track-active' or '')] {
+        h.summary['lb-stage-track-summary'] {
+          h.span['lb-stage-track-num'] { tostring(trackIdx) },
+          h.span['lb-stage-track-title'] { episode.title },
+          h.span['lb-stage-track-state'] { episode.state },
+        },
+        h.p['lb-stage-track-desc'] { episode.content },
+      })
   end
 
   local id = 'lb-stage-' .. math.random()
 
   local playing = phase.title .. (nextEpisode and ' - ' .. nextEpisode.title or '')
+  local progressPct = #episodes > 0 and math.floor(doneCount / #episodes * 100) or 0
+  local progressCounter = doneCount .. ' / ' .. #episodes
 
-  local html = h.div['lb-module-root'] {
-    data_id = 'lb-stage',
+  local debugId = id .. '-debug'
+
+  local html = h.div['lb-stage-root'] {
     h.button['lb-stage-entry'] {
       popovertarget = id,
       type = 'button',
-      h.span['lb-stage-entry-window'] {
-        h.span['lb-stage-entry-roller'] {
-          h.span { playing },
-          h.span { playing },
-        }
-      }
+      h.span['lb-stage-eq'] {
+        h.span {},
+        h.span {},
+        h.span {},
+      },
+      h.span['lb-stage-entry-info'] {
+        h.span['lb-stage-entry-label'] { 'Now Playing' },
+        h.span['lb-stage-entry-title'] { playing },
+      },
+      h.span['lb-stage-counter'] { progressCounter },
+      h.span['lb-stage-progress'] {
+        style = '--progress: ' .. progressPct .. '%;',
+      },
     },
     h.dialog['lb-dialog lb-stage-dialog'] {
       id = id,
       popover = '',
-      h.div {
-        style = 'float: right;',
+      h.div['lb-stage-dialog-header'] {
+        h.div['lb-stage-dialog-art'] {},
+        h.div['lb-stage-dialog-header-info'] {
+          h.span['lb-stage-dialog-label'] { objective.title },
+          h.span['lb-stage-dialog-phase'] { phase.title },
+          h.span['lb-stage-dialog-phase-sub'] {
+            phase.content,
+          },
+        },
         h.button['lb-reroll'] {
           risu_btn = "lb-interaction__lb-stage__Regenerate",
           type = 'button',
           h.lb_reroll_icon { closed = true }
         },
       },
-      h.hgroup {
-        h.h1 {
-          objective.title,
-        },
-        h.h2['lb-stage-phase'] {
-          phase.title,
-          h.span {
-            ' (' .. phase.stage .. ')'
-          }
-        },
-        h.p {
-          phase.content,
+      h.div['lb-stage-dialog-controls'] {
+        nextEpisode and h.div['lb-stage-now-playing'] {
+          h.div['lb-stage-now-playing-header'] {
+            h.span['lb-stage-eq lb-stage-eq-sm'] {
+              h.span {},
+              h.span {},
+              h.span {},
+            },
+            h.span { 'Now Playing' },
+          },
+          h.div['lb-stage-now-playing-title'] { nextEpisode.title },
+          h.p['lb-stage-now-playing-desc'] { nextEpisode.content },
+        } or '',
+        h.div['lb-stage-dialog-progress-row'] {
+          h.div['lb-stage-dialog-progress-bar'] {
+            h.div {
+              style = 'width: ' .. progressPct .. '%;',
+            },
+          },
+          h.span['lb-stage-dialog-progress-text'] {
+            'Episode ' .. progressCounter,
+          },
         },
       },
-      h.h3 {
-        'Ongoing Episode',
+      h.div['lb-stage-dialog-body'] {
+        h.div['lb-stage-tracklist-header'] {
+          h.span { 'TRACKLIST' },
+          h.span['lb-stage-tracklist-count'] { #episodes .. ' episodes' },
+        },
+        h.div['lb-stage-tracklist'] {
+          episodes_es,
+        },
       },
-      nextEpisode_e,
-      h.details {
-        h.summary 'All Episodes (Spoilers)',
-        episodes_es,
+      h.div['lb-stage-dialog-footer'] {
+        h.button['lb-stage-debug-btn'] {
+          popovertarget = debugId,
+          type = 'button',
+          h.span['lb-stage-debug-icon'] {},
+        },
+        h.button['lb-stage-dialog-close'] {
+          popovertarget = id,
+          type = 'button',
+          '닫기',
+        },
       },
-      h.details {
-        h.summary 'Debug (Spoilers)',
-        h.div {
-          'Objective: ' .. (objective.content or ''),
+      h.div['lb-stage-debug-popover'] {
+        id = debugId,
+        popover = '',
+        h.div['lb-stage-debug-popover-header'] {
+          h.span { 'Debug' },
+          h.button['lb-stage-debug-popover-close'] {
+            popovertarget = debugId,
+            type = 'button',
+            '\195\151',
+          },
         },
-        h.div {
-          'Completion: ' .. (objective.completion or ''),
+        h.div['lb-stage-debug-content'] {
+          h.div { 'Objective: ' .. (objective.content or '') },
+          h.div { 'Completion: ' .. (objective.completion or '') },
+          h.div { 'Divergence: ' .. (content.divergence or '') },
+          h.div { 'Comment: ' .. (comment or '') },
+          h.div { 'History: ' .. (history or '') },
         },
-        h.div {
-          'Divergence: ' .. (content.divergence or ''),
-        },
-        h.div {
-          'Comment: ' .. (comment or ''),
-        },
-        h.div {
-          'History: ' .. (history or ''),
-        }
-      }
+      },
     },
   }
 
-  return data .. tostring(html)
+  return tostring(html)
 end
 
 listenEdit(
-  "editDisplay",
+  'editDisplay',
   function(tid, data, meta)
+    if not data or data == '' then
+      return ''
+    end
+
     setTriggerId(tid)
 
-    if meta and meta.index ~= nil then
-      local position = meta.index - getChatLength(triggerId)
+    if meta.index ~= 0 then
+      local position = meta.index - getChatLength(tid)
       if position < -5 then
         return data
       end
     end
 
-    local success, result = pcall(main, data)
-    if success then
-      return result
-    else
-      print("[LightBoard] Stage display failed:", tostring(result))
+    local nodes = prelude.extractNodes('lb-stage', data)
+    if #nodes == 0 then
+      return data
     end
 
-    return data
+    local node = nodes[1]
+    local renderSuccess, rendered = pcall(render, node)
+    if not renderSuccess then
+      print('[LightBoard] Stage render failed:', tostring(rendered))
+      rendered = '<lb-lazy id="lb-stage">오류: ' .. tostring(rendered) .. '</lb-lazy>'
+    elseif not rendered then
+      return data
+    end
+
+    return data:sub(1, node.rangeStart - 1) .. rendered .. data:sub(node.rangeEnd + 1)
   end
 )
 
 listenEdit(
-  "editRequest",
+  'editRequest',
   function(tid, data)
     setTriggerId(tid)
 

@@ -23,7 +23,14 @@ local function loadCallback(triggerId, id, name)
   local book = prelude.getPriorityLoreBook(triggerId, id .. '.lb.' .. name)
   if book and book.content ~= '' then
     local ok, func = pcall(load, book.content, '@' .. id .. '.' .. name, 't')
-    if ok and type(func) == "function" then return func() end
+    if ok and type(func) == "function" then
+      local ok2, res = pcall(func)
+      if ok2 and type(res) == "function" then
+        return res
+      end
+      print('[LightBoard Backend] Callback ' .. name .. ' load error for ' .. id, tostring(res))
+      return
+    end
     print('[LightBoard Backend] Callback ' .. name .. ' load error for ' .. id, tostring(func))
   end
 end
@@ -75,7 +82,7 @@ local function getManifests(triggerId)
   end
 
   table.sort(parsedManifests, function(a, b)
-    return (a.insertOrder or 0) > (b.insertOrder or 0)
+    return (a.insertOrder or 0) < (b.insertOrder or 0)
   end)
 
   return parsedManifests

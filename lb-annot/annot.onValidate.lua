@@ -1,17 +1,4 @@
-local triggerId = ''
-
-local function setTriggerId(tid)
-  triggerId = tid
-  local source = getLoreBooks(triggerId, 'lightboard-prelude')
-  if not source or #source == 0 then
-    error('Failed to load lightboard-prelude.')
-  end
-  load(source[1].content, '@prelude', 't')()
-end
-
-function onValidate(triggerId, output)
-  setTriggerId(triggerId)
-
+local function main(tid, output)
   local node = prelude.queryNodes('lb-annot', output)
   if #node == 0 then
     return
@@ -44,7 +31,7 @@ function onValidate(triggerId, output)
     error('InvalidOutput: Malformed data format. Aggregated errors:\n' .. table.concat(errors, '\n'))
   end
 
-  local chats = getFullChat(triggerId)
+  local chats = getFullChat(tid)
   local targetIndex = nil
 
   for i = #chats, 1, -1 do
@@ -92,4 +79,4 @@ function onValidate(triggerId, output)
   end
 end
 
-return onValidate
+return main

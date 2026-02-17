@@ -195,8 +195,7 @@ local function renderCollection(chatAnnotsMaybe, fullState)
     h.div['lb-annot-pinned-list'](pinned_es),
   } or nil
 
-  return tostring(h.div['lb-module-root'] {
-    data_id = 'lb-annot',
+  return tostring(h.div['lb-annot-root'] {
     h.button['lb-annot-opener'] {
       popovertarget = id,
       type = 'button',
@@ -229,58 +228,73 @@ local function renderCollection(chatAnnotsMaybe, fullState)
   })
 end
 
-listenEdit(
-  "editDisplay",
-  function(tid, data, meta)
-    setTriggerId(tid)
+local function main(data, chatIndex)
+  ---@type AnnotsState
+  local defaultState = {
+    pinned = {},
+    stack = {},
+  }
 
-    if meta and meta.index ~= nil then
-      local position = meta.index - getChatLength(triggerId)
-      if position < -5 then
-        return data
-      end
-    end
+  ---@type AnnotsState
+  local fullState = getState(triggerId, 'lb-annot-data') or defaultState
+  if fullState == null then fullState = defaultState end
 
-    ---@type AnnotsState
-    local fullState = getState(triggerId, 'lb-annot-data') or {}
+  local out = data
+  local nodes = prelude.queryNodes('lb-annot', out)
+  if #nodes > 0 then
+    local node = nodes[#nodes]
+    local before = out:sub(1, node.rangeStart - 1)
+    local after = out:sub(node.rangeEnd + 1)
 
-    local out = data
-    local nodes = prelude.queryNodes('lb-annot', out)
-    if #nodes > 0 then
-      local node = nodes[#nodes]
-      local before = out:sub(1, node.rangeStart - 1)
-      local after = out:sub(node.rangeEnd + 1)
-
-      ---@type ChatAnnots?
-      local annots = nil
-      for _, chatAnnots in ipairs(fullState.stack) do
-        if chatAnnots.chatIndex == (tonumber(node.attributes.of) or meta.index) then
-          annots = chatAnnots
-          break
-        end
-      end
-
-      local success, result = pcall(renderCollection, annots, fullState)
-      if success then
-        out = before .. after .. result
-      else
-        print("[LightBoard] Annot collection render failed:", tostring(result))
-      end
-    end
-
-    for _, item in ipairs(fullState.stack) do
-      if item.chatIndex == meta.index then
-        local success, result = pcall(renderInline, item, out, fullState)
-        if success then
-          return result
-        else
-          print("[LightBoard] Annot inline render failed:", tostring(result))
-        end
+    ---@type ChatAnnots?
+    local annots = nil
+    for _, chatAnnots in ipairs(fullState.stack) do
+      if chatAnnots.chatIndex == (tonumber(node.attributes.of) or chatIndex) then
+        annots = chatAnnots
         break
       end
     end
 
-    return out
+    local success, result = pcall(renderCollection, annots, fullState)
+    if success then
+      out = before .. after .. result
+    else
+      print("[LightBoard] Annot collection render failed:", tostring(result))
+    end
+  end
+
+  for _, item in ipairs(fullState.stack) do
+    if item.chatIndex == chatIndex then
+      local success, result = pcall(renderInline, item, out, fullState)
+      if success then
+        return result
+      else
+        print("[LightBoard] Annot inline render failed:", tostring(result))
+      end
+      break
+    end
+  end
+
+  return out
+end
+
+listenEdit(
+  'editDisplay',
+  function(tid, data, meta)
+    setTriggerId(tid)
+
+    local position = meta.index - getChatLength(triggerId)
+    if position < -5 then
+      return data
+    end
+
+    local success, result = pcall(main, data, meta.index)
+    if success then
+      return result
+    else
+      print('[LightBoard] Annot render failed:', tostring(result))
+      return data
+    end
   end
 )
 

@@ -1,56 +1,523 @@
 <style>
-  .lb-stage-entry {
-    background: var(--risu-theme-bgcolor);
-    border: 1px solid var(--FontColorStandard);
-    border-radius: 4px;
-    color: var(--FontColorStandard);
-    padding: 8px 0;
+  [data-id=lb-stage],
+  .lb-stage-root {
+    --accent: #e8a838;
   }
 
-  .lb-stage-entry-window {
+  .lb-stage-root {
+    order: 9;
+    width: 100%;
+  }
+
+  .lb-stage-entry {
+    align-items: center;
+    background: var(--risu-theme-bgcolor);
+    border: 1px solid color-mix(in srgb, var(--FontColorStandard) 20%, transparent);
+    border-radius: 4px;
+    color: var(--FontColorStandard);
+    display: flex;
+    gap: 8px;
+    overflow: hidden;
+    padding: 6px 10px;
+    position: relative;
+    text-align: left;
+    width: 100%;
+  }
+
+  /* Equalizer bars */
+  .lb-stage-eq {
+    align-items: flex-end;
+    display: flex;
+    flex-shrink: 0;
+    gap: 2px;
+    height: 14px;
+  }
+  .lb-stage-eq > span {
+    background: var(--accent);
+    border-radius: 1px;
     display: block;
+    width: 3px;
+  }
+  @keyframes lb-stage-eq-1 {
+    0%,
+    100% {
+      height: 40%;
+    }
+    15% {
+      height: 100%;
+    }
+  }
+  @keyframes lb-stage-eq-2 {
+    0%,
+    100% {
+      height: 30%;
+    }
+    12% {
+      height: 80%;
+    }
+  }
+  @keyframes lb-stage-eq-3 {
+    0%,
+    100% {
+      height: 55%;
+    }
+    18% {
+      height: 95%;
+    }
+  }
+  .lb-stage-eq > span:nth-child(1) {
+    animation: lb-stage-eq-1 0.8s ease-in-out infinite;
+    height: 40%;
+  }
+  .lb-stage-eq > span:nth-child(2) {
+    animation: lb-stage-eq-2 0.6s ease-in-out infinite;
+    height: 80%;
+  }
+  .lb-stage-eq > span:nth-child(3) {
+    animation: lb-stage-eq-3 0.9s ease-in-out infinite;
+    height: 55%;
+  }
+  {{#when::toggle::lb-stage.nofx}}
+  .lb-stage-eq > span {
+    animation: none !important;
+  }
+  {{/when}}
+
+  .lb-stage-entry-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
     overflow: hidden;
   }
 
-  @keyframes flow {
-    0% {
-      transform: translateX(0);
-    }
-    100% {
-      transform: translateX(-100%);
-    }
-  }
-  .lb-stage-entry-roller {
-    animation: flow linear infinite 10000ms;
-    display: block;
-    position: relative;
-  }
-  .lb-stage-entry-roller * {
-    display: block;
-    padding-right: 1em;
-  }
-  .lb-stage-entry-roller *::before {
-    content: 'Now Playing: ';
-  }
-  .lb-stage-entry-roller :last-child {
-    inset: 0;
-    position: absolute;
-    transform: translateX(100%);
+  .lb-stage-entry-label {
+    color: var(--accent);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    line-height: 1;
+    text-transform: uppercase;
   }
 
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
+  .lb-stage-entry-title {
+    font-size: 12px;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
+
+  .lb-stage-counter {
+    color: var(--accent);
+    flex-shrink: 0;
+    font-size: 11px;
+    margin-left: auto;
+    opacity: 0.8;
+  }
+
+  /* Progress bar */
+  .lb-stage-progress {
+    background: color-mix(in srgb, var(--FontColorStandard) 10%, transparent);
+    border-radius: 0 0 4px 4px;
+    bottom: 0;
+    display: block;
+    height: 2px;
+    left: 0;
+    position: absolute;
+    right: 0;
+  }
+  .lb-stage-progress::after {
+    background: var(--accent);
+    border-radius: inherit;
+    content: '';
+    display: block;
+    height: 100%;
+    transition: width 0.3s ease;
+    width: var(--progress, 0%);
+  }
+
   .lb-stage-dialog {
-    background: var(--risu-theme-bgcolor);
-    border: 1px solid var(--FontColorStandard);
+    background: #181818;
+    border: none;
+    border-radius: 12px;
+    color: #e8e8e8;
+    max-width: 400px;
+    overflow: hidden;
+    padding: 0;
+  }
+  .lb-stage-dialog:popover-open {
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+  }
+
+  /* Art — large album cover */
+  .lb-stage-dialog-header {
+    position: relative;
+  }
+
+  .lb-stage-dialog-art {
+    aspect-ratio: 1;
+    background: url('{{source::char}}') center / cover no-repeat #2a2a2a;
+    display: block;
+    width: 100%;
+  }
+
+  .lb-stage-dialog-art::after {
+    background: linear-gradient(transparent 50%, #181818);
+    content: '';
+    inset: 0;
+    position: absolute;
+  }
+
+  .lb-stage-dialog-header-info {
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    left: 0;
+    padding: 16px 20px;
+    position: absolute;
+    right: 0;
+    z-index: 1;
+  }
+
+  .lb-stage-dialog-label {
+    color: #ccc;
+    font-size: 11px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .lb-stage-dialog-phase {
+    font-size: 20px;
+    font-weight: 700;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .lb-stage-dialog-phase-sub {
+    color: #aaa;
+    font-size: 12px;
+    line-height: 1.4;
+    word-break: keep-all;
+  }
+
+  .lb-stage-dialog-header .lb-reroll {
+    background: #00000066;
+    backdrop-filter: blur(8px);
+    border: 1px solid #ffffff20;
+    border-radius: 50%;
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    z-index: 1;
+  }
+  .lb-stage-dialog-header .lb-reroll:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #181818;
+  }
+
+  /* Now Playing + Progress — control strip */
+  .lb-stage-dialog-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 20px 16px;
+  }
+
+  .lb-stage-now-playing {
+    background: none;
+    border-radius: 0;
+    padding: 0;
+  }
+
+  .lb-stage-now-playing-header {
+    align-items: center;
+    color: var(--accent);
+    display: flex;
+    font-size: 10px;
+    font-weight: 600;
+    gap: 6px;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+
+  .lb-stage-now-playing-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .lb-stage-now-playing-desc {
+    color: #999;
+    font-size: 12px;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* Progress bar (dialog) */
+  .lb-stage-dialog-progress-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .lb-stage-dialog-progress-bar {
+    background: #333;
+    border-radius: 2px;
+    height: 3px;
+    overflow: hidden;
+  }
+
+  .lb-stage-dialog-progress-bar > div {
+    background: var(--accent);
+    border-radius: inherit;
+    height: 100%;
+    transition: width 0.3s ease;
+  }
+
+  .lb-stage-dialog-progress-text {
+    color: #666;
+    font-size: 10px;
+    text-align: right;
+  }
+
+  /* Body — tracklist */
+  .lb-stage-dialog-body {
+    border-top: 1px solid #282828;
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+    overflow-y: auto;
+    padding: 0;
+  }
+
+  .lb-stage-tracklist-header {
+    align-items: baseline;
+    display: flex;
+    font-size: 10px;
+    font-weight: 700;
+    gap: 8px;
+    justify-content: space-between;
+    letter-spacing: 1px;
+    padding: 12px 20px 4px;
+    text-transform: uppercase;
+  }
+
+  .lb-stage-tracklist-count {
+    color: #555;
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+
+  .lb-stage-tracklist {
+    display: flex;
+    flex-direction: column;
+    padding: 0 12px 8px;
+  }
+
+  .lb-stage-track {
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .lb-stage-track > summary {
+    list-style: none;
+  }
+
+  .lb-stage-track-summary {
+    align-items: center;
+    display: grid;
+    gap: 8px;
+    grid-template-columns: 24px 1fr auto;
+    padding: 6px 8px;
+  }
+
+  .lb-stage-track:hover {
+    background: #ffffff08;
+  }
+
+  .lb-stage-track-active {
+    background: var(--accent)10;
+  }
+  .lb-stage-track-active .lb-stage-track-title {
+    color: var(--accent);
+  }
+
+  .lb-stage-track-num {
+    color: #555;
+    font-size: 11px;
+    overflow: hidden;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .lb-stage-track-active .lb-stage-track-num {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .lb-stage-track-desc {
+    color: #999;
+    font-size: 12px;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0 8px 8px 40px;
+  }
+  .lb-stage-track[open]::details-content {
+    opacity: 1;
+    transition: opacity 0.15s ease-out, content-visibility 1ms allow-discrete;
+  }
+  .lb-stage-track:not([open])::details-content {
+    opacity: 0;
+    transition: opacity 0.1s ease;
+  }
+
+  .lb-stage-track-title {
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .lb-stage-track-state {
+    color: #555;
+    font-size: 10px;
+  }
+
+  /* Small equalizer (for now-playing header) */
+  .lb-stage-eq-sm {
+    height: 12px;
+  }
+  .lb-stage-eq-sm > span {
+    width: 2px;
+  }
+
+  /* Debug — nested popover */
+  .lb-stage-debug-content {
+    color: #888;
+    display: flex;
+    flex-direction: column;
+    font-size: 11px;
+    gap: 4px;
+    line-height: 1.5;
+    word-break: break-all;
+  }
+
+  .lb-stage-debug-popover {
+    background: #222;
+    border: 1px solid #333;
     border-radius: 8px;
-    color: var(--FontColorStandard);
-    padding: 16px;
+    color: #ccc;
+    inset: auto auto 48px 0;
+    max-width: 360px;
+    padding: 0;
+    position-area: bottom;
+    width: 90%;
+  }
+  .lb-stage-debug-popover:popover-open {
+    display: block;
+  }
+
+  .lb-stage-debug-popover-header {
+    align-items: center;
+    border-bottom: 1px solid #333;
+    display: flex;
+    font-size: 12px;
+    font-weight: 600;
+    justify-content: space-between;
+    padding: 10px 14px;
+  }
+
+  .lb-stage-debug-popover-close {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0 4px;
+  }
+  .lb-stage-debug-popover-close:hover {
+    color: #e8e8e8;
+  }
+
+  .lb-stage-debug-popover .lb-stage-debug-content {
+    margin-top: 0;
+    padding: 12px 14px;
+  }
+
+  /* Footer */
+  .lb-stage-dialog-footer {
+    align-items: center;
+    border-top: 1px solid #282828;
+    display: flex;
+  }
+
+  .lb-stage-debug-btn {
+    align-items: center;
+    background: none;
+    border: none;
+    border-right: 1px solid #282828;
+    color: #555;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    padding: 10px 14px;
+    transition: color 0.1s ease;
+  }
+  .lb-stage-debug-btn:hover {
+    color: var(--accent);
+  }
+
+  .lb-stage-debug-icon {
+    display: block;
+    height: 14px;
+    position: relative;
+    width: 14px;
+  }
+  .lb-stage-debug-icon::before,
+  .lb-stage-debug-icon::after {
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+    content: '';
+    position: absolute;
+  }
+  .lb-stage-debug-icon::before {
+    height: 10px;
+    left: 0;
+    top: 0;
+    width: 10px;
+  }
+  .lb-stage-debug-icon::after {
+    border: none;
+    border-radius: 0;
+    background: currentColor;
+    height: 1.5px;
+    right: 0;
+    bottom: 0;
+    transform: rotate(45deg);
+    width: 6px;
+  }
+
+  .lb-stage-dialog-close {
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    flex-grow: 1;
+    font-size: 13px;
+    padding: 10px;
+    transition: background 0.1s ease, color 0.1s ease;
+  }
+
+  @media (hover: hover) {
+    .lb-stage-dialog-close:hover {
+      background: var(--accent);
+      color: #181818;
+    }
   }
 </style>

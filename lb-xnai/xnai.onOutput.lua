@@ -1,20 +1,3 @@
-local triggerId = ''
-
-local function setTriggerId(tid)
-  triggerId = tid
-  if type(prelude) ~= 'nil' then
-    prelude.import(triggerId, 'toon.decode')
-    return
-  end
-  local source = getLoreBooks(triggerId, 'lightboard-prelude')
-  if not source or #source == 0 then
-    error('Failed to load lightboard-prelude.')
-  end
-  load(source[1].content, '@prelude', 't')()
-
-  prelude.import(triggerId, 'toon.decode')
-end
-
 ---Strips all XML nodes from text, returning stripped text and a restore function.
 ---@param text string
 ---@return string stripped
@@ -92,9 +75,7 @@ end
 ---@param output string
 ---@param fullChatContent string
 ---@param index number
-function onOutput(tid, output, fullChatContent, index)
-  setTriggerId(tid)
-
+local function main(tid, output, fullChatContent, index)
   if not string.find(output, '<lb%-xnai') then
     return nil
   end
@@ -106,7 +87,7 @@ function onOutput(tid, output, fullChatContent, index)
   local nodes = prelude.queryNodes('lb-xnai', output)
 
   ---@type XNAIGen
-  local gen = prelude.import(triggerId, 'lb-xnai.gen')
+  local gen = prelude.import(tid, 'lb-xnai.gen')
 
   local node = nodes[#nodes]
   local success, xnaiData = pcall(prelude.toon.decode, node.content)
@@ -115,7 +96,7 @@ function onOutput(tid, output, fullChatContent, index)
     ---@type XNAIResponse
     local response = xnaiData
     ---@type XNAIStackItem[]
-    local xnaiState = getState(triggerId, 'lb-xnai-stack') or {}
+    local xnaiState = getState(tid, 'lb-xnai-stack') or {}
     if type(xnaiState) ~= 'table' then
       xnaiState = {}
     else
@@ -137,14 +118,14 @@ function onOutput(tid, output, fullChatContent, index)
       }
     }
 
-    local shouldGenerateNow = getGlobalVar(triggerId, 'toggle_lb-xnai.generation') == '0'
+    local shouldGenerateNow = getGlobalVar(tid, 'toggle_lb-xnai.generation') == '0'
 
     ---@type table<string, string>
     local inlays = {}
 
     if shouldGenerateNow then
       if response.keyvis then
-        local ok, inlay = pcall(gen.generate, triggerId, response.keyvis)
+        local ok, inlay = pcall(gen.generate, tid, response.keyvis)
         if ok and inlay then
           inlays['-1'] = inlay
         end
@@ -155,7 +136,7 @@ function onOutput(tid, output, fullChatContent, index)
       local slot = tostring(scene.slot)
       stackItem.data.scenes[slot] = scene
       if shouldGenerateNow then
-        local ok, inlay = pcall(gen.generate, triggerId, scene)
+        local ok, inlay = pcall(gen.generate, tid, scene)
         if ok and inlay then
           inlays[slot] = inlay
         end
@@ -164,7 +145,7 @@ function onOutput(tid, output, fullChatContent, index)
 
     table.insert(xnaiState, stackItem)
 
-    local maxSaves = tonumber(getGlobalVar(triggerId, 'toggle_lb-xnai.maxSaves')) or 3
+    local maxSaves = tonumber(getGlobalVar(tid, 'toggle_lb-xnai.maxSaves')) or 3
     while #xnaiState > maxSaves do
       table.remove(xnaiState, 1)
     end
@@ -186,7 +167,7 @@ function onOutput(tid, output, fullChatContent, index)
     -- remove unreplaced [Slot #] tags
     slotted = slotted:gsub('\n%[Slot%s+%d+%]\n', '')
     slotted = restoreNodes(slotted)
-    setState(triggerId, 'lb-xnai-stack', xnaiState)
+    setState(tid, 'lb-xnai-stack', xnaiState)
 
     if inlays['-1'] then
       return slotted .. '\n\n<lb-xnai kv>' .. inlays['-1'] .. '</lb-xnai>', '<lb-lazy id="lb-xnai" />'
@@ -198,4 +179,4 @@ function onOutput(tid, output, fullChatContent, index)
   return nil, '<lb-lazy id="lb-xnai" />'
 end
 
-return onOutput
+return main

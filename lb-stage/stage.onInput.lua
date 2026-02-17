@@ -1,20 +1,3 @@
-local triggerId = ''
-
-local function setTriggerId(tid)
-  triggerId = tid
-  if type(prelude) ~= 'nil' then
-    prelude.import(triggerId, 'toon.decode')
-    return
-  end
-  local source = getLoreBooks(triggerId, 'lightboard-prelude')
-  if not source or #source == 0 then
-    error('Failed to load lightboard-prelude.')
-  end
-  load(source[1].content, '@prelude', 't')()
-
-  prelude.import(triggerId, 'toon.decode')
-end
-
 local function base64Decode(data)
   local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
   data = string.gsub(data, '[^' .. b .. '=]', '')
@@ -44,9 +27,7 @@ local function xordecrypt(str)
   return table.concat(result)
 end
 
-function onInput(tid, input)
-  setTriggerId(tid)
-
+local function main(_, input)
   local node = prelude.queryNodes('lb-stage', input)[1]
   if not node then
     return input
@@ -60,4 +41,4 @@ function onInput(tid, input)
   return input
 end
 
-return onInput
+return main

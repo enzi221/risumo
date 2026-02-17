@@ -1,12 +1,20 @@
 # Tagging Details
 
-Three key components you need to tag: Camera, Scene, and Characters. Two types of images: Scenes and Key Visual.
+Three key components you need to tag: Camera, Environment, and Characters.
 
 ## Components
 
 ### Common Rules
 
 Use common, objective, visualizable, generic image board (Danbooru) tags, suitable for _data labeling_.
+
+Limit characters to max {{dictelement::{"0":"3","1":"2","2":"1"}::{{getglobalvar::toggle_lb-xnai.characters}}}}. Out-of-frame characters with only some bodyparts visible can be tagged regardless of the limit like: `boy, out of frame, hand`.
+
+#### Tag Syntax
+
+`{tag}`/`{{tag}}` increase intensity, `[tag]`/`[[tag]]` decrease. `{number}::{tag}::` multiplies intensity.
+
+Respect Client-specified modifiers (Instructions Override or Client Direction) exactly as written, preserving internal whitespace and punctuation (`::cloud9 ::`, not `::cloud9::`). Do not add modifiers on your own since you have no visual feedback.
 
 ### Camera
 
@@ -42,9 +50,9 @@ In order of increasing view, from legs:
 
 Specific body parts: `(part) focus` with `close-up`.
 
-### Scene
+### Environment
 
-{{#when::toggle::lb-xnai.nsfw}}If the scene is explicit, start with `nsfw`.{{/when}}
+{{#when::toggle::lb-xnai.nsfw}}If the image would be explicit, start with `nsfw`.{{/when}}
 
 #### Character Count
 
@@ -54,8 +62,6 @@ Specific body parts: `(part) focus` with `close-up`.
 - no humans
 
 And so on.
-
-Limit character count to {{dictelement::{"0":"3","1":"2","2":"1"}::{{getglobalvar::toggle_lb-xnai.characters}}}}. If more characters are present, tag only the most prominent. Out-of-frame characters with only bodyparts visible can be tagged regardless of the limit: `boy, out of frame, hand`.
 
 #### Location and Lighting
 
@@ -77,14 +83,14 @@ Age tags are strictly for appearance only. If the character is middle-aged woman
   - Required: Length (very long to short; hair bun is an exception), color, style. Include bangs as well (mandatory, unless head/eye out of frame). `long straight blue hair`, `white single hair bun`, `medium black wavy hair` combined with `choppy bangs`, `swept bangs`
   - Addition: `ahoge`, `braid`
 - Eye:
-  - Required unless closed or head/eyes out of frame, even when `from behind`: `[color] eyes`.
+  - Required unless eyes not visible. Still required for `from behind`: `[color] eyes`.
   - Addition: `tareme`, `tsurime`, `jitome`, `empty eyes`, `dashed eyes`, `@_@`, etc.
 - Body type
   - Required: Skin color.
   - Recommended: `slim`, `slender`, `chubby`, `muscular` or `toned`, `fat`
   - Required if female: Breast size: `small/medium/large/huge breasts`
 - Other facial features if any: `freckles`, `facial hair`
-- Attire: For each item, `[color] [type]`, with specific details. Only tag items visible in the scene. If the body part would go out of frame, do not include the item.
+- Attire: For each item, `[color] [material?] [type]`, with specific details. Only tag items visible in the scene.
   - Requires `naked` if naked.
   - Disassemble uniforms into explicit parts.
   - If applicable, go specific. Length, sleeve type, etc.
@@ -104,30 +110,30 @@ Age tags are strictly for appearance only. If the character is middle-aged woman
   - Sexual: Include all actions being performed with high details. `sex from front` (Not just `sex`, specify direction), `imminent penetration`, `embracing`, etc.{{/when}}
 - Exposed body parts: Only if within the frame. `armpits`, `clavicle`, `cleavage`, `navel`, `thighs`, `buttocks`, {{#when::toggle::lb-xnai.nsfw}}`nipples`, `pussy`, `anus`, `penis`{{/when}}...
 
-If a character lacks detail in their description, fill in missing details creatively but within settings.
-
-Characters without any descriptions given are not worth tagging.
+For characters with partial descriptions, fill in missing details creatively within settings. Characters with no description at all should be omitted entirely.
 
 #### Positive and Negative Tags
 
-You will ONLY label positive tags. Do not label negative tags by yourself, unless the client has EXPLICITLY specified negative tags for characters in EITHER Instructions Override or Client Direction. IGNORE ALL OTHER SECTIONS, INCLUDING THE CHARACTER DESCRIPTIONS ITSELF.
+Only label positive tags. Negative tags: only include if the Client explicitly specifies them in Instructions Override or Client Direction. Do not infer negatives from any other source.
 
 For positive tags, requirements still apply (unless explicitly overridden or emphasized), such as:
 
 - Required tags must be present still.
 - Tag only VISIBLE elements.
 
-## Image Types
+## Images
 
 As a creative photographer, you should label images so that it'll attract viewers and be artistically satisfying.
 
 Important note: You are to tag for the LAST LOG ENTRY (Log #N) only.
 
+{{#when::lb-xnai.kv.off::tis::0}}
 ### Key Visual
 
 The main promotional image of the log entry. Should encompass the overall theme of the log or the most important moment. Can be environment only (`no human`) if surroundings are more important, or there are no characters present.
 
 Key Visual should be boldly produced like a magazine cover or an album cover. Should be distinct from all other Scenes, in composition, characters, environment, or anything.
+{{/when}}
 
 ### Scene
 
@@ -145,39 +151,7 @@ We've prepared slots where scenes can be placed: `[Slot #]`. Pick a slot number,
 
 Slots were placed mechanically, so some slots might be unsuitable for scene placement, such as slots within out-of-prose contents. Avoid such slots.
 
-Key visuals are placed at either the top or the bottom of the log entry. Avoid using the top or the bottom slots.
-
-## Tag Syntax
-
-{curly braces} increase tag intensity, [square brackets] decrease. {number}::{tag}:: increases or decreases the tag intensity by the number.
-
-For example:
-
-{{#escape}}```
-[[cloud]]
-[cloud]
-{cloud}
-{{cloud}}
--1::cloud::
-1.2::cloud::
-
-```{{/escape}}
-
-Respect any modifiers the Client has specified in Instructions Override or Client Direction. Modifiers are sensitive to whitespaces and punctuations, so keep the Client's formatting exactly as is.
-
-Example:
-
-```
-
-GOOD:
-::cloud9 ::
-
-BAD (do not remove spaces or punctuations inside):
-::cloud9::
-
-```
-
-But do not add modifiers by yourself since you have no visual feedback.
+Do not use slots close to each other, or they will overwhelm the prose content. Make some distance. {{#when::lb-xnai.kv.off::tis::0}}Key visuals are placed at either the top or the bottom of the log entry. For the same reason, do not use the top or the bottom slot.{{/when}}
 
 ## Client Comments
 
@@ -216,7 +190,9 @@ scenes[2]:
     characters[2]:
       - positive: girl, adolescent, long pink hair, red eyes, slender, small breasts, red silk off-shoulder dress, sitting on bed, hugging knees, head down, target#conversation
         negative: freckles
+        name: elodia de bellois
       - positive: girl, female, green braided hair, brown eyes, slender, medium breasts, maid uniform, white headband, black onepiece, black flat shoes, standing, smiling, source#conversation
+        name: bridgett baker
     scene: 2girls, interior, bedroom, morning, daylight, sidelighting
     slot: 3
   - camera: ...
@@ -224,19 +200,22 @@ scenes[2]:
       - positive: ...
         negative: ...
     scene: ...
-    slot: ...
+    slot: ...{{#when::keep::lb-xnai.kv.off::tis::0}}
 keyvis:
   camera: from above, upper body, dutch angle
   characters[1]:
     - positive: ...
       negative: ...
-  scene: 1girl, exterior, railing, night, 3::dark::
+      name: ...
+  scene: 1girl, exterior, railing, night, 3::dark::{{/when}}
 </lb-xnai>
 ```
 
 - Use `<lb-xnai>`.
 - Output in TOON format (2-space indent, array length in header).
-- keyvis for key visual, scenes (optional) for scenes list.
+- keyvis for key visual
+- scenes for scenes list
+- `characters[].name` are optional. Write the character's name (full name if given, or the most identifiable form) in English.
 - `characters[].negative` are optional.
 - Close `</lb-xnai>`.
 
@@ -244,7 +223,7 @@ keyvis:
 
 Do not use slots placed out of prose content.
 
-Only make keyvis and scenes for the last log entry.
+Only tag for the last log entry.
 
 Remember: You will ONLY label POSITIVE tags unless explicitly instructed otherwise.
 

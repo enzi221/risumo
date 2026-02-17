@@ -135,14 +135,12 @@ local function render(node, chatIndex)
   local id = 'lb-mini-' .. math.random()
 
   local boardTitle = node.attributes.name or "미니보드"
-  local html = h.div['lb-module-root'] {
+  local html = h.div['lb-module-opener-root'] {
     data_id = 'lb-mini',
-    h.button['lb-collapsible'] {
+    h.button['lb-module-opener'] {
       popovertarget = id,
       type = 'button',
-      h.span['lb-opener'] {
-        h.span '미니보드',
-      },
+      '미니보드',
     },
     h.dialog['lb-dialog lb-mini-dialog'] {
       id = id,
@@ -163,6 +161,11 @@ local function render(node, chatIndex)
           h.lb_comment_icon { closed = true },
           "게시글 쓰기"
         },
+        h.button['lb-reroll'] {
+          risu_btn = 'lb-reroll__lb-mini',
+          type = 'button',
+          h.lb_reroll_icon { closed = true }
+        },
       },
       h.div['lb-mini-wrap'] {
         h.div['lb-mini-container lb-mini-rowgap'] {
@@ -174,11 +177,6 @@ local function render(node, chatIndex)
         type = 'button',
         "닫기",
       }
-    },
-    h.button['lb-reroll'] {
-      risu_btn = 'lb-reroll__lb-mini',
-      type = 'button',
-      h.lb_reroll_icon { closed = true }
     },
   }
 
@@ -201,22 +199,10 @@ local function main(data, chatIndex)
     return data
   end
 
-  local output = ''
-  local lastIndex = 1
-
-  for i = 1, #extractionResult do
-    local match = extractionResult[i]
-    if match.rangeStart > lastIndex then
-      output = output .. data:sub(lastIndex, match.rangeStart - 1)
-    end
-    if i == #extractionResult then
-      -- render lastResult in its original position
-      output = output .. render(lastResult, chatIndex)
-    end
-    lastIndex = match.rangeEnd + 1
-  end
-
-  return output .. data:sub(lastIndex)
+  local rendered = render(lastResult, chatIndex)
+  return data:sub(1, lastResult.rangeStart - 1)
+      .. rendered
+      .. data:sub(lastResult.rangeEnd + 1)
 end
 
 listenEdit(

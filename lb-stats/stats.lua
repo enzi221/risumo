@@ -88,49 +88,13 @@ local function render(node)
   })
 end
 
-local function main(data)
-  if not data or data == '' then
-    return ''
-  end
-
-  local extractionSuccess, extractionResult = pcall(prelude.queryNodes, 'lb-stats', data)
-  if not extractionSuccess then
-    print("[LightBoard] Stats extraction failed:", tostring(extractionResult))
-    return data
-  end
-
-  local lastResult = extractionResult and extractionResult[#extractionResult] or nil
-  if not lastResult then
-    return data
-  end
-
-  local output = ''
-  local lastIndex = 1
-
-  -- 0: prepend, 1: append
-  local position = getGlobalVar(triggerId, 'toggle_lb-stats.position') or '0'
-
-  for i = 1, #extractionResult do
-    local match = extractionResult[i]
-    if match.rangeStart > lastIndex then
-      output = output .. '\n\n' .. data:sub(lastIndex, match.rangeStart - 1)
-    end
-    if i == #extractionResult then
-      if position == '0' then
-        output = render(lastResult) .. output
-      else
-        output = output .. render(lastResult)
-      end
-    end
-    lastIndex = match.rangeEnd + 1
-  end
-
-  return output .. data:sub(lastIndex)
-end
-
 listenEdit(
   "editDisplay",
   function(tid, data, meta)
+    if not data or data == '' then
+      return ''
+    end
+
     setTriggerId(tid)
 
     if meta and meta.index ~= nil then
@@ -140,12 +104,31 @@ listenEdit(
       end
     end
 
-    local success, result = pcall(main, data)
-    if success then
-      return result
-    else
-      print("[LightBoard] Stats display failed:", tostring(result))
-      return data .. '<lb-lazy id="lb-stats">오류: ' .. result .. '</lb-lazy>'
+    local extractionSuccess, extractionResult = pcall(prelude.queryNodes, 'lb-stats', data)
+    if not extractionSuccess then
+      print("[LightBoard] Stats extraction failed:", tostring(extractionResult))
+      return data
     end
+
+    local lastResult = extractionResult and extractionResult[#extractionResult] or nil
+    if not lastResult then
+      return data
+    end
+
+    local renderSuccess, rendered = pcall(render, lastResult)
+    if not renderSuccess then
+      print("[LightBoard] Stats render failed:", tostring(rendered))
+      rendered = '<lb-lazy id="lb-stats">오류: ' .. tostring(rendered) .. '</lb-lazy>'
+    end
+
+    local cleaned = string.gsub(data, '<lb%-stats[^>]*>.-</lb%-stats>', '')
+
+    -- 0: prepend, 1: append
+    local renderPosition = getGlobalVar(triggerId, 'toggle_lb-stats.position') or '0'
+    if renderPosition == '0' then
+      return rendered .. cleaned
+    end
+
+    return cleaned .. rendered
   end
 )

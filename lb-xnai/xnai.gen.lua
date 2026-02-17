@@ -98,7 +98,7 @@ local function generate(triggerId, desc)
 
   local inlay = generateImage(triggerId, prompts.positive, prompts.negative or ''):await()
   if not inlay or inlay == '' then
-    return error('API 호출 실패.')
+    return error('API 호출 실패. 삽화 모듈의 저수준 접근을 꺼버렸나요?')
   end
 
   return inlay

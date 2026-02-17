@@ -4,23 +4,27 @@
 
 ---@diagnostic disable: lowercase-global
 
-local manifest = require('./manifest')
-local sideeffect = require('./sideeffect')
-local lbdata = require('./lbdata')
-local pipeline = require('./pipeline')
-local C = require('./constants')
-
 local triggerId = ''
 
 local function setTriggerId(tid)
   triggerId = tid
-  if type(prelude) ~= "nil" then return end
+  if type(prelude) ~= 'nil' then
+    prelude.import(tid, 'toon.decode')
+    return
+  end
   local source = getLoreBooks(triggerId, 'lightboard-prelude')
   if not source or #source == 0 then
     error('Failed to load lightboard-prelude.')
   end
   load(source[1].content, '@prelude', 't')()
+  prelude.import(tid, 'toon.decode')
 end
+
+local manifest = require('./manifest')
+local sideeffect = require('./sideeffect')
+local lbdata = require('./lbdata')
+local pipeline = require('./pipeline')
+local C = require('./constants')
 
 --- Finds the last chat index with `char` role within a range.
 --- @param fullChat Chat[]
@@ -43,7 +47,7 @@ end
 --- @return Manifest
 local function requireActiveManifest(identifier)
   if not prelude.getFlagToggle(triggerId, 'lightboard.active') then
-    error('리롤 전에 백엔드를 활성화해주세요.')
+    error('리롤 전에 백엔드 전원을 켜주세요.')
   end
   local man = manifest.get(triggerId, identifier)
   if not man then
@@ -100,7 +104,6 @@ local main = async(function(manifests)
     end
   end
 
-  -- Phase 1: Run normal manifests in parallel and assemble LBDATA
   local allProcessedResults = {}
   local maxConcurrent = math.min(5, math.max(1, tonumber(getGlobalVar(triggerId, C.CONFIG.CONCURRENT)) or 1))
 
@@ -131,7 +134,7 @@ local main = async(function(manifests)
   end
 
   -- Get the latest full chat again in case other scripts modified it
-  local fullChatNewest = getFullChat(triggerId)
+  local fullChatNewest = #normalManifests > 0 and getFullChat(triggerId) or fullChat
   local lastCharChatIdx = findLastCharChat(fullChatNewest, 0, 5)
   local lastCharChat = lastCharChatIdx and fullChatNewest[lastCharChatIdx].data or ''
 
@@ -526,7 +529,7 @@ onButtonClick = async(function(tid, code)
 
     local mode = getGlobalVar(tid, C.CONFIG.ACTIVE) or "0"
     if mode == "0" then
-      alertNormal(tid, '[LightBoard] 상호작용 전에 백엔드를 활성화해주세요.')
+      alertNormal(tid, '[LightBoard] 상호작용 전에 백엔드 전원을 켜주세요.')
       return
     end
 
