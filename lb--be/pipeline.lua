@@ -78,18 +78,15 @@ function M.runPipeline(triggerId, man, fullChat, options)
     end
     print('[LightBoard Backend][VERBOSE] Response cleaned.')
 
-    -- critical failure, instant fallback
-    if (modeType == 'generation' or modeType == 'reroll') and (not result or result == '' or result == nil) then
-      error('모델 응답이 비어있거나 null입니다. 검열됐을 수 있습니다.')
-    end
-
-    -- validation from FE
     local valid = true
     local validationError = nil
 
-    if man.onValidate and result then
-      print('[LightBoard Backend][VERBOSE] Response validating.')
+    print('[LightBoard Backend][VERBOSE] Response validating.')
 
+    if not result or result == '' or result == null then
+      valid = false
+      validationError = 'You did not return any output.'
+    elseif man.onValidate and result then
       local success, err = pcall(man.onValidate, triggerId, result)
       if not success then
         local cleanErr = tostring(err):gsub("^.-:%d+: ", "")
