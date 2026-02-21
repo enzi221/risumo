@@ -494,7 +494,9 @@ onStart = function(tid)
     }
   end
 
-  setState(triggerId, 'lb-xnai-stack', fullState)
+  ---@type XNAIGen
+  local gen = prelude.import(triggerId, 'lb-xnai.gen')
+  gen.persistStateAndHistory(triggerId, fullState)
   reloadChat(triggerId, chatIndex)
   removeChat(triggerId, -2)
   removeChat(triggerId, -1)

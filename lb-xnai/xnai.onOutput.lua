@@ -144,11 +144,7 @@ local function main(tid, output, fullChatContent, index)
     end
 
     table.insert(xnaiState, stackItem)
-
-    local maxSaves = tonumber(getGlobalVar(tid, 'toggle_lb-xnai.maxSaves')) or 3
-    while #xnaiState > maxSaves do
-      table.remove(xnaiState, 1)
-    end
+    xnaiState = select(1, gen.persistStateAndHistory(tid, xnaiState))
 
     local stripped, restoreNodes = stripXMLNodes(fullChatContent)
     local slotted = gen.insertSlots(stripped)
@@ -167,8 +163,6 @@ local function main(tid, output, fullChatContent, index)
     -- remove unreplaced [Slot #] tags
     slotted = slotted:gsub('\n%[Slot%s+%d+%]\n', '')
     slotted = restoreNodes(slotted)
-    setState(tid, 'lb-xnai-stack', xnaiState)
-
     if inlays['-1'] then
       return slotted .. '\n\n<lb-xnai kv>' .. inlays['-1'] .. '</lb-xnai>', '<lb-lazy id="lb-xnai" />'
     end

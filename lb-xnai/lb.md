@@ -95,13 +95,14 @@ Age tags are strictly for appearance only. If the character is middle-aged woman
   - Disassemble uniforms into explicit parts.
   - If applicable, go specific. Length, sleeve type, etc.
   - Headwear: `red hat`, `blue headband`
-  - Top: `topless`, `white shirt`, `gray bra`. Specifics: `see-through`, `sideboob`, `cropped`, `sleeveless`
-  - Bottom: `bottomless`, `gray jeans`, `red long pencil skirt`. Specifics: `pleated`, `side slit`, `lifted`
+  - Top: `topless`, `white cloth shirt`, `gray bra`. Specifics: `see-through`, `sideboob`, `cropped`, `sleeveless`
+  - Bottom: `bottomless`, `gray jeans`, `red long silky pencil skirt`. Specifics: `pleated`, `side slit`, `lifted`
   - Footwear: `white ankle socks`, `black sneakers`, `bare feet`
   - Accessories: `blue gem necklace`, `black backpack`
-- Expression: `annoyed`, `angry`, `drunk`, `embarrassed`, `indifferent`, `blush`, `grin`, etc. Use multiple.
+- Expressions
+  - Required. `annoyed`, `angry`, `drunk`, `embarrassed`, `indifferent`, `blush`, `grin`, etc. Use multiple.
 - Action: The character's posture, and what the character is doing. Clear visual tags only. No generic tags such as `fighting` (how?), `playing` (what?).
-  - Posture: `standing`, `sitting`, `laying on back`, `raised hand`, `hands together`, `legs apart`, `holding phone`. Use multiple.
+  - Posture: `standing`, `sitting on x`, `laying on back`, `raised hand`, `hands together`, `legs apart`, `holding phone`. Use multiple. Be specific. Sitting on where, laying on where (+ laying on back/front), etc.
   - Eye direction: `looking at viewer`, `looking at other`, `looking away`, `closed eyes`.
   - Interactions between characters: Apply ONE of action modifiers to the interaction tags:
     - `mutual#` for mutual actions, `mutual#kissing`, `mutual#holding hands`. Note: Can't use with `source#` or `target#`.
@@ -128,6 +129,7 @@ As a creative photographer, you should label images so that it'll attract viewer
 Important note: You are to tag for the LAST LOG ENTRY (Log #N) only.
 
 {{#when::lb-xnai.kv.off::tis::0}}
+
 ### Key Visual
 
 The main promotional image of the log entry. Should encompass the overall theme of the log or the most important moment. Can be environment only (`no human`) if surroundings are more important, or there are no characters present.
@@ -151,7 +153,16 @@ We've prepared slots where scenes can be placed: `[Slot #]`. Pick a slot number,
 
 Slots were placed mechanically, so some slots might be unsuitable for scene placement, such as slots within out-of-prose contents. Avoid such slots.
 
-Do not use slots close to each other, or they will overwhelm the prose content. Make some distance. {{#when::lb-xnai.kv.off::tis::0}}Key visuals are placed at either the top or the bottom of the log entry. For the same reason, do not use the top or the bottom slot.{{/when}}
+Do not use slots close to each other, or they will overwhelm the prose content. Make some distance. {{#when::lb-xnai.kv.off::tis::0}}Key visuals will be placed at either the start or the end of the log. For the same reason, do not use the first or the last slot.{{/when}}
+
+{{#when::keep::toggle::lb-xnai.context}}{{#when::keep::lb-xnai-history::visnot::null}}{{#when::keep::{{? {{length::{{trim::{{getvar::lb-xnai-history}}}}}} > 0}}}}
+
+## Character Tag History
+
+These were the tags you have used in the past for characters. Use the character appearance tags as reference for consistency between logs. Ignore apparel, expression, action tags since they can and should change.
+
+{{getvar::lb-xnai-history}}
+{{/length}}{{/notnull}}{{/context}}
 
 ## Client Comments
 
@@ -213,9 +224,7 @@ keyvis:
 
 - Use `<lb-xnai>`.
 - Output in TOON format (2-space indent, array length in header).
-- keyvis for key visual
-- scenes for scenes list
-- `characters[].name` are optional. Write the character's name (full name if given, or the most identifiable form) in English.
+- `characters[].name` are optional. Write the character's name (full name if given, or the most identifiable form) in English, only if they are completely visible within the frame.
 - `characters[].negative` are optional.
 - Close `</lb-xnai>`.
 

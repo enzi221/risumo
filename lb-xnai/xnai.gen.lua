@@ -1,6 +1,16 @@
 ---@class XNAIPromptSet
+---@field name string?
 ---@field positive string
 ---@field negative string?
+
+---@param value any
+---@return string
+local function trimText(value)
+  if type(value) ~= 'string' then
+    return ''
+  end
+  return prelude.trim(value)
+end
 
 ---@param desc XNAIDescriptor
 ---@return XNAIPromptSet?
@@ -143,13 +153,166 @@ local function insertSlots(text)
   return trimmed
 end
 
+---@param slotA string
+---@param slotB string
+---@return boolean
+local function sortSlots(slotA, slotB)
+  local numA = tonumber(slotA)
+  local numB = tonumber(slotB)
+
+  if numA and numB then
+    return numA < numB
+  end
+
+  return tostring(slotA) < tostring(slotB)
+end
+
+---@param xnaiState XNAIStackItem[]
+---@return string
+local function buildCharacterHistory(xnaiState)
+  local historyMap = {}
+  local orderedKeys = {}
+
+  ---@param character XNAIPromptSet
+  ---@param meta { chatIndex: number, source: 'keyvis'|'scene', slot?: string }
+  local function collect(character, meta)
+    if type(character) ~= 'table' then
+      return
+    end
+
+    local name = trimText(character.name)
+    local positive = trimText(character.positive)
+    local negative = trimText(character.negative)
+
+    if name == '' then
+      return
+    end
+
+    local record = historyMap[name]
+
+    if not record then
+      record = {
+        name = name,
+        outputs = {},
+        chatIndexMap = {},
+      }
+
+      historyMap[name] = record
+      table.insert(orderedKeys, name)
+    end
+
+    local outputItem = {
+      chatIndex = meta.chatIndex,
+      source = meta.source,
+      positive = positive,
+    }
+    if meta.slot ~= nil then
+      outputItem.slot = meta.slot
+    end
+    outputItem.name = name
+    if negative ~= '' then
+      outputItem.negative = negative
+    end
+
+    local chatKey = tostring(meta.chatIndex)
+    local existingIndex = record.chatIndexMap[chatKey]
+    if existingIndex then
+      local existingOutput = record.outputs[existingIndex]
+      local existingLen = #(existingOutput.positive or '')
+      local newLen = #(outputItem.positive or '')
+
+      if newLen > existingLen then
+        record.outputs[existingIndex] = outputItem
+      end
+      return
+    end
+
+    table.insert(record.outputs, outputItem)
+    record.chatIndexMap[chatKey] = #record.outputs
+  end
+
+  ---@param desc XNAIDescriptor?
+  ---@param meta { chatIndex: number, source: 'keyvis'|'scene', slot?: string }
+  local function collectDescriptor(desc, meta)
+    if type(desc) ~= 'table' or type(desc.characters) ~= 'table' then
+      return
+    end
+
+    for _, character in ipairs(desc.characters) do
+      collect(character, meta)
+    end
+  end
+
+  for _, stackItem in ipairs(xnaiState or {}) do
+    if type(stackItem) == 'table' and type(stackItem.data) == 'table' then
+      if stackItem.data.keyvis then
+        collectDescriptor(stackItem.data.keyvis, {
+          chatIndex = stackItem.chatIndex,
+          source = 'keyvis',
+          slot = '-1',
+        })
+      end
+
+      local sceneSlots = {}
+      for slot, _ in pairs(stackItem.data.scenes or {}) do
+        table.insert(sceneSlots, slot)
+      end
+      table.sort(sceneSlots, sortSlots)
+
+      for _, slot in ipairs(sceneSlots) do
+        collectDescriptor(stackItem.data.scenes[slot], {
+          chatIndex = stackItem.chatIndex,
+          source = 'scene',
+          slot = slot,
+        })
+      end
+    end
+  end
+
+  local history = {}
+  for _, key in ipairs(orderedKeys) do
+    local record = historyMap[key]
+    table.insert(history, '### ' .. record.name .. '')
+
+    for _, output in ipairs(record.outputs) do
+      table.insert(history, '')
+      table.insert(history, '[Log #' .. tostring(output.chatIndex) .. ']')
+      table.insert(history, output.positive or '')
+    end
+
+    table.insert(history, '')
+  end
+
+  return prelude.trim(table.concat(history, '\n'))
+end
+
+---@param triggerId string
+---@param xnaiState XNAIStackItem[]
+---@return XNAIStackItem[], string
+local function persistStateAndHistory(triggerId, xnaiState)
+  local safeState = type(xnaiState) == 'table' and xnaiState or {}
+  local maxSaves = tonumber(getGlobalVar(triggerId, 'toggle_lb-xnai.maxSaves')) or 3
+
+  while #safeState > maxSaves do
+    table.remove(safeState, 1)
+  end
+
+  local history = buildCharacterHistory(safeState)
+  setState(triggerId, 'lb-xnai-stack', safeState)
+  setChatVar(triggerId, 'lb-xnai-history', history)
+
+  return safeState, history
+end
+
 ---@class XNAIGen
 ---@field generate fun (triggerId: string, desc: XNAIDescriptor): string?
 ---@field insertSlots fun (text: string): string
 ---@field locateTargetChat fun (fullChat: Chat[]): number?
+---@field persistStateAndHistory fun (triggerId: string, xnaiState: XNAIStackItem[]): XNAIStackItem[], string
 
 return {
   generate = generate,
   insertSlots = insertSlots,
   locateTargetChat = locateTargetChat,
+  persistStateAndHistory = persistStateAndHistory,
 }
