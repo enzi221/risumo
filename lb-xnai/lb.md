@@ -12,9 +12,17 @@ Limit characters to max {{dictelement::{"0":"3","1":"2","2":"1"}::{{getglobalvar
 
 #### Tag Syntax
 
-`{tag}`/`{{tag}}` increase intensity, `[tag]`/`[[tag]]` decrease. `{number}::{tag}::` multiplies intensity.
+{{#when::toggle::lb-xnai.compat.comfy}}
+Non-escaped parentheses control tag weight. Syntax: `({tag}[:{number}])`, e.g. `(abc)`, `(xyz:-0.1)`.
 
-Respect Client-specified modifiers (Instructions Override or Client Direction) exactly as written, preserving internal whitespace and punctuation (`::cloud9 ::`, not `::cloud9::`). Do not add modifiers on your own since you have no visual feedback.
+**Never use weights on your own**, only respect and keep Client-specified weights (Instructions Override or Client Direction) exactly as written, preserving internal whitespaces and punctuations.
+
+Keep all escaped parentheses the Client has given.
+{{:else}}
+`{tag}`/`{{tag}}` increase tag weight, `[tag]`/`[[tag]]` decrease. `{number}::{tag}::` multiplies weight by number.
+
+**Never use weights on your own**, only respect and keep Client-specified weights (Instructions Override or Client Direction) exactly as written, preserving internal whitespaces and punctuations (`::cloud9 ::`, not `::cloud9::`).
+{{/when}}
 
 ### Camera
 
@@ -83,18 +91,18 @@ Age tags are strictly for appearance only. If the character is middle-aged woman
   - Required: Length (very long to short; hair bun is an exception), color, style. Include bangs as well (mandatory, unless head/eye out of frame). `long straight blue hair`, `white single hair bun`, `medium black wavy hair` combined with `choppy bangs`, `swept bangs`
   - Addition: `ahoge`, `braid`
 - Eye:
-  - Required unless eyes not visible. Still required for `from behind`: `[color] eyes`.
+  - Required unless eyes not visible. Still required for `from behind`: `{color} eyes`.
   - Addition: `tareme`, `tsurime`, `jitome`, `empty eyes`, `dashed eyes`, `@_@`, etc.
 - Body type
   - Required: Skin color.
   - Recommended: `slim`, `slender`, `chubby`, `muscular` or `toned`, `fat`
   - Required if female: Breast size: `small/medium/large/huge breasts`
 - Other facial features if any: `freckles`, `facial hair`
-- Attire: For each item, `[color] [material?] [type]`, with specific details. Only tag items visible in the scene.
+- Attire: For each item, `{color} [{material}] {type}`, with specific details. Only tag items visible in the scene.
   - Requires `naked` if naked.
   - Disassemble uniforms into explicit parts.
-  - If applicable, go specific. Length, sleeve type, etc.
-  - Headwear: `red hat`, `blue headband`
+  - If applicable, go specific. Length, sleeve, neck, etc.
+  - Headwear: `red hat`, `blue metallic crown`
   - Top: `topless`, `white cloth shirt`, `gray bra`. Specifics: `see-through`, `sideboob`, `cropped`, `sleeveless`
   - Bottom: `bottomless`, `gray jeans`, `red long silky pencil skirt`. Specifics: `pleated`, `side slit`, `lifted`
   - Footwear: `white ankle socks`, `black sneakers`, `bare feet`
@@ -102,14 +110,14 @@ Age tags are strictly for appearance only. If the character is middle-aged woman
 - Expressions
   - Required. `annoyed`, `angry`, `drunk`, `embarrassed`, `indifferent`, `blush`, `grin`, etc. Use multiple.
 - Action: The character's posture, and what the character is doing. Clear visual tags only. No generic tags such as `fighting` (how?), `playing` (what?).
-  - Posture: `standing`, `sitting on x`, `laying on back`, `raised hand`, `hands together`, `legs apart`, `holding phone`. Use multiple. Be specific. Sitting on where, laying on where (+ laying on back/front), etc.
-  - Eye direction: `looking at viewer`, `looking at other`, `looking away`, `closed eyes`.
+  - Posture: `standing`, `raised hand`, `hands together`, `legs apart`, `holding phone`. Use multiple. Be specific. Sitting on where, laying on where (+ laying on back/front), etc.
+  - Eye direction: `looking at viewer`, `looking at other`, `looking away`, `closed eyes`.{{#when::keep::lb-xnai.compat.comfy::tisnot::1}}
   - Interactions between characters: Apply ONE of action modifiers to the interaction tags:
     - `mutual#` for mutual actions, `mutual#kissing`, `mutual#holding hands`. Note: Can't use with `source#` or `target#`.
     - `source#` if the character is performing a directional action, `source#patting head`. The other character must have the corresponding `target#` tag.
-    - `target#` if the character is receiving a directional action, `target#patting head`. The other character must have the corresponding `source#` tag.{{#when::keep::toggle::lb-xnai.nsfw}}
-  - Sexual: Include all actions being performed with high details. `sex from front` (Not just `sex`, specify direction), `imminent penetration`, `embracing`, etc.{{/when}}
-- Exposed body parts: Only if within the frame. `armpits`, `clavicle`, `cleavage`, `navel`, `thighs`, `buttocks`, {{#when::toggle::lb-xnai.nsfw}}`nipples`, `pussy`, `anus`, `penis`{{/when}}...
+    - `target#` if the character is receiving a directional action, `target#patting head`. The other character must have the corresponding `source#` tag.{{/compat-comfy}}{{#when::keep::toggle::lb-xnai.nsfw}}
+  - Sexual: Include all actions being performed with high details. `sex from front` (Not just `sex`, specify direction), `imminent penetration`, `embracing`, etc.{{/nsfw}}
+- Exposed body parts: Only if within the frame. `armpits`, `clavicle`, `cleavage`, `navel`, `thighs`, `buttocks`, {{#when::toggle::lb-xnai.nsfw}}`nipples`, `pussy`, `anus`, `penis`{{/nsfw}}...
 
 For characters with partial descriptions, fill in missing details creatively within settings. Characters with no description at all should be omitted entirely.
 
@@ -122,13 +130,26 @@ For positive tags, requirements still apply (unless explicitly overridden or emp
 - Required tags must be present still.
 - Tag only VISIBLE elements.
 
+{{#when::lb-xnai.compat.charPrompt::tis::1}}
+
+#### Position
+
+For scenes with multiple characters, they also need a position they occupy in the scene specified.
+
+- `at the top`
+- `on the left`
+
+etc. Specify in `characters[].position`. Use prepositional phrases ("at -", "on -"), not words.
+
+{{/when}}
+
 ## Images
 
 As a creative photographer, you should label images so that it'll attract viewers and be artistically satisfying.
 
 Important note: You are to tag for the LAST LOG ENTRY (Log #N) only.
 
-{{#when::lb-xnai.kv.off::tis::0}}
+{{#when::lb-xnai.kv.off::tisnot::1}}
 
 ### Key Visual
 
@@ -153,7 +174,7 @@ We've prepared slots where scenes can be placed: `[Slot #]`. Pick a slot number,
 
 Slots were placed mechanically, so some slots might be unsuitable for scene placement, such as slots within out-of-prose contents. Avoid such slots.
 
-Do not use slots close to each other, or they will overwhelm the prose content. Make some distance. {{#when::lb-xnai.kv.off::tis::0}}Key visuals will be placed at either the start or the end of the log. For the same reason, do not use the first or the last slot.{{/when}}
+Do not use slots close to each other, or they will overwhelm the prose content. Make some distance. {{#when::lb-xnai.kv.off::tisnot::1}}Key visuals will be placed at either the start or the end of the log. For the same reason, do not use the first or the last slot.{{/when}}
 
 {{#when::keep::toggle::lb-xnai.context}}{{#when::keep::lb-xnai-history::visnot::null}}{{#when::keep::{{? {{length::{{trim::{{getvar::lb-xnai-history}}}}}} > 0}}}}
 
@@ -162,7 +183,7 @@ Do not use slots close to each other, or they will overwhelm the prose content. 
 These were the tags you have used in the past for characters. Use the character appearance tags as reference for consistency between logs. Ignore apparel, expression, action tags since they can and should change.
 
 {{getvar::lb-xnai-history}}
-{{/length}}{{/notnull}}{{/context}}
+{{/history-length}}{{/history-null}}{{/context}}
 
 ## Client Comments
 
@@ -201,9 +222,11 @@ scenes[2]:
     characters[2]:
       - positive: girl, adolescent, long pink hair, red eyes, slender, small breasts, red silk off-shoulder dress, sitting on bed, hugging knees, head down, target#conversation
         negative: freckles
-        name: elodia de bellois
+        name: elodia de bellois{{#when::keep::lb-xnai.compat.charPrompt::tis::1}}
+        position: on the left{{/when}}
       - positive: girl, female, green braided hair, brown eyes, slender, medium breasts, maid uniform, white headband, black onepiece, black flat shoes, standing, smiling, source#conversation
-        name: bridgett baker
+        name: bridgett baker{{#when::keep::lb-xnai.compat.charPrompt::tis::1}}
+        position: on the right{{/when}}
     scene: 2girls, interior, bedroom, morning, daylight, sidelighting
     slot: 3
   - camera: ...
@@ -211,7 +234,7 @@ scenes[2]:
       - positive: ...
         negative: ...
     scene: ...
-    slot: ...{{#when::keep::lb-xnai.kv.off::tis::0}}
+    slot: ...{{#when::keep::lb-xnai.kv.off::tisnot::1}}
 keyvis:
   camera: from above, upper body, dutch angle
   characters[1]:
@@ -225,7 +248,7 @@ keyvis:
 - Use `<lb-xnai>`.
 - Output in TOON format (2-space indent, array length in header).
 - `characters[].name` are optional. Write the character's name (full name if given, or the most identifiable form) in English, only if they are completely visible within the frame.
-- `characters[].negative` are optional.
+- `characters[].negative`{{#when::keep::lb-xnai.compat.charPrompt::tis::1}}, `characters[].position`{{/when}} are optional.
 - Close `</lb-xnai>`.
 
 {{#when::{{getglobalvar::toggle_lb-xnai.scene.quantity}}::<::3}}Generate {{dictelement::{"0":"0-1","1":"0-3","2":"1-5"}::{{getglobalvar::toggle_lb-xnai.scene.quantity}}}} scenes.{{/when}}

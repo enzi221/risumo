@@ -1,5 +1,6 @@
 ---@class XNAIPromptSet
 ---@field name string?
+---@field position string?
 ---@field positive string
 ---@field negative string?
 
@@ -15,25 +16,6 @@ end
 ---@param desc XNAIDescriptor
 ---@return XNAIPromptSet?
 local function buildPresetPrompt(triggerId, desc)
-  local lead = {}
-  if desc.camera and desc.camera ~= '' then
-    table.insert(lead, desc.camera)
-  end
-  if desc.scene and desc.scene ~= '' then
-    table.insert(lead, desc.scene)
-  end
-
-  local leadText = #lead > 0 and table.concat(lead, ', ') or ''
-
-  local chars = {}
-  if desc.characters then
-    for _, character in ipairs(desc.characters) do
-      if character and character ~= '' then
-        table.insert(chars, character)
-      end
-    end
-  end
-
   local preset = getGlobalVar(triggerId, 'toggle_lb-xnai.preset')
   if not preset or preset == '' or preset == 'null' then
     preset = '1'
@@ -55,14 +37,23 @@ local function buildPresetPrompt(triggerId, desc)
   positive = positive and prelude.trim(positive) or ''
   negative = negative and prelude.trim(negative) or ''
 
-  if positive ~= '' then
-    if positive:find('{prompt}', 1, true) then
-      positive = positive:gsub('{prompt}', leadText)
-    elseif leadText ~= '' then
-      positive = table.concat({ leadText, positive }, ', ')
+  local setup = {}
+  if desc.camera and desc.camera ~= '' then
+    table.insert(setup, desc.camera)
+  end
+  if desc.scene and desc.scene ~= '' then
+    table.insert(setup, desc.scene)
+  end
+
+  local setupPrompt = #setup > 0 and table.concat(setup, ', ') or ''
+
+  local chars = {}
+  if desc.characters then
+    for _, character in ipairs(desc.characters) do
+      if character and character ~= '' then
+        table.insert(chars, character)
+      end
     end
-  else
-    positive = leadText
   end
 
   local positiveNote = getGlobalVar(triggerId, 'toggle_lb-xnai.positive') or ''
@@ -74,21 +65,75 @@ local function buildPresetPrompt(triggerId, desc)
     negative = table.concat({ negative, negativeNote }, ', ')
   end
 
+  local charDivider = getGlobalVar(triggerId, 'toggle_lb-xnai.compat.charDivider')
+  local charPrompt = getGlobalVar(triggerId, 'toggle_lb-xnai.compat.charPrompt')
+  local promptBody = setupPrompt
+
   if #chars > 0 then
-    local charP = { positive }
+    local charP = {}
     local charN = { negative }
 
+    if promptBody ~= '' then
+      table.insert(charP, promptBody)
+    end
+
     for _, char in ipairs(chars) do
-      table.insert(charP, char.positive)
+      local charPositive = char.positive
+
+      if charPrompt == '1' then
+        local rawPositive = trimText(charPositive)
+        local subject = 'character'
+        local remainder = rawPositive
+
+        if rawPositive:match('^girl,%s*') then
+          subject = 'girl'
+          remainder = prelude.trim(rawPositive:gsub('^girl,%s*', '', 1))
+        elseif rawPositive:match('^boy,%s*') then
+          subject = 'boy'
+          remainder = prelude.trim(rawPositive:gsub('^boy,%s*', '', 1))
+        elseif rawPositive:match('^character,%s*') then
+          remainder = prelude.trim(rawPositive:gsub('^character,%s*', '', 1))
+        end
+
+        local head = 'the ' .. subject
+        local position = trimText(char.position)
+        if position ~= '' then
+          head = head .. ' ' .. position
+        end
+
+        if remainder ~= '' then
+          charPositive = head .. ' is ' .. remainder
+        else
+          charPositive = head
+        end
+      end
+
+      table.insert(charP, charPositive)
       table.insert(charN, char.negative)
     end
 
-    positive = table.concat(charP, ' | ')
-    negative = table.concat(charN, ' | ')
+    if charDivider == '0' then
+      promptBody = table.concat(charP, ' | ')
+      negative = table.concat(charN, ' | ')
+    else
+      promptBody = table.concat(charP, '\n\n')
+      negative = table.concat(charN, '\n\n')
+    end
   end
 
+  if positive ~= '' then
+    if positive:find('{prompt}', 1, true) then
+      positive = positive:gsub('{prompt}', promptBody)
+    elseif promptBody ~= '' then
+      positive = table.concat({ positive, promptBody }, ', ')
+    end
+  else
+    positive = promptBody
+  end
+
+  local comfy = getGlobalVar(triggerId, 'toggle_lb-xnai.compat.comfy')
   return {
-    positive = positive:gsub('%(', '\\('):gsub('%)', '\\)'),
+    positive = comfy == '0' and positive:gsub('%(', '\\('):gsub('%)', '\\)') or positive,
     negative = negative,
   }
 end
