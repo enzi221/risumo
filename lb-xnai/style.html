@@ -384,4 +384,39 @@
     color: var(--FontColorQuote2);
     font-family: inherit;
   }
+
+  .lb-xnai-menu:popover-open {
+    animation: lb-slidein 0.15s ease forwards;
+    background: var(--bg);
+    border: 1px dashed var(--accent);
+    border-radius: 0.4em;
+    color: var(--accent);
+    display: flex;
+    flex-direction: column;
+    font-size: 0.8em;
+    margin-bottom: 0.5em;
+    padding: 0.5em 1em;
+    position-area: top span-right;
+    position-try: flip-block;
+    transform-origin: bottom center;
+  }
+
+  .lb-xnai-menu > button {
+    align-items: center;
+    color: inherit;
+    display: flex;
+    gap: 0.5em;
+    padding: 0.5em 0;
+    font-size: 1em;
+    text-align: left;
+    transition:
+      color 0.15s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  .lb-xnai-menu > button:hover {
+    color: var(--fg);
+  }
+  .lb-xnai-menu > button > svg {
+    height: 1em;
+    width: 1em;
+  }
 </style>

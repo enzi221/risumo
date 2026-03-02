@@ -4,17 +4,19 @@ scenes[n]:
     characters[n]:
       - positive: ...
         negative: ...
-        name: ...{{#when::keep::lb-xnai.compat.charPrompt::tis::1}}
+        name: ...{{#when::keep::toggle::lb-xnai.compat.charPrompt}}
         position: ...{{/when}}
       - ...
     scene: ...
-    slot: ...{{#when::keep::lb-xnai.kv.off::tis::0}}
+    slot: ...{{#when::keep::lb-xnai.kv.off::tisnot::1}}{{#when::keep::toggle::lb-xnai.supplement}}
+    supplement: ...{{/when}}
 keyvis:
   camera: ...
   characters[n]:
     - positive: ...
       negative: ...
-      name: ...{{#when::keep::lb-xnai.compat.charPrompt::tis::1}}
+      name: ...{{#when::keep::toggle::lb-xnai.compat.charPrompt}}
       position: ...{{/when}}
-  scene: ...{{/when}}
+  scene: ...{{/when}}{{#when::keep::toggle::lb-xnai.supplement}}
+  supplement: ...{{/when}}
 </lb-xnai>

@@ -30,13 +30,6 @@ local function buildPresetPrompt(triggerId, desc)
     return nil
   end
 
-  local content = prelude.trim(presetBook.content)
-  local positive = content:match('%[Positive%]%s*([%s%S]-)%s*%[Negative%]')
-  local negative = content:match('%[Negative%]%s*([%s%S]-)%s*$')
-
-  positive = positive and prelude.trim(positive) or ''
-  negative = negative and prelude.trim(negative) or ''
-
   local setup = {}
   if desc.camera and desc.camera ~= '' then
     table.insert(setup, desc.camera)
@@ -44,8 +37,7 @@ local function buildPresetPrompt(triggerId, desc)
   if desc.scene and desc.scene ~= '' then
     table.insert(setup, desc.scene)
   end
-
-  local setupPrompt = #setup > 0 and table.concat(setup, ', ') or ''
+  local setupPrompt = table.concat(setup, ', ')
 
   local chars = {}
   if desc.characters then
@@ -56,31 +48,21 @@ local function buildPresetPrompt(triggerId, desc)
     end
   end
 
-  local positiveNote = getGlobalVar(triggerId, 'toggle_lb-xnai.positive') or ''
-  if positiveNote ~= '' and positiveNote ~= null then
-    positive = table.concat({ positive, positiveNote }, ', ')
-  end
-  local negativeNote = getGlobalVar(triggerId, 'toggle_lb-xnai.negative') or ''
-  if negativeNote ~= '' and negativeNote ~= null then
-    negative = table.concat({ negative, negativeNote }, ', ')
-  end
+  local comfy = getGlobalVar(triggerId, 'toggle_lb-xnai.compat.comfy') == '1'
 
-  local charDivider = getGlobalVar(triggerId, 'toggle_lb-xnai.compat.charDivider')
+  local charDivider = comfy and getGlobalVar(triggerId, 'toggle_lb-xnai.compat.charDivider') == '1' and '\n\n' or ' | '
   local charPrompt = getGlobalVar(triggerId, 'toggle_lb-xnai.compat.charPrompt')
-  local promptBody = setupPrompt
 
+  local charPromptP = ''
+  local charPromptN = ''
   if #chars > 0 then
-    local charP = {}
-    local charN = { negative }
-
-    if promptBody ~= '' then
-      table.insert(charP, promptBody)
-    end
+    local charsP = {}
+    local charsN = {}
 
     for _, char in ipairs(chars) do
       local charPositive = char.positive
 
-      if charPrompt == '1' then
+      if comfy and charPrompt == '1' then
         local rawPositive = trimText(charPositive)
         local subject = 'character'
         local remainder = rawPositive
@@ -108,32 +90,110 @@ local function buildPresetPrompt(triggerId, desc)
         end
       end
 
-      table.insert(charP, charPositive)
-      table.insert(charN, char.negative)
+      table.insert(charsP, charPositive)
+      table.insert(charsN, char.negative)
     end
 
-    if charDivider == '0' then
-      promptBody = table.concat(charP, ' | ')
-      negative = table.concat(charN, ' | ')
-    else
-      promptBody = table.concat(charP, '\n\n')
-      negative = table.concat(charN, '\n\n')
-    end
+    charPromptP = table.concat(charsP, charDivider)
+    charPromptN = table.concat(charsN, charDivider)
   end
 
-  if positive ~= '' then
-    if positive:find('{prompt}', 1, true) then
-      positive = positive:gsub('{prompt}', promptBody)
-    elseif promptBody ~= '' then
-      positive = table.concat({ positive, promptBody }, ', ')
+  local supplement = desc.supplement or ''
+
+  local content = prelude.trim(presetBook.content)
+
+  local positive = content:match('%[Positive%]%s*([%s%S]-)%s*%[Negative%]')
+  positive = positive and prelude.trim(positive) or ''
+
+  local positiveNote = getGlobalVar(triggerId, 'toggle_lb-xnai.positive') or ''
+  if positive == '' then
+    positive = '{prompt}'
+  end
+  if not positive:find('{prompt}', 1, true) and not positive:find('{setup}', 1, true) and not positive:find('{supplement}', 1, true) then
+    positive = positive .. '{prompt}'
+  end
+
+  if positive:find('{prompt}', 1, true) then
+    if not comfy then
+      -- In {prompt} mode, characters should go to the end to fit the NAI prompt structure (common | charA | charB)
+      positive = positive:gsub('{prompt}', table.concat({ setupPrompt, positiveNote, supplement }, '\n\n')) ..
+      ' | ' .. charPromptP
+    else
+      positive = positive:gsub('{prompt}', table.concat({ setupPrompt, positiveNote, charPromptP, supplement }, '\n\n'))
     end
   else
-    positive = promptBody
+    if positive:find('{setup}', 1, true) then
+      positive = positive:gsub('{setup}', setupPrompt)
+    else
+      positive = positive ~= '' and positive .. ', ' .. setupPrompt or setupPrompt
+    end
+
+    -- In non-{prompt} mode, NAI mode should ignore the {char} prompt and always append to the end to fit the NAI prompt structure (common | charA | charB)
+    if not comfy then
+      positive = positive:gsub('{char}', '')
+
+      if positive:find('{supplement}', 1, true) then
+        positive = positive:gsub('{supplement}', supplement)
+      else
+        positive = positive .. '\n\n' .. supplement
+      end
+
+      positive = positive .. ' | ' .. charPromptP
+    else
+      if positive:find('{char}', 1, true) then
+        positive = positive:gsub('{char}', charPromptP)
+      else
+        positive = positive ~= '' and positive .. '\n\n' .. charPromptP or charPromptP
+      end
+
+      if positive:find('{supplement}', 1, true) then
+        positive = positive:gsub('{supplement}', supplement)
+      else
+        positive = positive .. '\n\n' .. supplement
+      end
+    end
   end
 
-  local comfy = getGlobalVar(triggerId, 'toggle_lb-xnai.compat.comfy')
+  local negative = content:match('%[Negative%]%s*([%s%S]-)%s*$')
+  negative = negative and prelude.trim(negative) or ''
+
+  local negativeNote = getGlobalVar(triggerId, 'toggle_lb-xnai.negative') or ''
+  if negative == '' then
+    negative = '{prompt}'
+  end
+  if not negative:find('{prompt}', 1, true) then
+    negative = negative .. '{prompt}'
+  end
+
+  if not comfy then
+    negative = negative:gsub('{prompt}', negativeNote) .. ' | ' .. charPromptN
+  else
+    negative = negative:gsub('{prompt}', negativeNote) .. '\n\n' .. charPromptN
+  end
+
+  positive = positive:gsub('\n\n\n+', '\n\n')
+  negative = negative:gsub('\n\n\n+', '\n\n')
+
+  if comfy then
+    local naiWeight = '(%-?%d*%.?%d+)::(.-)::'
+    local comfyWeight = getGlobalVar(triggerId, 'toggle_lb-xnai.compat.weight')
+    if comfyWeight == '1' then
+      local function naiWeightToComfy(s)
+        return s:gsub(naiWeight, '(%2:%1)')
+      end
+      positive = naiWeightToComfy(positive)
+      negative = naiWeightToComfy(negative)
+    else
+      local function stripNaiWeight(s)
+        return s:gsub(naiWeight, '%2')
+      end
+      positive = stripNaiWeight(positive)
+      negative = stripNaiWeight(negative)
+    end
+  end
+
   return {
-    positive = comfy == '0' and positive:gsub('%(', '\\('):gsub('%)', '\\)') or positive,
+    positive = comfy and positive or positive:gsub('%(', '\\('):gsub('%)', '\\)') or positive,
     negative = negative,
   }
 end
@@ -190,7 +250,7 @@ end
 local function insertSlots(text)
   local slotIndex = 0
   local trimmed = text:match('^%s*(.-)%s*$') or text
-  trimmed = trimmed:match('^%s*(.-)%s*$'):gsub('\n\n+', function()
+  trimmed = trimmed:gsub('\n\n+', function()
     local out = '\n\n[Slot ' .. slotIndex .. ']\n\n'
     slotIndex = slotIndex + 1
     return out

@@ -51,7 +51,6 @@ function M.runPipeline(triggerId, man, fullChat, options)
 
   local promptSuccess, promptResult = pcall(prompt.make, triggerId, man, fullChat, modeType, options.extras)
   if not promptSuccess then
-    print("[LightBoard] Failed to create prompt for " .. man.identifier .. ": " .. tostring(promptResult))
     return '\n<lb-lazy id="' .. man.identifier .. '" />'
   end
   local prom = promptResult
@@ -69,25 +68,66 @@ function M.runPipeline(triggerId, man, fullChat, options)
     --- @diagnostic disable-next-line: assign-type-mismatch
     local modeOverride = attempts > 0 and retryMode ~= '0' and retryMode or nil
 
-    local response = runLLM(triggerId, man, prom, modeOverride)
+    local llmSuccess, llmResponse = pcall(runLLM, triggerId, man, prom, modeOverride)
+    if not llmSuccess then
+      error('응답을 받지 못했습니다. ' .. tostring(llmResponse))
+    end
     print('[LightBoard Backend][VERBOSE] Received response.')
 
-    local processSuccess, result = pcall(cleanLLMResult, man, response)
+    local processSuccess, processResult = pcall(cleanLLMResult, man, llmResponse)
     if not processSuccess then
-      error('응답을 처리하지 못했습니다. ' .. tostring(result))
+      error('응답을 처리하지 못했습니다. ' .. tostring(processResult))
     end
     print('[LightBoard Backend][VERBOSE] Response cleaned.')
+
+    -- Reiteration: self-review loop before validation (skip on retries)
+    if attempts == 0 then
+      for ri = 1, man.reiteration or 0 do
+        print('[LightBoard Backend][VERBOSE] Reiteration ' .. ri .. '/' .. man.reiteration)
+
+        table.insert(prom, {
+          content = processResult,
+          role = 'char'
+        })
+
+        local reiterationInstruction = string.format([=[<system>
+Reiteration phase (%d/%d)
+
+Now, read the instruction and your previous output carefully. Is it format-adhering? Did it follow all the instructions without any omission?
+
+Carefully think, then if it is OK, output %s node without any changes. If it needs changes, apply the changes and output the node.
+</system>]=],
+          ri, man.reiteration, man.identifier)
+
+        table.insert(prom, {
+          role = 'user',
+          content = reiterationInstruction
+        })
+
+        local reiterResponse = runLLM(triggerId, man, prom, nil)
+        local reiterSuccess, reiterResult = pcall(cleanLLMResult, man, reiterResponse)
+        if not reiterSuccess then
+          print('[LightBoard Backend] Reiteration ' ..
+            ri .. ' failed for ' .. man.identifier .. ': ' .. tostring(reiterResult))
+          break
+        end
+
+        if reiterResult and reiterResult ~= '' then
+          processResult = reiterResult
+        end
+      end
+    end
 
     local valid = true
     local validationError = nil
 
     print('[LightBoard Backend][VERBOSE] Response validating.')
 
-    if not result or result == '' or result == null then
+    if not processResult or processResult == '' or processResult == null then
       valid = false
       validationError = 'You did not return any output.'
-    elseif man.onValidate and result then
-      local success, err = pcall(man.onValidate, triggerId, result)
+    elseif man.onValidate and processResult then
+      local success, err = pcall(man.onValidate, triggerId, processResult)
       if not success then
         local cleanErr = tostring(err):gsub("^.-:%d+: ", "")
         if cleanErr:find("^" .. VALIDATION_ERROR_PREFIX) then
@@ -109,20 +149,20 @@ function M.runPipeline(triggerId, man, fullChat, options)
           man.identifier .. ' but max retries reached: ' .. tostring(validationError))
       end
 
-      if man.onOutput and result and not man.sideEffect then
-        local success, modifiedOutput = pcall(man.onOutput, triggerId, result)
+      if man.onOutput and processResult and not man.sideEffect then
+        local success, modifiedOutput = pcall(man.onOutput, triggerId, processResult)
         if success and modifiedOutput and modifiedOutput ~= '' then
-          result = modifiedOutput
+          processResult = modifiedOutput
         else
           print("[LightBoard Backend] Failed processing (onOutput) for " ..
             man.identifier .. ": " .. tostring(modifiedOutput))
 
           local reason = success and 'nil 반환' or tostring(modifiedOutput)
-          error('출력 처리 실패(onOutput). ' .. reason .. '\n\n출력:\n' .. result:gsub('\n', '\\n'))
+          error('출력 처리 실패(onOutput). ' .. reason .. '\n\n출력:\n' .. processResult:gsub('\n', '\\n'))
         end
       end
 
-      return result
+      return processResult
     end
 
     attempts = attempts + 1
@@ -130,7 +170,7 @@ function M.runPipeline(triggerId, man, fullChat, options)
       man.identifier .. ". Retrying (" .. attempts .. "/" .. maxRetries .. "): " .. tostring(validationError))
 
     table.insert(prom, {
-      content = result,
+      content = processResult,
       role = 'char'
     })
 

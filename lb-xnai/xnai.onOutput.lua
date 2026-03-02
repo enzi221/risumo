@@ -49,13 +49,51 @@ local function stripXMLNodes(text)
     return text, function(s) return s end
   end
 
+  -- Absorb surrounding newlines into saved content so that the placeholder
+  -- does not inflate the \n\n boundary count. This keeps slot numbering
+  -- consistent between the onInput path (removeAllNodes) and onOutput path
+  -- (stripXMLNodes).
+  --
+  -- Cases:
+  --   Node at text start + trailing \n  → absorb all trailing \n
+  --   Node at text end   + preceding \n → absorb all preceding \n from preText
+  --   Both sides have \n (middle)       → absorb one trailing \n
   local parts = {}
   local lastPos = 1
 
   for _, section in ipairs(sections) do
-    parts[#parts + 1] = text:sub(lastPos, section.start - 1)
+    local preText = text:sub(lastPos, section.start - 1)
+    local nodeEnd = section.finish
+    local prevIsNL = section.start > 1 and text:sub(section.start - 1, section.start - 1) == "\n"
+    local nextIsNL = text:sub(nodeEnd + 1, nodeEnd + 1) == "\n"
+
+    local absorbBefore = 0
+    local absorbAfter = 0
+
+    local isAtStart = section.start == 1 or not text:sub(1, section.start - 1):find('%S')
+    local isAtEnd = not text:find('%S', nodeEnd + 1)
+
+    if isAtStart and nextIsNL then
+      local afterNL = text:sub(nodeEnd + 1):match('^\n+')
+      if afterNL then absorbAfter = #afterNL end
+    elseif isAtEnd and prevIsNL then
+      local beforeNL = preText:match('\n+$')
+      if beforeNL then absorbBefore = #beforeNL end
+    elseif prevIsNL and nextIsNL then
+      absorbAfter = 1
+    end
+
+    if absorbBefore > 0 then
+      saved[section.idx] = preText:sub(-absorbBefore) .. saved[section.idx]
+      preText = preText:sub(1, -absorbBefore - 1)
+    end
+    if absorbAfter > 0 then
+      saved[section.idx] = saved[section.idx] .. text:sub(nodeEnd + 1, nodeEnd + absorbAfter)
+    end
+
+    parts[#parts + 1] = preText
     parts[#parts + 1] = '\0XMLR_' .. section.idx .. '\0'
-    lastPos = section.finish + 1
+    lastPos = nodeEnd + absorbAfter + 1
   end
 
   parts[#parts + 1] = text:sub(lastPos)
@@ -163,6 +201,7 @@ local function main(tid, output, fullChatContent, index)
     -- remove unreplaced [Slot #] tags
     slotted = slotted:gsub('\n%[Slot%s+%d+%]\n', '')
     slotted = restoreNodes(slotted)
+
     if inlays['-1'] then
       return slotted .. '\n\n<lb-xnai kv>' .. inlays['-1'] .. '</lb-xnai>', '<lb-lazy id="lb-xnai" />'
     end

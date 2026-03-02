@@ -105,31 +105,25 @@ local main = async(function(manifests)
   end
 
   local allProcessedResults = {}
-  local maxConcurrent = math.min(5, math.max(1, tonumber(getGlobalVar(triggerId, C.CONFIG.CONCURRENT)) or 1))
 
-  for i = 1, #normalManifests, maxConcurrent do
-    --- @type Promise<string>[]
-    local currentChunkPromises = {}
-    local chunkEndIndex = math.min(i + maxConcurrent - 1, #normalManifests)
-
-    for j = i, chunkEndIndex do
-      local man = normalManifests[j]
-      table.insert(currentChunkPromises, pipeline.runPipelineAsync(triggerId, man, fullChat, {
+  for _, man in ipairs(normalManifests) do
+    local ok, result = pcall(function()
+      return pipeline.runPipelineAsync(triggerId, man, fullChat, {
         type = 'generation',
         lazy = man.lazy
-      }))
+      }):await()
+    end)
+
+    if not ok then
+      alertError(triggerId, '[LightBoard] ' .. man.identifier .. ' 생성 실패.\n' .. tostring(result))
+      result = string.format('<lb-lazy id="%s"></lb-lazy>', man.identifier)
+    elseif not result or result == '' then
+      alertError(triggerId, '[LightBoard] ' .. man.identifier .. ' 생성 실패. 모델 응답이 비어있습니다.')
+      result = string.format('<lb-lazy id="%s"></lb-lazy>', man.identifier)
     end
 
-    print('[LightBoard Backend][VERBOSE] Waiting for chunks...')
-
-    --- @type string[]
-    local chunkResults = Promise.all(currentChunkPromises):await()
-    if chunkResults then
-      for _, chunkResult in ipairs(chunkResults) do
-        if type(chunkResult) == "string" and chunkResult ~= "" then
-          table.insert(allProcessedResults, chunkResult)
-        end
-      end
+    if type(result) == "string" and result ~= "" then
+      table.insert(allProcessedResults, result)
     end
   end
 
@@ -169,7 +163,6 @@ local main = async(function(manifests)
   local success, message = pcall(sideeffect.runSideEffects, triggerId, {
     sideEffectManifests = sideEffectManifests,
     fullChat = fullChat,
-    maxConcurrent = maxConcurrent,
   })
   if not success then
     error('[LightBoard Backend] SideEffect Error: ' .. tostring(message))
@@ -288,16 +281,16 @@ local function reroll(identifier, blockID)
     return pipeline.runPipelineAsync(triggerId, man, contextSlice, { type = 'reroll', lazy = false }):await()
   end)
 
-  if not success or not result then
+  if not success or not result or result == '' then
     setChat(triggerId, targetJsIdx, originalTargetContent)
     if isSeparated then
       setChat(triggerId, lbdataJsIdx, originalLbdataContent)
     end
-    alertError(triggerId, '[LightBoard] 리롤 실패. ' .. identifier .. ' 개발자에게 문의하세요.\n' .. tostring(result))
+    alertError(triggerId, '[LightBoard] 리롤 실패 (' .. identifier .. ').\n' .. tostring(result))
     return
   end
 
-  if man.sideEffect then
+  if success and man.sideEffect then
     sideeffect.handleSideEffectResult(triggerId, {
       man = man,
       action = 'reroll',
@@ -410,7 +403,7 @@ Action: `%s`
 
   if not success then
     setChat(triggerId, jsIndex, originalContent)
-    alertError(triggerId, "[LightBoard] 상호작용 실패. " .. identifier .. " 개발자에게 문의하세요.\n" .. tostring(result))
+    alertError(triggerId, '[LightBoard] 상호작용 실패 (' .. identifier .. ').\n' .. tostring(result))
     return
   end
 
@@ -422,14 +415,17 @@ Action: `%s`
 
   local finalChat
 
-  if man.sideEffect then
+  if success and man.sideEffect then
     sideeffect.handleSideEffectResult(triggerId, {
       man = man,
       action = 'interaction',
       result = result,
       identifier = identifier,
       blockID = modifiers.blockID,
-      onError = function(msg) alertError(triggerId, msg) end,
+      onError = function(msg)
+        setChat(triggerId, jsIndex, originalContent)
+        alertError(triggerId, msg)
+      end,
     })
     return
   end

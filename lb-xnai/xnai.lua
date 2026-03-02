@@ -20,6 +20,7 @@ end
 ---@field characters XNAIPromptSet[]
 ---@field scene string
 ---@field slot? number
+---@field supplement? string
 
 ---@class XNAIResponse
 ---@field keyvis? XNAIDescriptor
@@ -36,31 +37,30 @@ end
 ---@param desc XNAIDescriptor
 ---@return XNAIPromptSet
 local function buildRawPrompt(desc)
-  local lead = {}
+  local setup = {}
   if desc.scene and desc.scene ~= '' then
-    table.insert(lead, desc.scene)
+    table.insert(setup, desc.scene)
   end
   if desc.camera and desc.camera ~= '' then
-    table.insert(lead, desc.camera)
+    table.insert(setup, desc.camera)
+  end
+  local setupText = t_concat(setup, ', ')
+
+  local supplement = desc.supplement and desc.supplement ~= '' and desc.supplement or ''
+  if supplement ~= '' then
+    setupText = setupText ~= '' and setupText .. '\n\n' .. supplement or supplement
   end
 
-  local leadText = #lead > 0 and t_concat(lead, ', ') or ''
-
-  local positiveParts = {
-    leadText
-  }
-  local negativeParts = {
-    ''
-  }
-
+  local charsP = {}
+  local charsN = {}
   if desc.characters then
     for _, character in ipairs(desc.characters) do
-      table.insert(positiveParts, character.positive)
-      table.insert(negativeParts, character.negative or '')
+      table.insert(charsP, character.positive)
+      table.insert(charsN, character.negative or '')
     end
   end
 
-  return { positive = t_concat(positiveParts, ' | '), negative = t_concat(negativeParts, ' | ') }
+  return { positive = setupText .. '\n\n' .. t_concat(charsP, ' |\n'), negative = t_concat(charsN, ' |\n') }
 end
 
 ---@param popID string
@@ -199,12 +199,6 @@ local function renderInline(data, chatIndex, stackItem)
           risu_btn = t_concat({ 'lb-xnai-gen/', chatIndex, '_-1' }),
           type = 'button',
           '✦ 키 비주얼 생성',
-          inStack and h.button['lb-xnai-toolbar-btn'] {
-            risu_btn = t_concat({ 'lb-xnai-gen/', chatIndex }),
-            title = '전체 생성',
-            type = 'button',
-            h.lb_xnai_ff_icon { closed = true },
-          } or nil,
         }
 
         kv = tostring(h.div['lb-xnai-placeholder-wrapper'] {
@@ -224,13 +218,6 @@ local function renderInline(data, chatIndex, stackItem)
               title = '재생성',
               type = 'button',
               h.lb_xnai_play_icon { closed = true },
-            } or nil,
-            inStack and h.button['lb-xnai-toolbar-btn'] {
-              popovertarget = fullsizePop and popID or nil,
-              risu_btn = t_concat({ 'lb-xnai-gen/', chatIndex }),
-              title = '전체 재생성',
-              type = 'button',
-              h.lb_xnai_ff_icon { closed = true },
             } or nil,
             fullsizePop and inStack and h.label['lb-xnai-toolbar-btn'] {
               htmlFor = promptID,
@@ -347,6 +334,9 @@ listenEdit(
   end
 )
 
+---@type XNAICleanHandler
+local cleanHandler = require('./xnai_cleanHandler')
+
 ---@type XNAIDeleteHandler
 local deleteHandler = require('./xnai_deleteHandler')
 
@@ -358,6 +348,14 @@ local regenHandler = require('./xnai_regenHandler')
 
 onButtonClick = async(function(tid, code)
   setTriggerId(tid)
+
+  if code == 'lb-xnai-clearHistory' then
+    return cleanHandler.clearHistory(tid)
+  end
+
+  if code == 'lb-xnai-clearOldScenes' then
+    return cleanHandler.clearOldScenes(tid)
+  end
 
   -- lb-xnai-delete/{chatIndex}_{slot}
   local deletePrefix = 'lb%-xnai%-delete/'

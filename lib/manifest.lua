@@ -12,6 +12,7 @@
 --- @field mode '1'|'2'
 --- @field multilingual boolean
 --- @field personaDesc boolean
+--- @field reiteration number
 --- @field rerollBehavior 'preserve-prev'|'remove-prev'
 --- @field sideEffect boolean
 --- @field onInput (fun (triggerId: string, input: string, index: number): string)?

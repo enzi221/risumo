@@ -71,8 +71,7 @@ function M.handleSideEffectResult(triggerId, params)
     targetIdx)
 
   if not onOutputSuccess or not modifiedContent then
-    setChat(triggerId, targetIdx, originalContent)
-    params.onError('[LightBoard] sideEffect onOutput 실패. ' .. tostring(modifiedContent))
+    params.onError('[LightBoard] sideEffect 출력 처리 실패 (' .. params.identifier .. ').\n' .. tostring(modifiedContent))
     return false
   end
 
@@ -121,7 +120,6 @@ end
 --- @class RunSideEffectsParams
 --- @field sideEffectManifests Manifest[]
 --- @field fullChat Chat[]
---- @field maxConcurrent number
 
 --- Executes sideEffect manifests and applies results to chat/LBDATA.
 --- @param triggerId string
@@ -133,25 +131,23 @@ function M.runSideEffects(triggerId, params)
 
   local sideEffectResults = {}
 
-  for i = 1, #params.sideEffectManifests, params.maxConcurrent do
-    local currentChunkPromises = {}
-    local chunkEndIndex = math.min(i + params.maxConcurrent - 1, #params.sideEffectManifests)
-
-    for j = i, chunkEndIndex do
-      local man = params.sideEffectManifests[j]
-      table.insert(currentChunkPromises, pipeline.runPipelineAsync(triggerId, man, params.fullChat, {
+  for i, man in ipairs(params.sideEffectManifests) do
+    local ok, result = pcall(function()
+      return pipeline.runPipelineAsync(triggerId, man, params.fullChat, {
         type = 'generation',
         lazy = man.lazy
-      }))
+      }):await()
+    end)
+
+    if not ok then
+      alertError(triggerId, '[LightBoard] ' .. man.identifier .. ' 생성 실패.\n' .. tostring(result))
+      result = string.format('<lb-lazy id="%s" />', man.identifier)
+    elseif not result or result == '' then
+      alertError(triggerId, '[LightBoard] ' .. man.identifier .. ' 생성 실패. 모델 응답이 비어있습니다.')
+      result = string.format('<lb-lazy id="%s" />', man.identifier)
     end
 
-    local chunkResults = Promise.all(currentChunkPromises):await()
-    if chunkResults then
-      for idx, chunkResult in ipairs(chunkResults) do
-        local manIdx = i + idx - 1
-        sideEffectResults[manIdx] = chunkResult
-      end
-    end
+    sideEffectResults[i] = result
   end
 
   local fullChatNewest = getFullChat(triggerId)
@@ -178,7 +174,7 @@ function M.runSideEffects(triggerId, params)
       if pipelineResult:match('^%s*<lb%-lazy') then
         table.insert(lazyPlaceholders, pipelineResult)
       else
-        local success, result, lbdata = pcall(
+        local success, result, lbdataResult = pcall(
           runSideEffectOnOutput,
           triggerId,
           man,
@@ -187,12 +183,12 @@ function M.runSideEffects(triggerId, params)
           targetIdx)
         if success and result then
           currentChatContent = result
-          if lbdata and prelude.trim(lbdata) ~= '' then
-            table.insert(lbdataContents, lbdata)
+          if lbdataResult and prelude.trim(lbdataResult) ~= '' then
+            table.insert(lbdataContents, lbdataResult)
           end
         else
-          print("[LightBoard Backend] sideEffect onOutput failed for " ..
-            man.identifier .. ": " .. tostring(result))
+          alertError(triggerId, '[LightBoard] ' .. man.identifier .. ' 출력 처리 실패.\n' .. tostring(result))
+          table.insert(lazyPlaceholders, string.format('<lb-lazy id="%s" />', man.identifier))
         end
       end
     end

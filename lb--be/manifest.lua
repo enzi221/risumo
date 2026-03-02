@@ -61,6 +61,8 @@ local function getManifests(triggerId)
               tonumber(getGlobalVar(triggerId, prefix .. "maxCtx"))
           tbl.maxLogs                           = tonumber(tbl.maxLogs) or
               tonumber(getGlobalVar(triggerId, prefix .. "maxLogs"))
+          tbl.reiteration                       = tonumber(tbl.reiteration) or
+              tonumber(getGlobalVar(triggerId, prefix .. "reiteration")) or 0
 
           tbl.authorsNote                       = resolveConfig(triggerId, tbl.authorsNote, id, "authorsNote", false)
           tbl.charDesc                          = resolveConfig(triggerId, tbl.charDesc, id, "charDesc", false)
