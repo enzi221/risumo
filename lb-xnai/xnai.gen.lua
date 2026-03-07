@@ -105,7 +105,6 @@ local function buildPresetPrompt(triggerId, desc)
   local positive = content:match('%[Positive%]%s*([%s%S]-)%s*%[Negative%]')
   positive = positive and prelude.trim(positive) or ''
 
-  local positiveNote = getGlobalVar(triggerId, 'toggle_lb-xnai.positive') or ''
   if positive == '' then
     positive = '{prompt}'
   end
@@ -113,13 +112,31 @@ local function buildPresetPrompt(triggerId, desc)
     positive = positive .. '{prompt}'
   end
 
+  local positiveNote = getGlobalVar(triggerId, 'toggle_lb-xnai.positive') or ''
+  if positiveNote == null then
+    positiveNote = ''
+  end
   if positive:find('{prompt}', 1, true) then
+    local promptBody = setupPrompt
+    if positiveNote ~= '' then
+      promptBody = promptBody .. ', ' .. positiveNote
+    end
+
     if not comfy then
-      -- In {prompt} mode, characters should go to the end to fit the NAI prompt structure (common | charA | charB)
-      positive = positive:gsub('{prompt}', table.concat({ setupPrompt, positiveNote, supplement }, '\n\n')) ..
-      ' | ' .. charPromptP
+      -- In {prompt} NAI mode, characters should go to the end to fit the NAI prompt structure (common | charA | charB)
+      if supplement ~= '' then
+        promptBody = promptBody .. ',\n\n' .. supplement
+      end
+      positive = positive:gsub('{prompt}', promptBody) ..
+          ' | ' .. charPromptP
     else
-      positive = positive:gsub('{prompt}', table.concat({ setupPrompt, positiveNote, charPromptP, supplement }, '\n\n'))
+      if charPromptP ~= '' then
+        promptBody = promptBody .. ',\n\n' .. charPromptP
+      end
+      if supplement ~= '' then
+        promptBody = promptBody .. ',\n\n' .. supplement
+      end
+      positive = positive:gsub('{prompt}', promptBody)
     end
   else
     if positive:find('{setup}', 1, true) then
@@ -128,7 +145,7 @@ local function buildPresetPrompt(triggerId, desc)
       positive = positive ~= '' and positive .. ', ' .. setupPrompt or setupPrompt
     end
 
-    -- In non-{prompt} mode, NAI mode should ignore the {char} prompt and always append to the end to fit the NAI prompt structure (common | charA | charB)
+    -- In non-{prompt} mode NAI, mode should ignore the {char} prompt and always append to the end to fit the NAI prompt structure (common | charA | charB)
     if not comfy then
       positive = positive:gsub('{char}', '')
 
@@ -157,7 +174,6 @@ local function buildPresetPrompt(triggerId, desc)
   local negative = content:match('%[Negative%]%s*([%s%S]-)%s*$')
   negative = negative and prelude.trim(negative) or ''
 
-  local negativeNote = getGlobalVar(triggerId, 'toggle_lb-xnai.negative') or ''
   if negative == '' then
     negative = '{prompt}'
   end
@@ -165,6 +181,10 @@ local function buildPresetPrompt(triggerId, desc)
     negative = negative .. '{prompt}'
   end
 
+  local negativeNote = getGlobalVar(triggerId, 'toggle_lb-xnai.negative') or ''
+  if negativeNote == null then
+    negativeNote = ''
+  end
   if not comfy then
     negative = negative:gsub('{prompt}', negativeNote) .. ' | ' .. charPromptN
   else
