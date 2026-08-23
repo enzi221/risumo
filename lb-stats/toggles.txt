@@ -1,0 +1,18 @@
+=🔦상태창=group
+lb-stats.mode=모　　　드=select=끄기,메인,보조
+lb-stats.lazy=발　　　동=select=즉시,누르면
+=———————📒주　제=divider
+lb-stats.equipments=장　　　비=select=❌,핵심,전부
+=의상 외의 중요 장비 추적 여부=caption
+lb-stats.custom=커스텀필드=text
+lb-stats.custom-prompt=┗지　　침=text
+=추가로 추적할 상태 한 개와 그 추적법=caption
+lb-stats.position=위　　　치=select=⬆️,⬇️
+=———————⚙️시스템=divider
+lb-stats.thoughts=생각　보조=select=적고 제거,생각만,안하기
+lb-stats.maxLogs=포함채팅수=text
+=↑ 분석력 향상, 비용 증가=caption
+=최소 1, 기본 5=caption
+==divider
+=라이트보드 상태창 4.0.0—amonamona=caption
+==groupEnd

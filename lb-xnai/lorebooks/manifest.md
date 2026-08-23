@@ -1,0 +1,9 @@
+identifier=lb-xnai
+authorsNote=true
+charDesc=true
+loreBooks=true
+maxLogs=5
+personaDesc=true
+rerollBehavior=remove-prev
+multilingual=false
+sideEffect=true

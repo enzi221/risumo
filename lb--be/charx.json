@@ -1,0 +1,75 @@
+{
+  "CSS": "style.html",
+  "description": "라이트보드 백엔드",
+  "hideIcon": false,
+  "lorebook": [
+    {
+      "alwaysActive": true,
+      "comment": "LBDATA",
+      "file": "lorebooks/lbdata.md",
+      "insertOrder": 4500
+    },
+    {
+      "comment": "lightboard-char-desc",
+      "file": "lorebooks/char-desc.md"
+    },
+    {
+      "comment": "lightboard-max-context",
+      "file": "lorebooks/max-context.md"
+    },
+    {
+      "comment": "lightboard.image",
+      "file": "lorebooks/image.lua"
+    },
+    {
+      "bundle": true,
+      "comment": "lightboard-prelude",
+      "file": "lorebooks/prelude.lua"
+    },
+    {
+      "bundle": true,
+      "comment": "toon.encode",
+      "file": "lorebooks/toon.encode.lua",
+      "insertOrder": 1
+    },
+    {
+      "bundle": true,
+      "comment": "toon.decode",
+      "file": "lorebooks/toon.decode.lua",
+      "insertOrder": 1
+    }
+  ],
+  "lowLevelAccess": true,
+  "name": "🔦라이트보드 - 4.0.0",
+  "namespace": "lightboard",
+  "output": "../dist/lb--be.charx",
+  "regex": [
+    "regex/remove-main-output.md",
+    "regex/hide-default-cod.md",
+    "regex/hide-platform-dividers-disabled.md",
+    "regex/display-cleaner.md",
+    "regex/display-comment-icon.md",
+    "regex/display-cross-icon.md",
+    "regex/display-interaction-hints.md",
+    "regex/display-pin-icon.md",
+    "regex/display-platform-area.md",
+    "regex/display-reroll-icon.md",
+    "regex/ignore-interaction-metadata.md",
+    "regex/ignore-default-cod.md",
+    "regex/ignore-empty-platform-area.md",
+    "regex/ignore-lazy.md",
+    "regex/compat-hide-platform-header.md",
+    "regex/compat-ignore-platform-header.md"
+  ],
+  "toggles": "toggles.txt",
+  "triggers": [
+    {
+      "bundle": true,
+      "comment": "",
+      "lowLevelAccess": true,
+      "lua": "triggers/init.lua",
+      "type": "start"
+    }
+  ],
+  "version": "4.0.0"
+}

@@ -1,0 +1,24 @@
+=♦️미니보드=group
+lb-mini.mode=모　　드=select=끄기,메인,보조
+lb-mini.lazy=발　　동=select=즉시,누르면
+=———————📒주　제=divider
+lb-mini.quantity=분　　량=select=2-5,4-7,5-8
+lb-mini.preset=사전설정=select=기본(┗커스텀),세계관정합(┗커스텀),생각:{{char}},감정:{{char}},생각:{{user}},감정:{{user}},생각:┗주제,감정:┗주제
+=세계관정합—게시판 말투 지침 제외 등=caption
+=생각,감정:┗주제—주제 토글에 화자 입력=caption
+lb-mini.subject=┗주　제=textarea
+lb-mini.mood=┗느　낌=textarea
+lb-mini.privacy=┗사생활=select=이목집중,자율,약보호,강보호,언급금지
+lb-mini.protagonist=　┗누구=text
+=누구의 사생활? 기본 {{user}}=caption
+lb-mini.darkness=밝　　기=select=☀️,🌙
+lb-mini.theme=테　　마=select=♦️,💎,✨,🌳
+=———————⚙️시스템=divider
+lb-mini.sampling=다양성 강화
+=비용 증가=caption
+lb-mini.thoughts=생각보조=select=적고 제거,생각만,안하기
+lb-mini.context=컨　　텍=select=포함,제거
+=제거 시 메인 모델이 게시판 내용을 볼 수 없음=caption
+==divider
+=라이트보드 미니보드 4.0.0—amonamona=caption
+==groupEnd

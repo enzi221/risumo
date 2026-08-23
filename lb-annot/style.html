@@ -1,6 +1,7 @@
 <style>
   .lb-annot-abbr-wrap,
-  .lb-annot-root {
+  .lb-annot-root,
+  [data-id='lb-annot'] {
     --darkness: {{getglobalvar::toggle_lb-annot.darkness}};
     --theme:
       {{#if_pure {{? {{getglobalvar::toggle_lb-annot.theme}}=0 }} }}'♦️'{{/if}}
@@ -11,7 +12,7 @@
 
   /* 공통 라이트 배경 */
   @container style(--darkness: 0) {
-    :is(.x-risu-lb-annot-abbr-wrap, .lb-annot-root) > * {
+    :is(.x-risu-lb-annot-abbr-wrap, .lb-annot-root, [data-id='lb-annot']) > * {
       --lb-annot-bg: #fff;
       --lb-annot-bg-2: #f9f9f9;
       --lb-annot-border: #e0e0e0;
@@ -19,7 +20,7 @@
   }
 
   @container style(--theme: '♦️') and style(--darkness: 0) {
-    :is(.x-risu-lb-annot-abbr-wrap, .lb-annot-root) > * {
+    :is(.x-risu-lb-annot-abbr-wrap, .lb-annot-root, [data-id='lb-annot']) > * {
       --lb-annot-fg: #282a35;
       --lb-annot-fg-2: #777;
       --lb-annot-accent: #ff005e;
@@ -29,7 +30,7 @@
   }
 
   @container style(--theme: '♦️') and style(--darkness: 1) {
-    :is(.x-risu-lb-annot-abbr-wrap, .lb-annot-root) > * {
+    :is(.x-risu-lb-annot-abbr-wrap, .lb-annot-root, [data-id='lb-annot']) > * {
       --lb-annot-bg: #20212b;
       --lb-annot-bg-2: #2a2938;
       --lb-annot-border: #3d3e4b;
@@ -42,7 +43,7 @@
   }
 
   @container style(--theme: '💎') and style(--darkness: 0) {
-    :is(.x-risu-lb-annot-abbr-wrap, .lb-annot-root) > * {
+    :is(.x-risu-lb-annot-abbr-wrap, .lb-annot-root, [data-id='lb-annot']) > * {
       --lb-annot-fg: #495057;
       --lb-annot-fg-2: #6c757d;
       --lb-annot-accent: #007BFF;
@@ -52,7 +53,7 @@
   }
 
   @container style(--theme: '💎') and style(--darkness: 1) {
-    :is(.x-risu-lb-annot-abbr-wrap, .lb-annot-root) > * {
+    :is(.x-risu-lb-annot-abbr-wrap, .lb-annot-root, [data-id='lb-annot']) > * {
       --lb-annot-bg: #1a1d23;
       --lb-annot-bg-2: #212833;
       --lb-annot-border: #3a4556;
@@ -65,7 +66,7 @@
   }
 
   @container style(--theme: '✨') and style(--darkness: 0) {
-    :is(.x-risu-lb-annot-abbr-wrap, .lb-annot-root) > * {
+    :is(.x-risu-lb-annot-abbr-wrap, .lb-annot-root, [data-id='lb-annot']) > * {
       --lb-annot-fg: #5d4e37;
       --lb-annot-fg-2: #8b7355;
       --lb-annot-accent: #d4af37;
@@ -75,7 +76,7 @@
   }
 
   @container style(--theme: '✨') and style(--darkness: 1) {
-    :is(.x-risu-lb-annot-abbr-wrap, .lb-annot-root) > * {
+    :is(.x-risu-lb-annot-abbr-wrap, .lb-annot-root, [data-id='lb-annot']) > * {
       --lb-annot-bg: #1e1f22;
       --lb-annot-bg-2: #2a2d32;
       --lb-annot-border: #3c3f44;
@@ -88,7 +89,7 @@
   }
 
   @container style(--theme: '🟪') and style(--darkness: 0) {
-    :is(.x-risu-lb-annot-abbr-wrap, .lb-annot-root) > * {
+    :is(.x-risu-lb-annot-abbr-wrap, .lb-annot-root, [data-id='lb-annot']) > * {
       --lb-annot-bg: #faf9fc;
       --lb-annot-bg-2: #f3f1f8;
       --lb-annot-border: #e0dce8;
@@ -101,7 +102,7 @@
   }
 
   @container style(--theme: '🟪') and style(--darkness: 1) {
-    :is(.x-risu-lb-annot-abbr-wrap, .lb-annot-root) > * {
+    :is(.x-risu-lb-annot-abbr-wrap, .lb-annot-root, [data-id='lb-annot']) > * {
       --lb-annot-bg: #1a1a24;
       --lb-annot-bg-2: #242430;
       --lb-annot-border: #3a3a4d;

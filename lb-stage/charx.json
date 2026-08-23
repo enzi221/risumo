@@ -1,0 +1,85 @@
+{
+  "CSS": "style.html",
+  "description": "장거리 스토리 어시스턴트",
+  "folders": [
+    "안지워져"
+  ],
+  "hideIcon": false,
+  "lorebook": [
+    {
+      "comment": "manifest.lb",
+      "file": "lorebooks/manifest.md"
+    },
+    {
+      "comment": "lb-stage.lb",
+      "file": "lorebooks/lb.md",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-stage.lb.format",
+      "file": "lorebooks/lb.format.md",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-stage.lb.interaction",
+      "file": "lorebooks/interaction.md"
+    },
+    {
+      "comment": "lb-stage.lb.job",
+      "file": "lorebooks/lb.job.md"
+    },
+    {
+      "comment": "lb-stage.lb.thoughts",
+      "file": "lorebooks/lb.thoughts.md"
+    },
+    {
+      "comment": "lb-stage.lb.thoughts-interaction",
+      "file": "lorebooks/lb.thoughts-interaction.md"
+    },
+    {
+      "comment": "lb-stage.lb.onInput",
+      "file": "lorebooks/stage.onInput.lua"
+    },
+    {
+      "comment": "lb-stage.lb.onOutput",
+      "file": "lorebooks/stage.onOutput.lua",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-stage.lb.onValidate",
+      "file": "lorebooks/stage.onValidate.lua",
+      "insertOrder": 1
+    },
+    {
+      "alwaysActive": true,
+      "comment": "Guidance",
+      "file": "lorebooks/guidance.md",
+      "insertOrder": 99999
+    }
+  ],
+  "lowLevelAccess": true,
+  "name": "🔦라이트보드 ⚡스테이지매니저 4.0.0",
+  "namespace": "lb-stage",
+  "output": "../dist/lb-stage.charx",
+  "regex": [
+    "regex/filter-response.md",
+    "regex/ignore.md",
+    "regex/lazy.md",
+    "regex/hide-unparsed.md",
+    "regex/fallback.md",
+    "regex/marker-keepalive.md",
+    "regex/marker-ignore-keepalive.md",
+    "regex/marker-hide.md"
+  ],
+  "toggles": "toggles.txt",
+  "triggers": [
+    {
+      "bundle": true,
+      "comment": "",
+      "lowLevelAccess": true,
+      "lua": "triggers/stage.lua",
+      "type": "start"
+    }
+  ],
+  "version": "4.0.0"
+}

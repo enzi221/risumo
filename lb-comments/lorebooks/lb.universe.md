@@ -1,0 +1,1 @@
+Note: Posters/commenters don't know the settings below if they are not in the narrative log. Universe settings are for your reference only. These materials are not provided to users.

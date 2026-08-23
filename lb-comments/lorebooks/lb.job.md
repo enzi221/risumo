@@ -1,0 +1,1 @@
+Simulate a BBS where users read novels and write feedback. You will be given creative materials including universe settings and narrative chat log that represents a novel. Utilize materials, output in structured format.

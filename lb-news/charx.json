@@ -1,0 +1,74 @@
+{
+  "CSS": "style.html",
+  "description": "범용 뉴스 모듈",
+  "hideIcon": false,
+  "lorebook": [
+    {
+      "comment": "manifest.lb",
+      "file": "lorebooks/manifest.md"
+    },
+    {
+      "comment": "lb-news.lb",
+      "file": "lorebooks/lb.md",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-news.lb.format",
+      "file": "lorebooks/lb.format.md",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-news.lb.interaction",
+      "file": "lorebooks/lb.interaction.md",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-news.lb.thoughts",
+      "file": "lorebooks/lb.thoughts.md",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-news.lb.thoughts-interaction",
+      "file": "lorebooks/lb.thoughts-interaction.md",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-news.lb.onOutput",
+      "file": "lorebooks/news.onOutput.lua",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-news.lb.onValidate",
+      "file": "lorebooks/news.onValidate.lua",
+      "insertOrder": 1
+    },
+    {
+      "alwaysActive": true,
+      "comment": "News",
+      "file": "lorebooks/news.md",
+      "insertOrder": 4567
+    }
+  ],
+  "lowLevelAccess": false,
+  "name": "🔦라이트보드 📰뉴스 4.0.0",
+  "namespace": "lb-news",
+  "output": "../dist/lb-news.charx",
+  "regex": [
+    "regex/filter-response.md",
+    "regex/ignore-old.md",
+    "regex/lazy.md",
+    "regex/hide-unparsed.md",
+    "regex/hx.md"
+  ],
+  "toggles": "toggles.txt",
+  "triggers": [
+    {
+      "bundle": true,
+      "comment": "",
+      "lowLevelAccess": false,
+      "lua": "triggers/news.lua",
+      "type": "start"
+    }
+  ],
+  "version": "4.0.0"
+}

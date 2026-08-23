@@ -1,0 +1,68 @@
+{
+  "CSS": "style.html",
+  "description": "",
+  "hideIcon": false,
+  "lorebook": [
+    {
+      "comment": "manifest.lb",
+      "file": "lorebooks/manifest.md",
+      "insertOrder": 9999999
+    },
+    {
+      "comment": "lb-annot.lb",
+      "file": "lorebooks/lb.md",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-annot.lb.job",
+      "file": "lorebooks/lb.job.md",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-annot.lb.format",
+      "file": "lorebooks/lb.format.md",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-annot.lb.thoughts",
+      "file": "lorebooks/lb.thoughts.md",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-annot.lb.onOutput",
+      "file": "lorebooks/annot.onOutput.lua"
+    },
+    {
+      "comment": "lb-annot.lb.onValidate",
+      "file": "lorebooks/annot.onValidate.lua"
+    },
+    {
+      "alwaysActive": true,
+      "comment": "Annotations",
+      "file": "lorebooks/annotations.md",
+      "insertOrder": 4000
+    }
+  ],
+  "lowLevelAccess": false,
+  "name": "🔦라이트보드 주석 4.0.0",
+  "namespace": "lb-annot",
+  "output": "../dist/lb-annot.charx",
+  "regex": [
+    "regex/filter-response.md",
+    "regex/ignore.md",
+    "regex/lazy.md",
+    "regex/hide-unparsed.md",
+    "regex/display-pin.md"
+  ],
+  "toggles": "toggles.txt",
+  "triggers": [
+    {
+      "bundle": true,
+      "comment": "",
+      "lowLevelAccess": false,
+      "lua": "triggers/annot.lua",
+      "type": "start"
+    }
+  ],
+  "version": "4.0.0"
+}

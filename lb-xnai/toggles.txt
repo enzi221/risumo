@@ -4,13 +4,13 @@ lb-xnai.lazy=발　　　동=select=즉시,누르면
 lb-xnai.generation=이미지발동=select=즉시,누르면
 =프롬프트 생성 후 이미지까지 즉시 생성?=caption
 lb-xnai.nsfw=NSFW 프롬프트
-=단순 활성화만으로 Google AI Studio / Copilot -> 하드검열 가능=caption
 =———————📒스타일=divider
 lb-xnai.preset=프　리　셋=text
 ="프리셋 X" 로어북 사용. "X" 부분만 입력. 기본 "1"=caption
 lb-xnai.focus=포　커　스=text
 =대상의 이름 입력=caption
-lb-xnai.characters=최대캐릭터=select=3,2,1
+lb-xnai.characters=최대캐릭터=text
+=숫자, 비우면 무제한=caption
 lb-xnai.direction=작가의노트=textarea
 =봇/채팅마다 "lb-xnai.lb.extra" 로어북 생성 후=caption
 =그 안에 적으면 편함 (헤딩 ##부터 시작)=caption
@@ -26,18 +26,24 @@ lb-xnai.kv.font=글　　　꼴=select=Gloock (세리프),Kalnia (세리프),HS�
 lb-xnai.kv.fx=특수효과
 =노이즈, 텍스트=caption
 =———————🖼️씬=divider
-lb-xnai.scene.quantity=분　　　량=select=0-1,0-3,1-5,미지정
-=미지정 후 작노나 "lb-xnai.lb.extra" 로어북에 분량 지정 가능=caption
+lb-xnai.scene.quantity=분　　　량=text
+=기본 1-3=caption
+lb-xnai.scene.comic=형　　　식=select=장면,만화
+=만화는 연산량 대폭 증가, 분량을 줄이시오=caption
 lb-xnai.scene.ar=가로세로비=select=3/1,2.35/1,16/9,1/1,2/3,원본
 lb-xnai.scene.width=최대　너비=text
 =픽셀, 숫자만 입력, 기본 600=caption
 lb-xnai.scene.align=정　　　렬=select=중앙,왼쪽
 =———————⚙️시스템=divider
+lb-xnai.thoughts=생각　보조=select=적고 제거,생각만,안하기
 lb-xnai.context=컨텍스트 유지
 =이전 태그 기록을 다음 요청에 전달?=caption
 lb-xnai.positive=긍정　프롬=textarea
 lb-xnai.negative=부정　프롬=textarea
 =항상 맨 뒤에 추가=caption
+lb-xnai.reiteration=다듬기횟수=text
+=멀티턴 재검증=caption
+=↑ 분석력, 품질 향상, 비용 증가=caption
 lb-xnai.maxLogs=포함채팅수=text
 =↑ 분석력 향상, 비용 증가=caption
 =최소 1, 기본 백엔드=caption
@@ -47,12 +53,17 @@ lb-xnai.maxSaves=저장　개수=text
 =최소 1, 기본 5=caption
 =———————⚙️ComfyUI=divider
 lb-xnai.compat.comfy=ComfyUI
-=괄호 유지, 가중치 설명 변경, source/target 설명 제거=caption
+=괄호 유지=caption
 lb-xnai.compat.charDivider=캐릭터구분=select=파이프,줄바꿈
 =charA | charB vs. charA⏎⏎charB=caption
+=ComfyUI 체크해야 적용=caption
 lb-xnai.compat.charPrompt=캐릭터프롬=select=일반,구분
 =girl, tagA, tagB, ... vs. the girl at the left is tagA, tagB, ...=caption
 =자연어 + 태그 동시 이해 필요=caption
+=ComfyUI 체크해야 적용=caption
+lb-xnai.compat.weight=가　중　치=select=제거,Comfy
+=NAI 가중치를 제거하거나 변환=caption
+=ComfyUI 체크해야 적용=caption
 ==divider
-=라이트보드 삽화 3.2.0—amonamona=caption
+=라이트보드 삽화 4.0.0—amonamona=caption
 ==groupEnd

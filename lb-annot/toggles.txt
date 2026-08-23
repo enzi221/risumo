@@ -1,0 +1,26 @@
+=🔦주석=group
+lb-annot.mode=모　　　드=select=끄기,메인,보조
+lb-annot.lazy=발　　　동=select=즉시,누르면
+=———————📒주　제=divider
+lb-annot.quantity=분　　　량=select=미지정,0-3,0-5,1-7
+lb-annot.clutter=잡다한　거=select=억제,자율
+=중요하지 않은 항목의 주석 억제 여부=caption
+lb-annot.preset=사전　설정=select=기본,{{char}} 작성,{{user}} 작성,┗작성자 작성
+=작성자 작성—작성자 토글에 화자 입력=caption
+lb-annot.writer=┗작성자　=text
+lb-annot.mood=┗느　　낌=textarea
+lb-annot.darkness=밝　　　기=select=☀️,🌙
+lb-annot.theme=테　　　마=select=♦️,💎,✨,🟪
+=———————⚙️시스템=divider
+lb-annot.thoughts=생각　보조=select=적고 제거,생각만,안하기
+lb-annot.maxLogs=포함채팅수=text
+=↑ 분석력 향상, 중복 감소, 비용 증가=caption
+=최소 1, 기본 백엔드=caption
+lb-annot.maxSaves=저장　개수=text
+=↑ 분석력 향상, 중복 감소, 비용 증가=caption
+=최소 1, 기본 5=caption
+lb-annot.context=컨　　　텍=select=포함,제거
+=제거 시 메인 모델이 주석을 볼 수 없음=caption
+==divider
+=라이트보드 주석 4.0.0—amonamona=caption
+==groupEnd

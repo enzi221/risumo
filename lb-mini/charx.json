@@ -1,0 +1,73 @@
+{
+  "CSS": "style.html",
+  "description": "범용 게시판 모듈",
+  "hideIcon": false,
+  "lorebook": [
+    {
+      "comment": "manifest.lb",
+      "file": "lorebooks/manifest.md"
+    },
+    {
+      "comment": "lb-mini.lb",
+      "file": "lorebooks/lb.md",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-mini.lb.format",
+      "file": "lorebooks/lb.format.md",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-mini.lb.interaction",
+      "file": "lorebooks/lb.interaction.md",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-mini.lb.thoughts",
+      "file": "lorebooks/lb.thoughts.md",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-mini.lb.thoughts-interaction",
+      "file": "lorebooks/lb.thoughts-interaction.md",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-mini.lb.onOutput",
+      "file": "lorebooks/mini.onOutput.lua",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-mini.lb.onValidate",
+      "file": "lorebooks/mini.onValidate.lua",
+      "insertOrder": 1
+    },
+    {
+      "alwaysActive": true,
+      "comment": "Miniboard",
+      "file": "lorebooks/mini.md",
+      "insertOrder": 4567
+    }
+  ],
+  "lowLevelAccess": false,
+  "name": "🔦라이트보드 ♦️미니보드 4.0.0",
+  "namespace": "lb-mini",
+  "output": "../dist/lb-mini.charx",
+  "regex": [
+    "regex/filter-response.md",
+    "regex/ignore-old.md",
+    "regex/lazy.md",
+    "regex/hide-unparsed.md"
+  ],
+  "toggles": "toggles.txt",
+  "triggers": [
+    {
+      "bundle": true,
+      "comment": "",
+      "lowLevelAccess": false,
+      "lua": "triggers/mini.lua",
+      "type": "start"
+    }
+  ],
+  "version": "4.0.0"
+}

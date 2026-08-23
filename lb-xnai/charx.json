@@ -1,0 +1,91 @@
+{
+  "CSS": "style.html",
+  "description": "본문 내 이미지 생성",
+  "folders": [
+    "코드"
+  ],
+  "hideIcon": false,
+  "lorebook": [
+    {
+      "comment": "lb-xnai.lb",
+      "file": "lorebooks/lb.md",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-xnai.lb.job",
+      "file": "lorebooks/lb.job.md",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-xnai.lb.format",
+      "file": "lorebooks/lb.format.md",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-xnai.lb.interaction",
+      "file": "lorebooks/lb.interaction.md",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-xnai.lb.thoughts",
+      "file": "lorebooks/lb.thoughts.md",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-xnai.lb.thoughts-interaction",
+      "file": "lorebooks/lb.thoughts-interaction.md",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-xnai.lb.onInput",
+      "file": "lorebooks/xnai.onInput.lua",
+      "folder": "코드"
+    },
+    {
+      "comment": "lb-xnai.lb.onOutput",
+      "file": "lorebooks/xnai.onOutput.lua",
+      "folder": "코드"
+    },
+    {
+      "comment": "lb-xnai.lb.onValidate",
+      "file": "lorebooks/xnai.onValidate.lua",
+      "folder": "코드"
+    },
+    {
+      "comment": "lb-xnai.gen",
+      "file": "lorebooks/xnai.gen.lua",
+      "folder": "코드"
+    },
+    {
+      "comment": "manifest.lb",
+      "file": "lorebooks/manifest.md",
+      "insertOrder": 1000
+    }
+  ],
+  "lowLevelAccess": true,
+  "name": "🔦라이트보드 🌠 삽화 4.0.0",
+  "namespace": "lb-xnai",
+  "output": "../dist/lb-xnai.charx",
+  "regex": [
+    "regex/lazy.md",
+    "regex/display-edit-icon.md",
+    "regex/display-edit-hint.md",
+    "regex/display-ff-icon.md",
+    "regex/display-old-kv.md",
+    "regex/display-old-scene.md",
+    "regex/display-play-icon.md",
+    "regex/hide-unparsed.md",
+    "regex/ignore.md"
+  ],
+  "toggles": "toggles.txt",
+  "triggers": [
+    {
+      "bundle": true,
+      "comment": "",
+      "lowLevelAccess": true,
+      "lua": "triggers/xnai.lua",
+      "type": "start"
+    }
+  ],
+  "version": "4.0.0"
+}

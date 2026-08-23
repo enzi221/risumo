@@ -1,0 +1,25 @@
+=📰뉴스=group
+lb-news.mode=모　　드=select=끄기,메인,보조
+lb-news.lazy=발　　동=select=즉시,누르면
+=———————📒주　제=divider
+lb-news.subject=주　　제=text
+lb-news.privacy=사　생활=select=이목집중,자율,약보호,강보호,언급금지
+lb-news.protagonist=┗누　구=text
+=누구의 사생활? 기본 {{user}}=caption
+lb-news.preset=사전설정=select=기본(┗커스텀),1980,됴션휘보
+lb-news.mood=┗느　낌=text
+=———————🎨외　형=divider
+lb-news.image=대표사진
+=헤드라인 사진 생성?=caption
+lb-news.image.preset=┗프리셋=text
+=삽화 프리셋, "프리셋 X" 로어북=caption
+lb-news.darkness=밝　　기=select=☀️,🌙
+=———————⚙️시스템=divider
+lb-news.sampling=다양성 강화
+=비용 증가=caption
+lb-news.thoughts=생각보조=select=적고 제거,생각만,안하기
+lb-news.context=컨　　텍=select=포함,제거
+=제거 시 메인 모델이 뉴스 내용을 볼 수 없음=caption
+==divider
+=라이트보드 뉴스 4.0.0—amonamona=caption
+==groupEnd
