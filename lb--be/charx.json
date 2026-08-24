@@ -42,7 +42,6 @@
   "lowLevelAccess": true,
   "name": "🔦라이트보드 - 4.0.0",
   "namespace": "lightboard",
-  "output": "../dist/lb--be.charx",
   "regex": [
     "regex/remove-main-output.md",
     "regex/hide-default-cod.md",

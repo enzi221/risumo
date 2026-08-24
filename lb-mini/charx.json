@@ -52,7 +52,6 @@
   "lowLevelAccess": false,
   "name": "🔦라이트보드 ♦️미니보드 4.0.0",
   "namespace": "lb-mini",
-  "output": "../dist/lb-mini.charx",
   "regex": [
     "regex/filter-response.md",
     "regex/ignore-old.md",

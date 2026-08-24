@@ -45,7 +45,6 @@
   "lowLevelAccess": false,
   "name": "🔦라이트보드 상태창 4.0.0",
   "namespace": "lb-stats",
-  "output": "../dist/lb-stats.charx",
   "regex": [
     "regex/filter-response.md",
     "regex/lazy.md",

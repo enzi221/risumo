@@ -65,7 +65,6 @@
   "lowLevelAccess": true,
   "name": "🔦라이트보드 🌠 삽화 4.0.0",
   "namespace": "lb-xnai",
-  "output": "../dist/lb-xnai.charx",
   "regex": [
     "regex/lazy.md",
     "regex/display-edit-icon.md",

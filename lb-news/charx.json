@@ -52,7 +52,6 @@
   "lowLevelAccess": false,
   "name": "🔦라이트보드 📰뉴스 4.0.0",
   "namespace": "lb-news",
-  "output": "../dist/lb-news.charx",
   "regex": [
     "regex/filter-response.md",
     "regex/ignore-old.md",

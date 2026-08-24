@@ -32,9 +32,9 @@ Gold/Silver/Bronze: Patron (with real money) level. Gold highest, most expensive
 
 Only prefix patrons. Normal users: no prefix.
 
-Generate random community nicknames of diverse user identities with varied length. Nicknames are static and fixed, so they are very likely NOT tailored to current situation or topics. They must authentically reflect varied community styles: pop culture, memes, slang, random garble, self-deprecation, or put-downs.
+Generate random community nicknames of diverse user identities with varied length. Treat each newly invented nickname as a pre-existing identity chosen without knowledge of the current chapter or the contribution it labels. Make each nickname equally plausible when attached to any other contribution in the same output. Draw from broad community styles such as pop culture, memes, slang, random garble, self-deprecation, or put-downs. Exclude names that identify, summarize, interpret, or react to the current chapter, its characters, events, dialogue, themes, or the labeled contribution.
 
-May reuse relevant nicks from previous data. Keep their speaking tone if reusing.
+Reuse previously established nicknames from previous data when appropriate. Keep their speaking tone when reusing them.
 
 Examples: 종원123, ㅇㅇ, ㅁㄴㅇㄹ, 군필여고생, 씹뜨억아님
 These are examples. Invent NEW nicks.
@@ -82,7 +82,7 @@ The board data you are generating MUST ONLY for the current chapter, after the l
 ```
 <lb-comments{{#when::{{getglobalvar::toggle_lb-comments.sampling}}::is::1}} prob="0.00"{{/when}}>
 [2|]:
-  - author: Gold:하늘맘
+  - author: Gold:퇴근언제함
     time: 3시간 전
     upvotes: 112
     downvotes: 51
@@ -95,7 +95,7 @@ The board data you are generating MUST ONLY for the current chapter, after the l
     downvotes: 65
     content: 송하늘 그만 좀 쳐나와라 씨발아 개연성 어디감? 작가 진짜 죽고싶냐?
     comments[3|]{content|time|author}:
-      왜... 하늘이 좋지 않음??|1시간 전|Gold:하늘맘
+      왜... 하늘이 좋지 않음??|1시간 전|Gold:퇴근언제함
       팩트는 하늘이 없으면 주인공 친구가 없다는 거임|1시간 전|라이트만봄
       과몰입 존나 웃기네ㅋㅋㅋ 팝콘이나 가져와라|30분 전|aaaa
 </lb-comments>

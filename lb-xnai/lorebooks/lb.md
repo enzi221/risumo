@@ -32,7 +32,7 @@ Stage a specific visible action within its environment. Choose the camera positi
 
 ### Camera
 
-{{#when::lb-xnai.scene.comic::tis::1}}For every panel in a multi-panel Scene, put exactly one Perspective and one Character Framing in that panel's `camera`. For Key Visual, put exactly one of each in `keyvis.camera`.{{:else}}Put exactly one Perspective and one Character Framing in every `camera`.{{/when}}
+{{#when::lb-xnai.scene.comic::tis::1}}For Key Visual, put exactly one Perspective and one Character Framing in `keyvis.camera`.{{:else}}Put exactly one Perspective and one Character Framing in every `camera`.{{/when}}
 
 #### Perspective
 
@@ -93,7 +93,9 @@ Keep location, spatial anchors, lighting, weather, prominent props, and anonymou
 
 Build each featured character's `positive` tags in this order: `girl` or `boy`, apparent age, hair, eyes, skin or species, body type, attire, expression, and exposed body parts. Include every visible required group. Tag only visible attributes of a partially visible character.
 
-Treat a person as a featured character when the person is an identifiable story participant or performs an individually described action in the selected moment. Give every featured character a corresponding `characters` entry.
+Build the eligible featured cast before selecting image moments. Treat only characters whose appearance is described in Narrative Universe Settings or Client requirements as eligible. Select featured characters only from this eligible cast. Give every featured character a corresponding `characters` entry.
+
+Within the eligible cast, feature each identifiable story participant and each person who performs an individually described action in the selected moment. A story participant outside the eligible cast cannot appear as a featured character, a partially visible character, or an anonymous background figure. When a selected moment includes an ineligible story participant, depict only the eligible participants and keep every visual description limited to those eligible participants.
 
 Treat anonymous people who only establish the population and activity of a location as background figures. Describe background figures collectively in `scene` without adding `characters` entries, individual identifiers, detailed appearances, or individually traceable actions. Populate a location with background figures when visible public or communal activity makes the setting more credible, but keep those figures subordinate to the featured action. Do not reclassify an omitted source character as a background figure.
 
@@ -131,7 +133,7 @@ Apply the following requirements to every visible group.
 - Expression: annoyed, angry, embarrassed, indifferent, blush, grin, etc. Specify all applicable. Limit tags to clear, visually identifiable emotions.
 - Exposed body parts: Tag every applicable exposed body part visible within the frame: `armpits`, `clavicle`, `cleavage`, `navel`, `thighs`, `buttocks`, {{#when::toggle::lb-xnai.nsfw}}`nipples`, `pussy`, `anus`, `penis`{{/nsfw}}...
 
-For characters with partial descriptions, fill in missing details creatively within settings. Characters with no description at all should be omitted entirely.
+For eligible characters with partial descriptions, fill in missing details creatively within settings.
 
 #### Positive and Negative Tags
 
@@ -183,9 +185,9 @@ Make the Key Visual materially distinct from every Scene through composition, vi
 
 {{#when::lb-xnai.scene.comic::tis::1}}A structured-text storyboard of two to four connected comic panels within the log entry. Panels may move across places and moments when the sequence clarifies the event.{{:else}}A structured-text storyboard frame of an event in a specific place and moment within the log entry.{{/when}}
 
-Select a moment with a visible change, interaction, reaction, movement, or consequential spatial relationship. Preserve the event's cause and effect inside the frame: show the acting character, the affected character or object, and the surroundings that make the action legible. Do not reduce an exchange, confrontation, conversation, coordinated activity, or shared reaction to one participant's isolated pose.
+Select a moment with a visible change, interaction, reaction, movement, or consequential spatial relationship. Preserve the event's cause and effect through every eligible participant and visible object available to the image. When another story participant is ineligible, frame that person outside the image and depict the eligible participant's visible side of the event without referring to the omitted person in the image data. Do not reduce an exchange, confrontation, conversation, coordinated activity, or shared reaction to one eligible participant's isolated pose when another eligible participant is required.
 
-Derive the featured cast from the selected moment before writing character prompts. Include every identifiable participant required to depict that moment. When a character limit is configured, keep the completely visible featured cast within that limit; partially visible featured characters may exceed it. Include multiple interacting characters together when they fit the configured limit or when no limit is configured. When the required completely visible cast exceeds a configured limit, select a different moment or a coherent sub-action whose visible participants fit the limit. Do not remove an interaction partner while retaining an action or reaction that depends on that partner. Add anonymous background figures separately when the location benefits from visible population.
+Derive the featured cast from the eligible participants in the selected moment before writing character prompts, and include every eligible identifiable participant required to depict that moment. When a character limit is configured, keep the completely visible featured cast within that limit; partially visible featured characters may exceed it. Include multiple eligible interacting characters together when they fit the configured limit or when no limit is configured. When the required completely visible cast exceeds a configured limit, select a different moment or a coherent sub-action whose visible participants fit the limit. Do not remove an eligible interaction partner while retaining an action or reaction that depends on that partner. Add anonymous background figures separately when the location benefits from visible population.
 
 Apply the Composition rules to the selected event. Make the acting, receiving, observing, approaching, blocking, or reacting role of each featured character legible through placement, scale, overlap, pose, eye direction, movement, contact, or a shared prop. Environment details alone do not turn an isolated character depiction into a Scene.
 
@@ -195,7 +197,7 @@ Preserve character and environment continuity between Scenes from the same conti
 
 Compose every Scene as a multi-panel comic layout with two to four connected visual beats. Keep all panels within one Scene.
 
-Put the Scene-wide distinct featured character count in `scenes[].cast`, then add a `panels` array with two to four panel objects in reading order. Every panel contains its own `camera`, `cast`, `characters`, and `scene`. Keep setting, time, lighting, weather, props, and other panel-specific environment tags in `panels[].scene`; repeat continuing environment tags in every panel where they remain visible.
+Put the Scene-wide distinct featured character count in `scenes[].cast`, then add a `panels` array with two to four panel objects in reading order. Every panel contains its own `cast`, `characters`, and `scene`. Keep setting, time, lighting, weather, props, and other panel-specific environment tags in `panels[].scene`; repeat continuing environment tags in every panel where they remain visible.
 
 Treat every featured character appearance in every panel as a separate depiction. Add the depiction only to that panel's `characters`. Prompt each entry for visible attributes and a character-specific description while preserving identity continuity. Repeat the same `name` when a fully visible character appears in multiple panels.
 
@@ -203,11 +205,13 @@ Treat every featured character appearance in every panel as a separate depiction
 
 #### Slots
 
-We've prepared slots where scenes can be placed: `[Slot #]`. Pick a slot number, and the scene will be placed there.
+We've prepared slots where scenes can be placed: `[Slot #]`. Place each Scene after the prose has fully established the depicted moment. Choose the first slot immediately after the final prose block required to understand the complete moment. When the moment spans multiple prose blocks, place the Scene after the last required block.
 
 Slots were placed mechanically, so some slots might be unsuitable for scene placement, such as slots within out-of-prose contents. Avoid such slots.
 
-Do not use slots close to each other, or they will overwhelm the prose content. Make some distance. {{#when::lb-xnai.kv.off::tisnot::1}}Key visuals will be placed at either the start or the end of the log. For the same reason, do not use the first or the last slot.{{/when}}
+Keep every depicted action, interaction, and reaction before the selected slot. Do not place a Scene before or within the prose that establishes its depicted moment.
+
+Choose a distinct event moment for each Scene. Distribute Scenes across different portions of the log when suitable moments exist. Do not select multiple slots for the same event, and leave at least four unselected slots between selected slots. {{#when::lb-xnai.kv.off::tisnot::1}}Key visuals will be placed at either the start or the end of the log. For the same reason, do not use the first or the last slot.{{/when}}
 
 {{#when::keep::toggle::lb-xnai.context}}{{#when::keep::lb-xnai-history::visnot::null}}{{#when::keep::{{? {{length::{{trim::{{getvar::lb-xnai-history}}}}}} > 0}}}}
 
@@ -253,16 +257,14 @@ The above instruction precedes all previous instructions.
 scenes[2]:
 {{#when::lb-xnai.scene.comic::tis::1}}  - cast: 2girls
     panels[2]:
-      - camera: from above, upper body
-        cast: 1girl
+      - cast: 1girl
         characters[1]:
           - positive: girl, adolescent, long pink straight hair, white silk blouse, ...
             negative: freckles
             name: elodia de bellois
             description: ...
         scene: interior, bedroom, morning, ...
-      - camera: from side, wide shot
-        cast: 2girls
+      - cast: 2girls
         characters[2]:
           - positive: girl, adolescent, long pink straight hair, white silk blouse, ...
             negative: freckles
@@ -275,15 +277,13 @@ scenes[2]:
     slot: 3
   - cast: ...
     panels[2]:
-      - camera: ...
-        cast: ...
+      - cast: ...
         characters[1]:
           - positive: ...
             negative: ...
             description: ...
         scene: ...
-      - camera: ...
-        cast: ...
+      - cast: ...
         characters[1]:
           - positive: ...
             negative: ...

@@ -24,14 +24,19 @@ end
 ---@param errors string[]
 ---@param panel any
 ---@param label string
-local function validatePanel(errors, panel, label)
+---@param cameraRequired boolean
+local function validatePanel(errors, panel, label, cameraRequired)
   if type(panel) ~= 'table' then
     table.insert(errors, label .. ' is not a valid object. Parsed type: ' .. type(panel))
     return
   end
 
-  if type(panel.camera) ~= 'string' or panel.camera == '' then
-    table.insert(errors, label .. ' has no camera field. Parsed type: ' .. type(panel.camera))
+  if cameraRequired then
+    if type(panel.camera) ~= 'string' or panel.camera == '' then
+      table.insert(errors, label .. ' has no camera field. Parsed type: ' .. type(panel.camera))
+    end
+  elseif panel.camera ~= nil then
+    table.insert(errors, label .. ' cannot contain a camera field.')
   end
 
   if type(panel.cast) ~= 'string' or panel.cast == '' then
@@ -74,14 +79,14 @@ local function validateDescriptor(errors, desc, label, panelsRequired, slotRequi
       table.insert(errors, label .. ' has no panel in its panels array.')
     else
       for panelIndex, panel in ipairs(desc.panels) do
-        validatePanel(errors, panel, label .. ', panel ' .. (panelIndex - 1))
+        validatePanel(errors, panel, label .. ', panel ' .. (panelIndex - 1), false)
       end
     end
   else
     if desc.panels ~= nil then
       table.insert(errors, label .. ' cannot contain panels.')
     else
-      validatePanel(errors, desc, label)
+      validatePanel(errors, desc, label, true)
     end
   end
 

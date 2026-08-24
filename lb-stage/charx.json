@@ -60,7 +60,6 @@
   "lowLevelAccess": true,
   "name": "🔦라이트보드 ⚡스테이지매니저 4.0.0",
   "namespace": "lb-stage",
-  "output": "../dist/lb-stage.charx",
   "regex": [
     "regex/filter-response.md",
     "regex/ignore.md",

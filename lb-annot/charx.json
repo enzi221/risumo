@@ -46,7 +46,6 @@
   "lowLevelAccess": false,
   "name": "🔦라이트보드 주석 4.0.0",
   "namespace": "lb-annot",
-  "output": "../dist/lb-annot.charx",
   "regex": [
     "regex/filter-response.md",
     "regex/ignore.md",

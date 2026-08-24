@@ -10,7 +10,7 @@ Build a module from its manifest.
 npm run build:charx -- lb-xnai/charx.json
 ```
 
-Pass an output path to override the manifest `output` value. Resolve this command-line output path from the current working directory.
+By default, write the artifact to `dist/<name>.charx`, using the manifest `name`. Pass an output path to override the derived path or the manifest `output` value. Resolve this command-line output path from the current working directory.
 
 ```sh
 npm run build:charx -- lb-xnai/charx.json dist/custom.charx
@@ -90,7 +90,6 @@ Use the following manifest structure.
   "lowLevelAccess": true,
   "name": "Sample Module",
   "namespace": "sample",
-  "output": "../dist/sample.charx",
   "regex": ["regex/display.md"],
   "toggles": "toggles.txt",
   "triggers": [
@@ -167,7 +166,7 @@ Run checks against the changed builder and the affected module.
 
 ```sh
 npm run build:charx -- lb-xnai/charx.json
-unzip -t dist/lb-xnai.charx
+unzip -t 'dist/🔦라이트보드 🌠 삽화 4.0.0.charx'
 git diff --check -- CHARX.md lb-xnai
 ```
 

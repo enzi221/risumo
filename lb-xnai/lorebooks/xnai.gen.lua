@@ -115,7 +115,7 @@ local function compilePanel(panel, panelIndex)
     end
   end
 
-  local panelSetup = joinNonempty({ panel.cast or '', panel.camera or '', panel.scene or '' })
+  local panelSetup = joinNonempty({ panel.cast or '', panel.scene or '' })
   local positive = 'Panel ' .. tostring(panelIndex) .. ': ' .. panelSetup
   if #positiveParts > 0 then
     positive = positive .. '.\n' .. table.concat(positiveParts, '\n')

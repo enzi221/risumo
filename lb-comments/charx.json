@@ -56,7 +56,6 @@
   "lowLevelAccess": false,
   "name": "🔦라이트보드 댓글창 4.0.0",
   "namespace": "lb-comments",
-  "output": "../dist/lb-comments.charx",
   "regex": [
     "regex/filter-response.md",
     "regex/ignore-old.md",

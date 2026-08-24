@@ -16,7 +16,6 @@ local function setTriggerId(tid)
 end
 
 ---@class XNAIPanel
----@field camera string
 ---@field cast string
 ---@field characters XNAIPromptSet[]
 ---@field scene string
@@ -336,7 +335,7 @@ local function renderInline(data, chatIndex, stackItem)
     end
   end
 
-  if stackItem then
+  if stackItem and #imageNodes > 0 then
     local lazyNodes = prelude.queryNodes('lb-lazy', out, { id = 'lb-xnai' })
     for nodeIndex = #lazyNodes, 1, -1 do
       local lazyNode = lazyNodes[nodeIndex]

@@ -52,7 +52,6 @@
   "lowLevelAccess": false,
   "name": "🔦라이트보드 💠헌터넷 4.0.0",
   "namespace": "lb-hn",
-  "output": "../dist/lb-hn.charx",
   "regex": [
     "regex/filter-response.md",
     "regex/ignore-old.md",
