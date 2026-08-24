@@ -8,7 +8,7 @@ Build each image prompt as structured storyboard data. Use camera and environmen
 
 Use common, objective, visualizable concepts. (No "Swordmaster outfit" - What does the swordmaster wear? Describe explicitly)
 
-Tags are Danbooru tags.
+{{#when::toggle::lb-xnai.korean}}Use Danbooru tag concepts, but render every tag in Korean. Treat every English tag and phrase in this guideline as a semantic reference that requires Korean translation in the output.{{:else}}Use Danbooru tags.{{/when}}
 
 {{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.characters}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.characters}} != null }}}}}}Limit completely visible featured characters in each individual-image Scene and Key Visual to max {{getglobalvar::toggle_lb-xnai.characters}}.{{#when::keep::lb-xnai.scene.comic::tis::1}} For a multi-panel Scene, apply this limit to the distinct completely visible featured characters across the complete Scene, not separately to each panel.{{/when}} Anonymous background figures do not count toward this limit. A partially visible featured character may exceed the limit and still needs a character entry and count tag for the visible body parts, such as `boy, out of frame, hand`.{{/when}}
 
@@ -93,7 +93,7 @@ Keep location, spatial anchors, lighting, weather, prominent props, and anonymou
 
 Build each featured character's `positive` tags in this order: `girl` or `boy`, apparent age, hair, eyes, skin or species, body type, attire, expression, and exposed body parts. Include every visible required group. Tag only visible attributes of a partially visible character.
 
-Build the eligible featured cast before selecting image moments. Treat only characters whose appearance is described in Narrative Universe Settings or Client requirements as eligible. Select featured characters only from this eligible cast. Give every featured character a corresponding `characters` entry.
+Build the eligible featured cast before selecting image moments. Include characters whose appearance is described in Narrative Universe Settings or Client requirements. Also include major characters established in Narrative Universe Settings when they have no appearance description. Select featured characters only from this eligible cast. Give every featured character a corresponding `characters` entry.
 
 Within the eligible cast, feature each identifiable story participant and each person who performs an individually described action in the selected moment. A story participant outside the eligible cast cannot appear as a featured character, a partially visible character, or an anonymous background figure. When a selected moment includes an ineligible story participant, depict only the eligible participants and keep every visual description limited to those eligible participants.
 
@@ -133,7 +133,7 @@ Apply the following requirements to every visible group.
 - Expression: annoyed, angry, embarrassed, indifferent, blush, grin, etc. Specify all applicable. Limit tags to clear, visually identifiable emotions.
 - Exposed body parts: Tag every applicable exposed body part visible within the frame: `armpits`, `clavicle`, `cleavage`, `navel`, `thighs`, `buttocks`, {{#when::toggle::lb-xnai.nsfw}}`nipples`, `pussy`, `anus`, `penis`{{/nsfw}}...
 
-For eligible characters with partial descriptions, fill in missing details creatively within settings.
+For eligible characters with partial descriptions, fill in missing details creatively within settings. Give an eligible major character with no appearance description a generic, nondescript design consistent with the setting. Prefer common features and simple attire over distinctive invented traits. Use `faceless`, an obscured face, a rear view, or cropping when the composition supports it.
 
 #### Positive and Negative Tags
 
@@ -205,9 +205,7 @@ Treat every featured character appearance in every panel as a separate depiction
 
 #### Slots
 
-We've prepared slots where scenes can be placed: `[Slot #]`. Place each Scene after the prose has fully established the depicted moment. Choose the first slot immediately after the final prose block required to understand the complete moment. When the moment spans multiple prose blocks, place the Scene after the last required block.
-
-Slots were placed mechanically, so some slots might be unsuitable for scene placement, such as slots within out-of-prose contents. Avoid such slots.
+`[Slot N]` is an insertion marker between content blocks. Select the first suitable marker after the final narrative paragraph that establishes the complete depicted moment. A marker is unsuitable when either adjacent content block is out-of-prose content, including a status or data block.
 
 Keep every depicted action, interaction, and reaction before the selected slot. Do not place a Scene before or within the prose that establishes its depicted moment.
 
@@ -229,7 +227,7 @@ These were the tags you have used in the past for characters. Use appearance and
 The Client has specified what they want:
 
 <instruction>
-{{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.focus}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.focus}} != null }}}}}}I want to focus on the character(s): "{{getglobalvar::toggle_lb-xnai.focus}}". Include at least one eligible focused character in every Scene. A focused character with no description remains ineligible. Keep other visible participants when the selected event requires them, but do not create a Scene centered only on other characters.
+{{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.focus}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.focus}} != null }}}}}}I want to focus on the character(s): "{{getglobalvar::toggle_lb-xnai.focus}}". Include at least one eligible focused character in every Scene. Apply the featured-character eligibility rules to a focused character. Keep other visible participants when the selected event requires them, but do not create a Scene centered only on other characters.
 
 {{/when}}{{getglobalvar::toggle_lb-xnai.direction}}
 </instruction>
@@ -240,7 +238,7 @@ The above instruction precedes all previous instructions.
 
 {{#when {{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.focus}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.focus}} != null }}}} }}
 <instruction>
-I want to focus on the character(s): "{{getglobalvar::toggle_lb-xnai.focus}}". Include at least one eligible focused character in every Scene. A focused character with no description remains ineligible. Keep other visible participants when the selected event requires them, but do not create a Scene centered only on other characters.
+I want to focus on the character(s): "{{getglobalvar::toggle_lb-xnai.focus}}". Include at least one eligible focused character in every Scene. Apply the featured-character eligibility rules to a focused character. Keep other visible participants when the selected event requires them, but do not create a Scene centered only on other characters.
 </instruction>
 
 The above instruction precedes all previous instructions.
@@ -328,10 +326,10 @@ keyvis:
 - Output in TOON format (2-space indent, array length in header).
 - The output is not YAML. Do not use YAML block syntax (`>-`, etc) even if the description is long.
 - Exclude anonymous background figures from `cast` and `characters`, but describe their collective presence with tags such as `crowd`.
-- `characters[].name` are optional. Write the character's name (full name if given, or the most identifiable form) in English, only if they are completely visible within the frame.
+- `characters[].name` are optional. Write the character's full name if given, or the most identifiable form, only if the character is completely visible within the frame. {{#when::toggle::lb-xnai.korean}}Write the name in Korean script. Transliterate a name that has no established Korean spelling.{{:else}}Write the name in English.{{/when}}
 - `characters[].negative` are optional. `characters[].description` is required.
 - Close `</lb-xnai>`.
 
 Requested Scene count: {{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.scene.quantity}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.scene.quantity}} != null }}}}}}{{trim::{{getglobalvar::toggle_lb-xnai.scene.quantity}} }} (<- Treat as `1-3` if invalid){{:else}}1-5{{/when}}.
 
-Everything must be in English.
+{{#when::toggle::lb-xnai.korean}}Write every generated text value in Korean, including all camera, cast, positive, negative, name, description, and scene values. Translate canonical tag spellings into concise Korean visual terms. Keep the `<lb-xnai>` markup, TOON field keys, numeric values, Boolean values, and tag-weight syntax unchanged.{{:else}}Write every generated text value in English.{{/when}}

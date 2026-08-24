@@ -27,6 +27,11 @@
       "insertOrder": 1
     },
     {
+      "comment": "lb-xnai.lb.jailbreak",
+      "file": "lorebooks/lb.jailbreak.md",
+      "insertOrder": 1
+    },
+    {
       "comment": "lb-xnai.lb.thoughts",
       "file": "lorebooks/lb.thoughts.md",
       "insertOrder": 1
@@ -34,6 +39,16 @@
     {
       "comment": "lb-xnai.lb.thoughts-interaction",
       "file": "lorebooks/lb.thoughts-interaction.md",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-xnai.lb.prefill",
+      "file": "lorebooks/lb.prefill.md",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-xnai.lb.prefill-user",
+      "file": "lorebooks/lb.prefill-user.md",
       "insertOrder": 1
     },
     {

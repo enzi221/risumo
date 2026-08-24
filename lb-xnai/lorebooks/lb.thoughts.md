@@ -6,11 +6,11 @@ Follow this template exactly. Fill every active field. A missing active field in
 
 1. Last Log Entry: `[Log, Slot Range]`
 2. Scene Count: `[Raw Input, Resolved Minimum, Resolved Maximum, Selected Count]`
-3. Eligible Featured Cast: `[Character, Appearance Description, Source: Narrative Universe Settings or Client Requirements][]`
-4. Eligible Event Moments: `[Event, Eligible Visual Cast, Omitted Ineligible Participants, Final Establishing Prose, First Slot After the Complete Moment][]`
+3. Eligible Featured Cast: `[Character, Eligibility Basis, Established Appearance or Generic Nondescript Design][]`
+4. Eligible Event Moments: `[Event, Eligible Visual Cast, Omitted Ineligible Participants, Final Establishing Narrative Paragraph, Immediately Following Insertion Marker][]`
 5. Selected Scenes:
-{{#when::keep::lb-xnai.scene.comic::tis::0}}   - For each Scene: `[Scene Number, Distinct Event Moment, Exact First Post-Moment Slot, Featured Cast, Cast, Anonymous Background, Focal Information]`
-{{/when}}{{#when::keep::lb-xnai.scene.comic::tis::1}}   - For each Scene: `[Scene Number, Distinct Event Moment, Exact First Post-Moment Slot, Distinct Featured Cast Across All Panels, Scene-Wide Cast, Anonymous Background, Focal Information]`
+{{#when::keep::lb-xnai.scene.comic::tis::0}}   - For each Scene: `[Scene Number, Distinct Event Moment, Exact Following Insertion Marker, Featured Cast, Cast, Anonymous Background, Focal Information]`
+{{/when}}{{#when::keep::lb-xnai.scene.comic::tis::1}}   - For each Scene: `[Scene Number, Distinct Event Moment, Exact Following Insertion Marker, Distinct Featured Cast Across All Panels, Scene-Wide Cast, Anonymous Background, Focal Information]`
 {{/when}}
 {{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.characters}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.characters}} != null }}}}}}{{#when::keep::lb-xnai.scene.comic::tis::0}}   - Limit each Scene to {{getglobalvar::toggle_lb-xnai.characters}} completely visible featured characters.
 {{/when}}{{/when}}
@@ -25,13 +25,13 @@ Follow this template exactly. Fill every active field. A missing active field in
 7. Validation:
 {{/when}}{{#when::lb-xnai.kv.off::tis::1}}6. Validation:
 {{/when}}   - Client Instruction: `[pass or corrected]`
-   - Scene Count, Distinct Event Moments, Post-Moment Slots, and Slot Separation: `[pass or corrected]`
+   - Scene Count, Distinct Event Moments, Following Insertion Markers, and Marker Separation: `[pass or corrected]`
 {{#when::keep::lb-xnai.scene.comic::tis::0}}   - Scene Cast Field and Character Array: `[pass or corrected]`
 {{/when}}{{#when::keep::lb-xnai.scene.comic::tis::1}}   - Scene-Wide Cast Union, Panel-Local Cast Fields, and Character Arrays: `[pass or corrected]`
 {{/when}}
 {{#when::lb-xnai.kv.off::tis::0}}   - Key Visual Character Limit, Cast Field, and Character Array: `[pass or corrected]`
 {{/when}}
-   - Featured Character Eligibility and Appearance Source: `[pass or corrected]`
+   - Featured Character Eligibility and Appearance Handling: `[pass or corrected]`
    - Appearance Groups, Character Descriptions, Posture, Action, and Visibility: `[pass or corrected]`
 {{#when::lb-xnai.scene.comic::tis::1}}   - Panel Objects and Panel-Scoped Depiction Entries: `[pass or corrected]`
 {{/when}}   - TOON Structure: `[pass or corrected]`

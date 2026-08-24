@@ -6,7 +6,7 @@ Follow this template exactly. Fill every active field. A missing active field in
 
 1. Interaction Action: `[Action, Selected Chat Index, Selected Slot]`
 2. Slot Context: `[Exact Slot Marker, Complete Depicted Moment Before Marker, Closest Prose After Marker for Continuity, Narrative State at Marker]`
-3. Eligible Featured Cast: `[Character, Appearance Description, Source: Narrative Universe Settings or Client Requirements][]`
+3. Eligible Featured Cast: `[Character, Eligibility Basis, Established Appearance or Generic Nondescript Design][]`
 4. Selected Scene: `[Event Completed Before Slot Marker, Eligible Visual Cast, Omitted Ineligible Participants, Featured Cast, Cast, Anonymous Background, Focal Information]`
 {{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.characters}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.characters}} != null }}}}}}{{#when::keep::lb-xnai.scene.comic::tis::0}}   - Limit the Scene to {{getglobalvar::toggle_lb-xnai.characters}} completely visible featured characters.
 {{/when}}{{/when}}
@@ -21,7 +21,7 @@ Follow this template exactly. Fill every active field. A missing active field in
 8. Validation:
 {{/when}}   - Client Instruction: `[pass or corrected]`
    - Exact Slot Marker, Complete Preceding Moment, and Single Scene: `[pass or corrected]`
-   - Featured Character Eligibility and Appearance Source: `[pass or corrected]`
+   - Featured Character Eligibility and Appearance Handling: `[pass or corrected]`
 {{#when::keep::lb-xnai.scene.comic::tis::0}}   - Scene Cast Field and Character Array: `[pass or corrected]`
 {{/when}}{{#when::keep::lb-xnai.scene.comic::tis::1}}   - Scene-Wide Cast Union, Panel-Local Cast Fields, and Character Arrays: `[pass or corrected]`
 {{/when}}

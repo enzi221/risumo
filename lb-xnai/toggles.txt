@@ -4,13 +4,17 @@ lb-xnai.lazy=발　　　동=select=즉시,누르면
 lb-xnai.generation=이미지발동=select=즉시,누르면
 =프롬프트 생성 후 이미지까지 즉시 생성?=caption
 lb-xnai.nsfw=NSFW 프롬프트
+lb-xnai.jb==┗탈옥 (프레이야)
+=검열에 당한 게 아니라면 체크 해제=caption
+lb-xnai.korean=┗한국어 출력
+=외부 검열 약화, 품질 악화=caption
 =———————📒스타일=divider
 lb-xnai.preset=프　리　셋=text
 ="프리셋 X" 로어북 사용. "X" 부분만 입력. 기본 "1"=caption
 lb-xnai.focus=포　커　스=text
 =대상의 이름 입력=caption
 lb-xnai.characters=최대캐릭터=text
-=숫자, 비우면 무제한=caption
+=숫자, 비우면 제한 없음=caption
 lb-xnai.direction=작가의노트=textarea
 =봇/채팅마다 "lb-xnai.lb.extra" 로어북 생성 후=caption
 =그 안에 적으면 편함 (헤딩 ##부터 시작)=caption
@@ -35,9 +39,9 @@ lb-xnai.scene.width=최대　너비=text
 =픽셀, 숫자만 입력, 기본 600=caption
 lb-xnai.scene.align=정　　　렬=select=중앙,왼쪽
 =———————⚙️시스템=divider
-lb-xnai.thoughts=생각　보조=select=적고 제거,생각만,안하기
 lb-xnai.context=컨텍스트 유지
 =이전 태그 기록을 다음 요청에 전달?=caption
+lb-xnai.thoughts=생각　보조=select=적고 제거,생각만,안하기
 lb-xnai.positive=긍정　프롬=textarea
 lb-xnai.negative=부정　프롬=textarea
 =항상 맨 뒤에 추가=caption
@@ -52,6 +56,7 @@ lb-xnai.maxSaves=저장　개수=text
 =↑ 분석력 향상, 비용 증가=caption
 =최소 1, 기본 5=caption
 =———————⚙️ComfyUI=divider
+=ComfyUI 출력 품질 테스트는 진행하지 않은 버전임=caption
 lb-xnai.compat.comfy=ComfyUI
 =괄호 유지=caption
 lb-xnai.compat.charDivider=캐릭터구분=select=파이프,줄바꿈
