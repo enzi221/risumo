@@ -16,7 +16,6 @@ local function setTriggerId(tid)
 end
 
 ---@class XNAIPanel
----@field cast string
 ---@field characters XNAIPromptSet[]
 ---@field scene string
 

@@ -65,13 +65,18 @@ local function trimText(value)
 end
 
 ---@param character XNAIPromptSet
+---@param panelIndex? number
 ---@return XNAIPromptSet
-local function compileCharacter(character)
+local function compileCharacter(character, panelIndex)
   local description = trimText(character.description)
   local positive = trimText(character.positive)
 
   if description ~= '' then
     positive = positive ~= '' and positive .. '. ' .. description or description
+  end
+  if panelIndex then
+    local panelTag = 'panel ' .. tostring(panelIndex)
+    positive = positive ~= '' and positive .. ', ' .. panelTag or panelTag
   end
 
   return {
@@ -96,37 +101,6 @@ local function joinNonempty(values)
   return table.concat(parts, ', ')
 end
 
----@param panel XNAIPanel
----@param panelIndex number
----@return XNAIPromptSet
-local function compilePanel(panel, panelIndex)
-  local negativeParts = {}
-  local positiveParts = {}
-
-  for _, character in ipairs(panel.characters or {}) do
-    local compiled = compileCharacter(character)
-    local negative = trimText(compiled.negative)
-
-    if negative ~= '' then
-      table.insert(negativeParts, negative)
-    end
-    if compiled.positive ~= '' then
-      table.insert(positiveParts, compiled.positive)
-    end
-  end
-
-  local panelSetup = joinNonempty({ panel.cast or '', panel.scene or '' })
-  local positive = 'Panel ' .. tostring(panelIndex) .. ': ' .. panelSetup
-  if #positiveParts > 0 then
-    positive = positive .. '.\n' .. table.concat(positiveParts, '\n')
-  end
-
-  return {
-    negative = table.concat(negativeParts, ', '),
-    positive = positive,
-  }
-end
-
 ---@param desc XNAIDescriptor
 ---@return { characters: XNAIPromptSet[], comic: boolean, description: string, setup: string }
 local function compileDescriptor(desc)
@@ -134,6 +108,7 @@ local function compileDescriptor(desc)
   local comic = type(desc.panels) == 'table' and #desc.panels > 0
 
   if comic then
+    local panelPrompts = {}
     local setup = COMIC_PROMPT
 
     if trimText(desc.cast) ~= '' then
@@ -141,13 +116,18 @@ local function compileDescriptor(desc)
     end
 
     for panelIndex, panel in ipairs(desc.panels) do
-      table.insert(characters, compilePanel(panel, panelIndex))
+      local panelPrompt = 'Panel ' .. tostring(panelIndex) .. ': ' .. trimText(panel.scene)
+      table.insert(panelPrompts, panelPrompt)
+
+      for _, character in ipairs(panel.characters or {}) do
+        table.insert(characters, compileCharacter(character, panelIndex))
+      end
     end
 
     return {
       characters = characters,
       comic = true,
-      description = '',
+      description = table.concat(panelPrompts, '\n'),
       setup = setup,
     }
   end
@@ -225,8 +205,7 @@ local function buildPresetPrompt(triggerId, desc)
   local image = prelude.import(triggerId, 'lightboard.image')
   return image.applyImagePreset(triggerId, compiled, {
     characterDivider = comfy and getGlobalVar(triggerId, 'toggle_lb-xnai.compat.charDivider') == '1' and '\n\n' or ' | ',
-    characterPromptSeparated = not compiled.comic and
-        getGlobalVar(triggerId, 'toggle_lb-xnai.compat.charPrompt') == '1',
+    characterPromptSeparated = getGlobalVar(triggerId, 'toggle_lb-xnai.compat.charPrompt') == '1',
     comfy = comfy,
     inlineSeparator = compiled.comic and '\n\n' or ', ',
     negativeNote = negativeNote,

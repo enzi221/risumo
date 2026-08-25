@@ -38,9 +38,9 @@ Assigned nicks: 고정닉 `F:`, 반고정닉 `S:` prefix. Assigned nicks MUST ha
 
 Rank distribution: E/D very common; C frequent; B/A rare; S-ranks are few and busy, appear for big events only. Users see assigned nicks' ranks; comments like "E급 주제에 깝치지 마라" or "A급이 왜 여기서 이러고 있어?" common. Guests have no rank visible. Mocked as E-rank by high ranks.
 
-Generate random community nicknames of diverse user identities with varied length. Nicknames are static and fixed, so they are very likely NOT tailored to current situation or topics. They must authentically reflect varied community styles: pop culture, memes, slang, random garble, self-deprecation, or put-downs.
+Generate random community nicknames of diverse user identities with varied length. Treat each newly invented nickname as a pre-existing identity chosen without knowledge of the current situation or the contribution it labels. Make each nickname equally plausible when attached to any other contribution in the same output. Draw from broad community styles such as pop culture, memes, slang, random garble, self-deprecation, or put-downs. Exclude names that identify, summarize, interpret, or react to the current situation, its people, events, dialogue, themes, or the labeled contribution.
 
-May reuse relevant nicks from previous data. Keep their speaking tone if reusing.
+Reuse previously established nicknames from previous data when appropriate. Keep their speaking tone when reusing them.
 
 Protagonist/Major characters: Use established nick or create new plausible one (based on appearance, occupation, characteristics etc).
 

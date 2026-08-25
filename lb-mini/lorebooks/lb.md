@@ -82,17 +82,17 @@ Note the personality. Some emotions should have weaker presence depending on the
 ### Nicknames
 
 {{#when::{{getglobalvar::toggle_lb-mini.preset}}::is::0}}
-Generate random community nicknames of diverse user identities with varied length. Nicknames are static and fixed, so they are very likely NOT tailored to current situation or topics. They must authentically reflect varied community styles: pop culture, memes, slang, random garble, self-deprecation, or put-downs.
+Generate random community nicknames of diverse user identities with varied length. Treat each newly invented nickname as a pre-existing identity chosen without knowledge of the current situation or the contribution it labels. Make each nickname equally plausible when attached to any other contribution in the same output. Draw from broad community styles such as pop culture, memes, slang, random garble, self-deprecation, or put-downs. Exclude names that identify, summarize, interpret, or react to the current situation, its people, events, dialogue, themes, or the labeled contribution.
 
-May reuse relevant nicks from previous data. Keep their speaking tone if reusing.
+Reuse previously established nicknames from previous data when appropriate. Keep their speaking tone when reusing them.
 
 Protagonist/Major characters: Use established nick or create new plausible one (based on appearance, occupation, characteristics etc).
 {{/when}}
 
 {{#when::{{getglobalvar::toggle_lb-mini.preset}}::is::1}}
-Generate random nicknames of diverse user identities with varied length. It should stay within the tone/mood/theme of the world setting.
+Generate random nicknames of diverse user identities with varied length. Treat each newly invented nickname as a pre-existing identity chosen without knowledge of the current situation or the contribution it labels. Make each nickname equally plausible when attached to any other contribution in the same output. Draw from broad naming styles available within the tone, mood, theme, and conventions of the world setting. Exclude names that identify, summarize, interpret, or react to the current situation, its people, events, dialogue, themes, or the labeled contribution.
 
-May reuse relevant nicks from previous data. Keep their speaking tone if reusing.
+Reuse previously established nicknames from previous data when appropriate. Keep their speaking tone when reusing them.
 
 Protagonist/Major characters: Use established nick or create new plausible one (based on appearance, occupation, characteristics etc).
 {{/when}}

@@ -4,7 +4,7 @@ lb-xnai.lazy=발　　　동=select=즉시,누르면
 lb-xnai.generation=이미지발동=select=즉시,누르면
 =프롬프트 생성 후 이미지까지 즉시 생성?=caption
 lb-xnai.nsfw=NSFW 프롬프트
-lb-xnai.jb==┗탈옥 (프레이야)
+lb-xnai.jb=┗탈옥 (프레이야)
 =검열에 당한 게 아니라면 체크 해제=caption
 lb-xnai.korean=┗한국어 출력
 =외부 검열 약화, 품질 악화=caption
@@ -70,5 +70,5 @@ lb-xnai.compat.weight=가　중　치=select=제거,Comfy
 =NAI 가중치를 제거하거나 변환=caption
 =ComfyUI 체크해야 적용=caption
 ==divider
-=라이트보드 삽화 4.0.0—amonamona=caption
+=라이트보드 삽화 4.0.1—amonamona=caption
 ==groupEnd

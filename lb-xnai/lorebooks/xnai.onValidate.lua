@@ -24,23 +24,20 @@ end
 ---@param errors string[]
 ---@param panel any
 ---@param label string
----@param cameraRequired boolean
-local function validatePanel(errors, panel, label, cameraRequired)
+---@param standalone boolean
+local function validatePanel(errors, panel, label, standalone)
   if type(panel) ~= 'table' then
     table.insert(errors, label .. ' is not a valid object. Parsed type: ' .. type(panel))
     return
   end
 
-  if cameraRequired then
+  if standalone then
     if type(panel.camera) ~= 'string' or panel.camera == '' then
       table.insert(errors, label .. ' has no camera field. Parsed type: ' .. type(panel.camera))
     end
-  elseif panel.camera ~= nil then
-    table.insert(errors, label .. ' cannot contain a camera field.')
-  end
-
-  if type(panel.cast) ~= 'string' or panel.cast == '' then
-    table.insert(errors, label .. ' has no cast field. Parsed type: ' .. type(panel.cast))
+    if type(panel.cast) ~= 'string' or panel.cast == '' then
+      table.insert(errors, label .. ' has no cast field. Parsed type: ' .. type(panel.cast))
+    end
   end
 
   if type(panel.characters) ~= 'table' or #panel.characters == 0 then

@@ -16,18 +16,18 @@ Follow this template exactly. Fill every active field. A missing active field in
 {{/when}}{{/when}}
 {{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.characters}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.characters}} != null }}}}}}{{#when::keep::lb-xnai.scene.comic::tis::1}}   - Limit each Scene to {{getglobalvar::toggle_lb-xnai.characters}} distinct completely visible featured characters across all panels, not separately per panel.
 {{/when}}{{/when}}
-{{#when::lb-xnai.scene.comic::tis::1}}   - Panels for each Scene: `[Panel Number, Event Beat, Panel Cast, Composition, Environment, Character Depictions, Required Appearance Groups][]`, with two to four panels in reading order.
-   - Derive the Scene-wide `cast` from the union of featured character identities across all panels. Count a recurring character once. Do not copy the largest panel's `cast` as the Scene-wide `cast`.
+{{#when::lb-xnai.scene.comic::tis::1}}   - Panels for each Scene: `[Panel Number, Event Beat, Composition, Environment, Character Depictions, Required Appearance Groups, Character Descriptions][]`, with two to four panels in reading order.
+   - Derive the Scene-wide `cast` from the union of featured character identities across all panels. Count a recurring character once.
 {{/when}}{{#when::lb-xnai.scene.comic::tis::0}}   - Camera and Composition for each Scene: `[Perspective, Framing, Character Blocking, Depth Planes, Focal Placement]`
    - Environment for each Scene: `[Location, Layout, Foreground, Middle Ground, Background, Props, Lighting]`
-   - Character Depictions for each Scene: `[Character Entry, Hair, Eyes, Skin or Species, Body Type, Attire, Expression, Exposed Body Parts, Action, Interaction, Frame Position, Depth Position][]`
+   - Character Depictions for each Scene: `[Character Entry, Hair, Eyes, Skin or Species, Body Type, Attire, Expression, Exposed Body Parts, Character Description, Base Posture, Action, Interaction, Frame Position, Depth Position][]`
 {{/when}}{{#when::lb-xnai.kv.off::tis::0}}6. Key Visual: `[Theme, Featured Cast, Cast, Character Limit, Character Entries, Camera, Composition, Environment, Distinction from Scenes]`
 7. Validation:
 {{/when}}{{#when::lb-xnai.kv.off::tis::1}}6. Validation:
 {{/when}}   - Client Instruction: `[pass or corrected]`
    - Scene Count, Distinct Event Moments, Following Insertion Markers, and Marker Separation: `[pass or corrected]`
 {{#when::keep::lb-xnai.scene.comic::tis::0}}   - Scene Cast Field and Character Array: `[pass or corrected]`
-{{/when}}{{#when::keep::lb-xnai.scene.comic::tis::1}}   - Scene-Wide Cast Union, Panel-Local Cast Fields, and Character Arrays: `[pass or corrected]`
+{{/when}}{{#when::keep::lb-xnai.scene.comic::tis::1}}   - Scene-Wide Cast Union and Panel Character Arrays: `[pass or corrected]`
 {{/when}}
 {{#when::lb-xnai.kv.off::tis::0}}   - Key Visual Character Limit, Cast Field, and Character Array: `[pass or corrected]`
 {{/when}}
