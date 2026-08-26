@@ -38,6 +38,28 @@ Let the CharX builder create `module.risum`. The embedded file carries the RisuA
 
 Keep the CharX implementation and its vendored RPack map outside this repository's tracked files. Use the root package scripts as the stable interface to the ignored `tools/charx/` checkout.
 
+## Unpack command
+
+Extract a CharX archive, decode `module.risum` as readable `module.json`, and materialize module sources with a generated `charx.json`.
+
+```sh
+npm run unpack:charx -- input.charx
+```
+
+By default, create a directory beside the archive using the filename without `.charx`. Pass a directory to override it. The output directory must be absent or empty.
+
+```sh
+npm run unpack:charx -- module.charx /tmp/module-source
+```
+
+Write lorebook entries under `lorebooks/`, regex entries under `regex/`, and Lua trigger effects under `triggers/`. Preserve execution order in the generated `charx.json` arrays instead of altering source filenames. The encoded `module.risum` is not retained. If the archive already contains `module.json`, write the decoded data to `module.decoded.json` instead.
+
+Extract a standalone legacy Risu module and its embedded assets with the same source layout.
+
+```sh
+npm run unpack:risum -- input.risum
+```
+
 ## Module layout
 
 Keep module sources grouped by role when the module contains the corresponding source type.

@@ -7,5 +7,6 @@
     "editor.formatOnSave": false
   },
   "prettier.bracketSameLine": false,
-  "prettier.htmlWhitespaceSensitivity": "strict"
+  "prettier.htmlWhitespaceSensitivity": "strict",
+  "git.ignoreLimitWarning": true
 }

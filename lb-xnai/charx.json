@@ -7,6 +7,11 @@
   "hideIcon": false,
   "lorebook": [
     {
+      "comment": "프리셋 1",
+      "file": "lorebooks/프리셋 1.md",
+      "insertOrder": 1
+    },
+    {
       "comment": "lb-xnai.lb",
       "file": "lorebooks/lb.md",
       "insertOrder": 1
@@ -78,7 +83,7 @@
     }
   ],
   "lowLevelAccess": true,
-  "name": "🔦라이트보드 🌠 삽화 4.0.1",
+  "name": "🔦라이트보드 🌠 삽화 4.0.2",
   "namespace": "lb-xnai",
   "regex": [
     "regex/lazy.md",
@@ -101,5 +106,5 @@
       "type": "start"
     }
   ],
-  "version": "4.0.1"
+  "version": "4.0.2"
 }
