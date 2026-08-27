@@ -15,6 +15,7 @@
 --- @field reiteration number
 --- @field rerollBehavior 'preserve-prev'|'remove-prev'
 --- @field sideEffect boolean
+--- @field thoughts '0'|'1'|'2' write down, in reasoning, none
 --- @field onInput (fun (triggerId: string, input: string, index: number): string)?
 --- @field onOutput (fun (triggerId: string, output: string, fullChatContent: string?, chatIndex: number?): string)?
 --- @field onMutation (fun (triggerId: string, action: string, output: string): string)?

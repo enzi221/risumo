@@ -40,9 +40,9 @@ local function validatePanel(errors, panel, label, standalone)
     end
   end
 
-  if type(panel.characters) ~= 'table' or #panel.characters == 0 then
+  if type(panel.characters) ~= 'table' then
     table.insert(errors,
-      label .. ' has no character or is not a valid array. Parsed type: ' .. type(panel.characters))
+      label .. ' characters is not a valid array. Parsed type: ' .. type(panel.characters))
   else
     for characterIndex, character in ipairs(panel.characters) do
       validateCharacter(errors, character, label .. ', character ' .. (characterIndex - 1))

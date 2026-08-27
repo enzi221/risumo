@@ -7,7 +7,7 @@ Follow this template exactly. Fill every active field. A missing active field in
 1. Last Log Entry: `[Log, Slot Range]`
 2. Scene Count: `[Raw Input, Resolved Minimum, Resolved Maximum, Selected Count]`
 3. Eligible Featured Cast: `[Character, Eligibility Basis, Established Appearance or Generic Nondescript Design][]`
-4. Eligible Event Moments: `[Event, Eligible Visual Cast, Omitted Ineligible Participants, Final Establishing Narrative Paragraph, Immediately Following Insertion Marker][]`
+4. Eligible Event Moments: `[Event, Eligible Visual Cast, Omitted Ineligible Participants, Immediately Following Insertion Marker][]`
 5. Selected Scenes:
 {{#when::keep::lb-xnai.scene.comic::tis::0}}   - For each Scene: `[Scene Number, Distinct Event Moment, Exact Following Insertion Marker, Featured Cast, Cast, Anonymous Background, Focal Information]`
 {{/when}}{{#when::keep::lb-xnai.scene.comic::tis::1}}   - For each Scene: `[Scene Number, Distinct Event Moment, Exact Following Insertion Marker, Distinct Featured Cast Across All Panels, Scene-Wide Cast, Anonymous Background, Focal Information]`

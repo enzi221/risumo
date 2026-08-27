@@ -8,7 +8,7 @@ Build each image prompt as structured storyboard data. Use camera and environmen
 
 Use common, objective, visualizable concepts. (No "Swordmaster outfit" - What does the swordmaster wear? Describe explicitly)
 
-{{#when::toggle::lb-xnai.korean}}Use Danbooru tag concepts, but render every tag in Korean. Treat every English tag and phrase in this guideline as a semantic reference that requires Korean translation in the output.{{:else}}Use Danbooru tags.{{/when}}
+{{#when::toggle::lb-xnai.japanese}}Use Danbooru tag concepts, but render every tag in Japanese. Treat every English tag and phrase in this guideline as a semantic reference that requires Japanese translation in the output.{{:else}}Use Danbooru tags.{{/when}}
 
 {{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.characters}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.characters}} != null }}}}}}Limit completely visible featured characters in each individual-image Scene and Key Visual to max {{getglobalvar::toggle_lb-xnai.characters}}.{{#when::keep::lb-xnai.scene.comic::tis::1}} For a multi-panel Scene, apply this limit to the distinct completely visible featured characters across the complete Scene, not separately to each panel.{{/when}} Anonymous background figures do not count toward this limit. A partially visible featured character may exceed the limit and still needs a character entry and count tag for the visible body parts, such as `boy, out of frame, hand`.{{/when}}
 
@@ -185,7 +185,7 @@ Make the Key Visual materially distinct from every Scene through composition, vi
 
 {{#when::lb-xnai.scene.comic::tis::1}}A structured-text storyboard of two to four connected comic panels within the log entry. Panels may move across places and moments when the sequence clarifies the event.{{:else}}A structured-text storyboard frame of an event in a specific place and moment within the log entry.{{/when}}
 
-Select a moment with a visible change, interaction, reaction, movement, or consequential spatial relationship. Preserve the event's cause and effect through every eligible participant and visible object available to the image. When another story participant is ineligible, frame that person outside the image and depict the eligible participant's visible side of the event without referring to the omitted person in the image data. Do not reduce an exchange, confrontation, conversation, coordinated activity, or shared reaction to one eligible participant's isolated pose when another eligible participant is required.
+{{#when::toggle::lb-xnai.scene.quantityexact}}Prefer a moment with a visible change, interaction, reaction, movement, or consequential spatial relationship.{{:else}}Select a moment with a visible change, interaction, reaction, movement, or consequential spatial relationship.{{/when}} Preserve the event's cause and effect through every eligible participant and visible object available to the image. When another story participant is ineligible, frame that person outside the image and depict the eligible participant's visible side of the event without referring to the omitted person in the image data. Do not reduce an exchange, confrontation, conversation, coordinated activity, or shared reaction to one eligible participant's isolated pose when another eligible participant is required.
 
 Derive the featured cast from the eligible participants in the selected moment before writing character prompts, and include every eligible identifiable participant required to depict that moment. When a character limit is configured, keep the completely visible featured cast within that limit; partially visible featured characters may exceed it. Include multiple eligible interacting characters together when they fit the configured limit or when no limit is configured. When the required completely visible cast exceeds a configured limit, select a different moment or a coherent sub-action whose visible participants fit the limit. Do not remove an eligible interaction partner while retaining an action or reaction that depends on that partner. Add anonymous background figures separately when the location benefits from visible population.
 
@@ -193,23 +193,23 @@ Apply the Composition rules to the selected event. Make the acting, receiving, o
 
 Preserve character and environment continuity between Scenes from the same continuous event. Repeat a continuing detail in each later Scene where that detail remains visible, and update the tags when the visible state changes.
 
-{{#when::lb-xnai.scene.comic::tis::1}}#### Multi-Panel Scenes
+{{#when::lb-xnai.scene.comic::tis::1}}
+#### Multi-Panel Scenes
 
 Compose every Scene as a multi-panel comic layout with two to four connected visual beats. Keep all panels within one Scene.
 
 Put the Scene-wide distinct featured character count in `scenes[].cast`, then add a `panels` array with two to four panel objects in reading order. Keep setting, time, lighting, weather, props, and other panel-specific environment tags in `panels[].scene`; repeat continuing environment tags in every panel where they remain visible.
 
 Treat every featured character appearance in every panel as a separate depiction. Add the depiction to that panel's `characters`. Prompt each entry for visible attributes and a character-specific description while preserving identity continuity. Repeat the same `name` when a fully visible character appears in multiple panels.
-
 {{/when}}
 
 #### Slots
 
-`[Slot N]` is an insertion marker between content blocks. Select the first suitable marker after the final narrative paragraph that establishes the complete depicted moment. A marker is unsuitable when either adjacent content block is out-of-prose content, including a status or data block.
+`[Slot N]` is an insertion marker between content blocks. Treat the markers immediately before the first narrative prose block and immediately after the last narrative prose block as the first and last markers of the narrative prose content. {{#when::toggle::lb-xnai.scene.quantityexact}}Select a suitable marker within this range after the final narrative paragraph that establishes the complete depicted moment.{{:else}}Select the first suitable marker within this range after the final narrative paragraph that establishes the complete depicted moment.{{/when}} Use each slot for at most one Scene.
 
 Keep every depicted action, interaction, and reaction before the selected slot. Do not place a Scene before or within the prose that establishes its depicted moment.
 
-Choose a distinct event moment for each Scene. Distribute Scenes across different portions of the log when suitable moments exist. Do not select multiple slots for the same event, and leave at least four unselected slots between selected slots. {{#when::lb-xnai.kv.off::tisnot::1}}Key visuals will be placed at either the start or the end of the log. For the same reason, do not use the first or the last slot.{{/when}}
+{{#when::toggle::lb-xnai.scene.quantityexact}}Distribute Scenes across different portions of the log when doing so preserves the required Scene count.{{:else}}Choose a distinct event moment for each Scene. Distribute Scenes across different portions of the log when suitable moments exist. Do not use the first or last marker of the narrative prose content, they are reserved.{{/when}}
 
 {{#when::keep::toggle::lb-xnai.context}}{{#when::keep::lb-xnai-history::visnot::null}}{{#when::keep::{{? {{length::{{trim::{{getvar::lb-xnai-history}}}}}} > 0}}}}
 
@@ -322,10 +322,10 @@ keyvis:
 - Output in TOON format (2-space indent, array length in header).
 - The output is not YAML. Do not use YAML block syntax (`>-`, etc) even if the description is long.
 - Exclude anonymous background figures from `cast` and `characters`, but describe their collective presence with tags such as `crowd`.
-- `characters[].name` are optional. Write the character's full name if given, or the most identifiable form, only if the character is completely visible within the frame. {{#when::toggle::lb-xnai.korean}}Write the name in Korean script. Transliterate a name that has no established Korean spelling.{{:else}}Write the name in English.{{/when}}
+- `characters[].name` are optional. Write the character's full name if given, or the most identifiable form, only if the character is completely visible within the frame. {{#when::toggle::lb-xnai.japanese}}Write the name in Japanese script. Transliterate a name that has no established Japanese spelling.{{:else}}Write the name in English.{{/when}}
 - `characters[].negative` is optional. `characters[].description` is required.
 - Close `</lb-xnai>`.
 
-Requested Scene count: {{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.scene.quantity}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.scene.quantity}} != null }}}}}}{{trim::{{getglobalvar::toggle_lb-xnai.scene.quantity}} }} (<- Treat as `1-3` if invalid){{:else}}1-5{{/when}}.
+{{#when::toggle::lb-xnai.scene.quantityexact}}Required{{:else}}Requested{{/when}} Scene count: {{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.scene.quantity}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.scene.quantity}} != null }}}}}}"{{trim::{{getglobalvar::toggle_lb-xnai.scene.quantity}} }}"{{:else}}1-5{{/when}}.
 
-{{#when::toggle::lb-xnai.korean}}Write every generated text value in Korean, including all camera, cast, positive, negative, name, description, and scene values. Translate canonical tag spellings into concise Korean visual terms. Keep the `<lb-xnai>` markup, TOON field keys, numeric values, Boolean values, and tag-weight syntax unchanged.{{:else}}Write every generated text value in English.{{/when}}
+{{#when::toggle::lb-xnai.japanese}}Write every generated text value in Japanese, including all camera, cast, positive, negative, name, description, and scene values. Translate canonical tag spellings into concise Japanese visual terms. Keep the `<lb-xnai>` markup, TOON field keys, numeric values, Boolean values, and tag-weight syntax unchanged.{{:else}}Write every generated text value in English.{{/when}}

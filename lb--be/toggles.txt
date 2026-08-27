@@ -2,6 +2,8 @@
 lightboard.active=전원
 lightboard.language=언어　명시=select=한국어,영어,일본어,명시 안함
 =——————⚙️요　　청=divider
+lightboard.routing=라우팅 식별자
+=지원하는 프로바이더 플러그인에서 모듈별 요청 분리 가능=caption
 lightboard.maxCtx=최대　컨텍=text
 =↑ 기억력 향상, 비용 증가. 커뮤니티 모듈 사용 시 높게 설정=caption
 =최소 8,000, 기본 8,000, 최대 리스 설정=caption
@@ -22,5 +24,5 @@ lightboard.maxRetries=최대　시도=text
 lightboard.retryMode=시도　모델=select=모듈별 설정,메인 강제,보조 강제
 =보조 강제 권장=caption
 ==divider
-=라이트보드 백엔드 4.0.0—amonamona=caption
+=라이트보드 백엔드 4.1.0—amonamona=caption
 ==groupEnd
