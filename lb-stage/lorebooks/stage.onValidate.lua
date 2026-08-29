@@ -1,7 +1,7 @@
 local function main(_, output)
   local node = prelude.queryNodes('lb-stage', output)
   if #node == 0 then
-    return
+    error('InvalidOutput: Missing <lb-stage> node.')
   end
 
   local success, content = pcall(prelude.toon.decode, node[#node].content)

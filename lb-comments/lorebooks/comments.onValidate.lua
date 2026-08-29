@@ -1,7 +1,7 @@
 local function main(_, output)
   local nodes = prelude.queryNodes('lb-comments', output)
   if #nodes == 0 then
-    return
+    error('InvalidOutput: Missing <lb-comments> node.')
   end
 
   local success, content = pcall(prelude.toon.decode, nodes[#nodes].content)

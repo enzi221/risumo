@@ -3,6 +3,7 @@
 --- @class Chat
 --- @field data string
 --- @field role 'char'|'system'|'user'
+--- @field time number
 local Chat = {}
 
 --- @param triggerId string
@@ -17,14 +18,16 @@ function getChatLength(triggerId) end
 --- @return Chat[]
 function getFullChat(triggerId) end
 
+--- Returns up to `count` recent main-chat entries in chronological order.
+--- @param triggerId string
+--- @param count number Negative values become 0. Fractional values are rounded down.
+--- @return Chat[]
+function getRecentChatsMain(triggerId, count) end
+
 --- @param triggerId string
 --- @param index number
 --- @return Chat
 function getChat(triggerId, index) end
-
---- @param triggerId string
---- @return number
-function getChatLength(triggerId) end
 
 --- @param triggerId string
 --- @param index number

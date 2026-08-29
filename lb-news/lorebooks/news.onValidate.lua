@@ -1,7 +1,7 @@
 local function main(tid, output)
   local nodes = prelude.queryNodes('lb-news', output)
   if #nodes == 0 then
-    return
+    error('InvalidOutput: Missing <lb-news> node.')
   end
 
   local success, content = pcall(prelude.toon.decode, nodes[#nodes].content)

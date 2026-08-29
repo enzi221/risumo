@@ -1,7 +1,7 @@
 local function main(tid, output)
   local node = prelude.queryNodes('lb-annot', output)
   if #node == 0 then
-    return
+    error('InvalidOutput: Missing <lb-annot> node.')
   end
 
   local success, content = pcall(json.decode, node[#node].content:gsub('\\\'', '\''))
