@@ -43,6 +43,11 @@
       "insertOrder": 1
     },
     {
+      "comment": "미니보드 1",
+      "file": "lorebooks/미니보드 1.lua",
+      "insertOrder": 1
+    },
+    {
       "alwaysActive": true,
       "comment": "Miniboard",
       "file": "lorebooks/mini.md",
@@ -50,7 +55,7 @@
     }
   ],
   "lowLevelAccess": false,
-  "name": "🔦라이트보드 ♦️미니보드 4.0.0",
+  "name": "🔦라이트보드 ♦️미니보드 4.1.0",
   "namespace": "lb-mini",
   "regex": [
     "regex/filter-response.md",
@@ -68,5 +73,5 @@
       "type": "start"
     }
   ],
-  "version": "4.0.0"
+  "version": "4.1.0"
 }

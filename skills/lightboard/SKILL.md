@@ -1,6 +1,6 @@
 ---
 name: lightboard
-description: How to develop Lightboard modules for Risuai.
+description: How to develop Lightboard modules for Risuai. Also includes Miniboard renderer development process.
 ---
 
 # Lightboard
@@ -73,8 +73,11 @@ Use Lua to implement stateful buttons with `risu-trigger` or `risu-btn` and cust
 ## Available References
 
 - To understand Risuai's Lua script environment, start with `references/000-lua.md`.
-- To understand Lightboard and develop modules that depend on it, read `references/000-lightboard.md`.
 - To understand Risuai's double-curly-brace templating language for lorebooks, background embeddings, and regex output values, read `references/000-cbs.md`.
+
+For a complete Lightboard module development, read `references/000-lightboard.md`.
+
+For a Lightboard Miniboard renderer code, read `references/000-miniboard-renderer.md`.
 
 ## Packing
 
@@ -97,6 +100,6 @@ Do not assume anything not provided to you. Question your prior knowledge. Read 
 
 Both Lua and CBS might feel familiar, but they are not.
 
-- Always read the Lightboard resource when developing or reviewing a module.
-- Read the Lua resource when inspecting Lua code.
+- Read the Lightboard resource when developing or reviewing a full Lightboard frontend module.
+- Read the Lua resource when the task needs Risuai Lua APIs beyond a task-specific reference.
 - Read the CBS resource when encountering unfamiliar curly-brace syntax.

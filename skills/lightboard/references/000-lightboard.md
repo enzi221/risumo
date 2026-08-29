@@ -318,7 +318,7 @@ Return the complete chat text to write. Use this callback only for edits that mu
 
 ## Prelude: Lightboard stdlib
 
-The backend provides core utilities primarily for data rendering.
+The backend provides core utilities from string manipulation, XML node queries, HTML building (`h`), to more Risuai-specific APIs such as lorebook loading.
 
 Begin Lua code with the following setup to use the standard library:
 
@@ -341,180 +341,7 @@ Call `setTriggerId()` before any other logic in every Risuai callback, including
 > [!NOTE]
 > The Lightboard Backend provides `prelude` to Lightboard callback functions, so those functions do not need the setup above.
 
-The standard library is then available through the global `prelude` table.
-
-```lua
----@param str string
----@return string
-function prelude.trim(str) end
-
----Escape HTML entities.
----@param str string
----@return string
-function prelude.escEntities(str) end
-
----Escape a string to use in Lua string pattern.
----@param str string
----@return string
-function prelude.escMatch(str) end
-
----@class Node
----@field attributes table<string, string>
----@field content string
----@field rangeEnd number
----@field rangeStart number
-
----Extracts all nodes.
----@param text string
----@return Node[]
-function prelude.queryNodes(tagNameRaw, text) end
-
---- Removes all XML tagged blocks that is not <(tagsToKeep)> and without "keepalive" attribute.
---- @param text string
---- @param tagsToKeep string[]?
---- @return string
-function prelude.removeAllNodes(text, tagsToKeep) end
-
----Get a lorebook with the highest insert order.
----@param triggerId string
----@param name string
----@return LoreBook?
-function prelude.getPriorityLoreBook(triggerId, name) end
-
----@param str string
----@param sep string
----@return string[]
-function prelude.split(str, sep) end
-```
-
-For example, `prelude.split('a,b,c', ',')` returns `{ 'a', 'b', 'c' }`.
-
-### Example frontend rendering script
-
-The prelude also provides the `h` hyperscript-like HTML rendering function. It automatically escapes all strings passed to it.
-
-```lua
-local triggerId = ''
-
-local function setTriggerId(tid)
-  triggerId = tid
-  if type(prelude) ~= 'nil' then
-    prelude.import(tid, 'toon.decode')
-    return
-  end
-  local source = getLoreBooks(triggerId, 'lightboard-prelude')
-  if not source or #source == 0 then
-    error('Failed to load lightboard-prelude.')
-  end
-  load(source[1].content, '@prelude', 't')()
-  prelude.import(tid, 'toon.decode')
-end
-
-local function render(node)
-  local rawContent = node.content
-  if not rawContent or rawContent == "" then
-    return "[LightBoard Error: Empty Content]"
-  end
-
-  local parsed = prelude.toon.decode(node.content)
-
-  local custom = getGlobalVar(triggerId, 'toggle_lb-stats.custom')
-
-  return tostring(h.section {
-    data_id = 'lb-stats',
-    class = "lb-stats-container",
-    h.div {
-      class = "lb-stats-header",
-      h.span "STATUS",
-      h.button['lb-reroll'] {
-        risu_btn = 'lb-reroll__lb-stats',
-        type = 'button',
-        h.lb_reroll_icon { closed = true }
-      },
-    },
-    h.div {
-      class = "lb-stats-grid",
-      h.div {
-        class = "lb-stats-item lb-stats-full",
-        h.span { class = "lb-stats-label", "Outfit" },
-        h.span { class = "lb-stats-value", parsed.outfit or "unknown" }
-      },
-      getGlobalVar(triggerId, 'toggle_lb-stats.equipments') ~= '0' and h.div {
-        class = "lb-stats-item lb-stats-full",
-        h.span { class = "lb-stats-label", "Equipments" },
-        h.span { class = "lb-stats-value", parsed.equipments or "unknown" }
-      } or nil,
-      custom ~= '' and custom ~= 'null' and h.div {
-        class = "lb-stats-item lb-stats-full",
-        h.span { class = "lb-stats-label", custom },
-        h.span { class = "lb-stats-value", parsed.custom or "none" }
-      } or nil,
-    },
-  })
-end
-
-local function main(data)
-  if not data or data == '' then
-    return ''
-  end
-
-  local extractionSuccess, extractionResult = pcall(prelude.queryNodes, 'lb-stats', data)
-  if not extractionSuccess then
-    print("[Lightboard] Stats extraction failed:", tostring(extractionResult))
-    return data
-  end
-
-  local lastResult = extractionResult and extractionResult[#extractionResult] or nil
-  if not lastResult then
-    return data
-  end
-
-  local output = ''
-  local lastIndex = 1
-
-  -- 0: prepend, 1: append
-  local position = getGlobalVar(triggerId, 'toggle_lb-stats.position') or '0'
-
-  for i = 1, #extractionResult do
-    local match = extractionResult[i]
-    if match.rangeStart > lastIndex then
-      output = output .. '\n\n' .. data:sub(lastIndex, match.rangeStart - 1)
-    end
-    if i == #extractionResult then
-      if position == '0' then
-        output = render(lastResult) .. output
-      else
-        output = output .. render(lastResult)
-      end
-    end
-    lastIndex = match.rangeEnd + 1
-  end
-
-  return output .. data:sub(lastIndex)
-end
-
-listenEdit(
-  'editDisplay',
-  function(tid, data, meta)
-    setTriggerId(tid)
-
-    if meta and meta.index ~= nil then
-      local position = meta.index - getChatLength(triggerId)
-      if position < -10 then
-        return data
-      end
-    end
-
-    local success, result = pcall(main, data)
-    if success then
-      return result
-    else
-      print('[Lightboard] Stats display failed:', tostring(result))
-      return data .. '<lb-lazy id="lb-stats">오류: ' .. result .. '</lb-lazy>'
-    end
-  end
-)
-```
+Read [Lightboard Prelude](000-prelude.md) for more.
 
 ## Lightboard Frontend Best Practices
 
@@ -527,6 +354,15 @@ listenEdit(
 - Provide an option to exclude the data from the main model context
 - Remove everything except the wrapper tag in `.lb.onOutput`
 - Provide `.lb.onValidate` for automatic fixes
+
+### Built-in icons
+
+All icons are 15x15 `<svg>`.
+
+- `<lb-comment-icon>`: A speech bubble.
+- `<lb-reroll-icon>`: A turning arrow.
+- `<lb-trash-icon>`: A diagonal cross.
+- `<lb-pin-icon>`: A pin icon. Set `pinned="true"` fills it.
 
 ### Limiting context inclusion
 
