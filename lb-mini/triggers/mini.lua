@@ -18,7 +18,8 @@ local function setTriggerId(tid)
   prelude.import(tid, 'toon.decode')
 end
 
-local DEFAULT_RENDERER_NAME = '미니보드 1'
+local CUSTOM_RENDERER_NAME = 'lb-mini.renderer'
+local DEFAULT_RENDERER_NAME = 'lb-mini.renderer.default'
 
 local THEME_COLORS = {
   {
@@ -82,16 +83,8 @@ end
 
 ---@return function
 local function resolveRenderer()
-  local selection = getGlobalVar(triggerId, 'toggle_lb-mini.renderer')
-  if type(selection) == 'string' then
-    selection = prelude.trim(selection)
-  else
-    selection = ''
-  end
-
-  if selection ~= '' and selection ~= 'null' then
-    local rendererName = '미니보드 ' .. selection
-    local renderer = loadRenderer(rendererName)
+  if getGlobalVar(triggerId, 'toggle_lb-mini.renderer') == '1' then
+    local renderer = loadRenderer(CUSTOM_RENDERER_NAME)
     if renderer then
       return renderer
     end

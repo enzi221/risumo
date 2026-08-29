@@ -1,6 +1,6 @@
 # Miniboard Renderer
 
-Create a standalone CharX module that supplies one visual renderer for Miniboard. Target the self-contained renderer contract in this reference for Miniboard 4.1.0+.
+Create a standalone CharX module that supplies one visual renderer for Miniboard. Target the self-contained renderer contract in this reference for Miniboard 4.1.1+.
 
 ## Deliverable
 
@@ -18,7 +18,7 @@ If `risupack` is available and the user wants distributable packaging all at onc
 `-- style.html
 ```
 
-Package `renderer.lua` as a disabled lorebook named `미니보드 X`. Use the renderer name requested by the user as `X`. Choose a distinct name when the user does not provide one. The user selects the renderer by entering the same `X` in the Miniboard `미니보드` toggle.
+Package `renderer.lua` as a disabled lorebook named exactly `lb-mini.renderer`. Miniboard automatically loads the highest-priority lorebook with that name when the user enables the `lb-mini.renderer` checkbox toggle.
 
 ### Without risupack
 
