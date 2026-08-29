@@ -161,9 +161,11 @@ end
 --- @param fullChat Chat[]
 --- @param type 'generation'|'interaction'|'reroll'
 --- @param extras string?
+--- @param chatOffset number?
 --- @return Chat[]
-local function makePrompt(triggerId, man, fullChat, type, extras)
+local function makePrompt(triggerId, man, fullChat, type, extras, chatOffset)
   local identifier = man.identifier
+  chatOffset = chatOffset or 0
 
   local intro = makeIntro(triggerId, man)
   local outro = makeOutro(triggerId, man, type)
@@ -263,7 +265,7 @@ local function makePrompt(triggerId, man, fullChat, type, extras)
   local maxLogs = math.max(1, man.maxLogs or tonumber(getGlobalVar(triggerId, "toggle_lightboard.maxLogs")) or 4)
 
   -- This takes user chat exclusion into account
-  local adjustedIndex = #fullChat + 1
+  local adjustedIndex = chatOffset + #fullChat + 1
   for originalIndex = #fullChat, 1, -1 do
     if #logsToAdd >= maxLogs then
       break
@@ -272,7 +274,8 @@ local function makePrompt(triggerId, man, fullChat, type, extras)
     if userChatsAllowed or fullChat[originalIndex].role ~= 'user' then
       local text = prelude.removeAllNodes(fullChat[originalIndex].data, { identifier })
       if man.onInput then
-        local success, modifiedText = pcall(man.onInput, triggerId, text, { index = originalIndex, type = type })
+        local success, modifiedText = pcall(man.onInput, triggerId, text,
+          { index = chatOffset + originalIndex, type = type })
         if success then
           text = modifiedText
         else

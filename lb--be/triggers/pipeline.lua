@@ -49,7 +49,14 @@ function M.runPipeline(triggerId, man, fullChat, options)
     return '\n<lb-lazy id="' .. man.identifier .. '" />'
   end
 
-  local promptSuccess, promptResult = pcall(prompt.make, triggerId, man, fullChat, modeType, options.extras)
+  local promptSuccess, promptResult = pcall(
+    prompt.make,
+    triggerId,
+    man,
+    fullChat,
+    modeType,
+    options.extras,
+    options.chatOffset)
   if not promptSuccess then
     return '\n<lb-lazy id="' .. man.identifier .. '" />'
   end
@@ -211,8 +218,9 @@ M.runPipelineAsync = async(M.runPipeline)
 --- @param triggerId string
 --- @param manifests Manifest[]
 --- @param fullChat Chat[]
+--- @param chatOffset number
 --- @return table[] results
-function M.runGenerationBatch(triggerId, manifests, fullChat)
+function M.runGenerationBatch(triggerId, manifests, fullChat, chatOffset)
   if #manifests == 0 then
     return {}
   end
@@ -234,6 +242,7 @@ function M.runGenerationBatch(triggerId, manifests, fullChat)
 
       local ok, result = pcall(function()
         return M.runPipelineAsync(triggerId, man, fullChat, {
+          chatOffset = chatOffset,
           lazy = man.lazy,
           type = 'generation',
         }):await()

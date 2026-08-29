@@ -22,7 +22,7 @@ function getFullChat(triggerId) end
 --- @param triggerId string
 --- @param count number Negative values become 0. Fractional values are rounded down.
 --- @return Chat[]
-function getRecentChatsMain(triggerId, count) end
+function getRecentChats(triggerId, count) end
 
 --- @param triggerId string
 --- @param index number

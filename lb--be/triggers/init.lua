@@ -43,6 +43,38 @@ local function findLastCharChat(fullChat, startOffset, range)
   return nil, nil
 end
 
+--- Resolves the chat context required by an automatic generation batch.
+--- @param manifests Manifest[]
+--- @return Chat[] chatContext, number chatOffset, boolean fullContext
+local function getGenerationChatContext(manifests)
+  local configuredMaxLogs = math.max(1, tonumber(getGlobalVar(triggerId, 'toggle_lightboard.maxLogs')) or 4)
+  local fullContext = false
+  local maxLogs = 1
+  local promptRequired = false
+
+  for _, man in ipairs(manifests) do
+    if man.sideEffect then
+      fullContext = true
+    end
+    if not man.lazy then
+      maxLogs = math.max(maxLogs, man.maxLogs or configuredMaxLogs)
+      promptRequired = true
+    end
+  end
+
+  if promptRequired and getGlobalVar(triggerId, 'toggle_lightboard.noUser') == '1' then
+    fullContext = true
+  end
+
+  if fullContext then
+    return getFullChat(triggerId), 0, true
+  end
+
+  local chatContext = getRecentChats(triggerId, math.ceil(maxLogs))
+  local chatOffset = getChatLength(triggerId) - #chatContext
+  return chatContext, chatOffset, false
+end
+
 --- @param identifier string
 --- @return Manifest
 local function requireActiveManifest(identifier)
@@ -89,9 +121,11 @@ local function writeResult(jsIdx, content, man, action)
 end
 
 --- @param manifests Manifest[]
-local main = async(function(manifests)
-  local fullChat = getFullChat(triggerId)
-  local batchResults = pipeline.runGenerationBatch(triggerId, manifests, fullChat)
+--- @param chatContext Chat[]
+--- @param chatOffset number
+--- @param fullContext boolean
+local main = async(function(manifests, chatContext, chatOffset, fullContext)
+  local batchResults = pipeline.runGenerationBatch(triggerId, manifests, chatContext, chatOffset)
   local normalManifestCount = 0
   local sideEffectBatchResults = {}
   local sideEffectManifests = {}
@@ -122,17 +156,28 @@ local main = async(function(manifests)
     end
   end
 
-  -- Get the latest full chat again in case other scripts modified it
-  local fullChatNewest = normalManifestCount > 0 and getFullChat(triggerId) or fullChat
-  local lastCharChatIdx = findLastCharChat(fullChatNewest, 0, 5)
-  local lastCharChat = lastCharChatIdx and fullChatNewest[lastCharChatIdx].data or ''
+  local latestChat = chatContext
+  local latestChatOffset = chatOffset
+  if normalManifestCount > 0 then
+    if fullContext then
+      latestChat = getFullChat(triggerId)
+      latestChatOffset = 0
+    else
+      latestChat = getRecentChats(triggerId, 6)
+      latestChatOffset = getChatLength(triggerId) - #latestChat
+    end
+  end
+
+  local lastCharChatIdx = findLastCharChat(latestChat, 0, 5)
+  local lastCharChat = lastCharChatIdx and latestChat[lastCharChatIdx].data or ''
+  local lastCharChatJsIdx = lastCharChatIdx and (latestChatOffset + lastCharChatIdx - 1) or -1
 
   if #allProcessedResults > 0 then
     local contents = table.concat(allProcessedResults, '\n\n')
     local updated = lbdata.replaceLBDATA(lastCharChat, contents)
 
     if updated then
-      setChat(triggerId, lastCharChatIdx ~= nil and (lastCharChatIdx - 1) or -1, updated)
+      setChat(triggerId, lastCharChatJsIdx, updated)
       lastCharChat = updated
     else
       -- Fallback: if a placeholder block wasn't found (unexpected), keep old behavior.
@@ -147,7 +192,7 @@ local main = async(function(manifests)
       else
         local finalMessage = position == '1' and assembled .. '\n\n' .. lastCharChat or
             lastCharChat .. '\n\n' .. assembled
-        setChat(triggerId, lastCharChatIdx ~= nil and (lastCharChatIdx - 1) or -1, finalMessage)
+        setChat(triggerId, lastCharChatJsIdx, finalMessage)
         lastCharChat = finalMessage
       end
     end
@@ -176,18 +221,26 @@ onOutput = async(function(tid)
     return
   end
 
-  local fullChat = getFullChat(tid)
+  local chatContext, chatOffset, fullContext = getGenerationChatContext(manifests)
+  local lastChat = chatContext[#chatContext]
   local position = getGlobalVar(tid, C.CONFIG.POSITION) or '0'
   if position == '0' then
-    setChat(tid, -1, fullChat[#fullChat].data .. '\n\n---\n[LBDATA START]\n[LBDATA END]\n---')
+    lastChat.data = lastChat.data .. '\n\n---\n[LBDATA START]\n[LBDATA END]\n---'
+    setChat(tid, -1, lastChat.data)
   elseif position == '1' then
-    setChat(tid, -1, '---\n[LBDATA START]\n[LBDATA END]\n---\n\n' .. fullChat[#fullChat].data)
+    lastChat.data = '---\n[LBDATA START]\n[LBDATA END]\n---\n\n' .. lastChat.data
+    setChat(tid, -1, lastChat.data)
   else
-    addChat(tid, 'char', '---\n[LBDATA START]\n[LBDATA END]\n---')
+    local placeholder = '---\n[LBDATA START]\n[LBDATA END]\n---'
+    addChat(tid, 'char', placeholder)
+    table.insert(chatContext, {
+      data = placeholder,
+      role = 'char',
+    })
   end
 
   local success, result = pcall(function()
-    local mainPromise = main(manifests)
+    local mainPromise = main(manifests, chatContext, chatOffset, fullContext)
     return mainPromise:await()
   end)
 
