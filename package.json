@@ -1,12 +1,15 @@
 {
+  "devDependencies": {
+    "risupack": "^0.1.0"
+  },
   "name": "risums",
   "private": true,
   "scripts": {
-    "build:charx": "node tools/charx/build-charx.js",
-    "bundle:lua": "node tools/charx/bundle.js",
-    "inspect:risusave": "node tools/charx/inspect-risusave.js",
-    "unpack:charx": "node tools/charx/unpack-charx.js",
-    "unpack:risum": "node tools/charx/unpack-risum.js"
+    "build:charx": "risupack build-charx",
+    "bundle:lua": "risupack bundle-lua",
+    "inspect:risusave": "risupack inspect-risusave",
+    "unpack:charx": "risupack unpack-charx",
+    "unpack:risum": "risupack unpack-risum"
   },
   "version": "0.0.0"
 }
