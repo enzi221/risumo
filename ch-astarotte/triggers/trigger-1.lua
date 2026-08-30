@@ -3,7 +3,6 @@ local triggerId = ''
 local function setTriggerId(tid)
   triggerId = tid
   if type(prelude) ~= 'nil' then
-    prelude.import(tid, 'toon.decode')
     return
   end
   local source = getLoreBooks(triggerId, 'lightboard-prelude')
@@ -11,7 +10,6 @@ local function setTriggerId(tid)
     error('Failed to load lightboard-prelude.')
   end
   load(source[1].content, '@prelude', 't')()
-  prelude.import(tid, 'toon.decode')
 end
 
 local function shuffleDeck(deck)
@@ -43,8 +41,8 @@ local minorArcana = {
   "cups/8", "cups/9", "cups/10", "cups/11", "cups/12", "cups/13", "cups/14",
   "swords/1", "swords/2", "swords/3", "swords/4", "swords/5", "swords/6", "swords/7",
   "swords/8", "swords/9", "swords/10", "swords/11", "swords/12", "swords/13", "swords/14",
-  "pentacles/1", "pentacles/2", "pentacles/3", "pentacles/4", "pentacles/5", "pentacles/6", "pentacles/7",
-  "pentacles/8", "pentacles/9", "pentacles/10", "pentacles/11", "pentacles/12", "pentacles/13", "pentacles/14",
+  "coins/1", "coins/2", "coins/3", "coins/4", "coins/5", "coins/6", "coins/7",
+  "coins/8", "coins/9", "coins/10", "coins/11", "coins/12", "coins/13", "coins/14",
 }
 
 local function getFullDeck()
@@ -78,7 +76,7 @@ local function printDeck()
   local deck = deckType == 'full' and getFullDeck() or getMajorDeck()
   local shuffledDeck = shuffleDeck(deck)
 
-  local spread = prelude.toon.decode(spreadCommand[1].content)
+  local spread = json.decode(spreadCommand[1].content)
 
   addChat(triggerId, 'user',
     '<tarot-spread-cache>' ..
@@ -211,16 +209,12 @@ local function renderSelection(spreadData, selectionData)
       rotation = rotation + 360
     end
 
-    local cardNumber = nil
     local imageCardName = cardName
     -- if only number then it is major; use the number as the image name
-    -- if it is (suit)/(number) then use only the suit
+    -- if it is (suit)/(number) then use the minor arcana image name
     if imageCardName:match('^(%a+)/(%d+)$') then
       local suit, number = imageCardName:match('^(%a+)/(%d+)$')
-      imageCardName = 'suit-' .. suit
-
-      local numberMap = { ['11'] = 'P', ['12'] = 'N', ['13'] = 'Q', ['14'] = 'K' }
-      cardNumber = numberMap[number] or number
+      imageCardName = 's-' .. suit .. '-' .. number
     end
 
     table.insert(card_es, h.label['astarot-spread-card-wrapper'] {
@@ -233,7 +227,6 @@ local function renderSelection(spreadData, selectionData)
         type = 'checkbox',
       },
       h.div['astarot-card astarot-spread-card'] {
-        data_number = cardNumber,
         style = string.format(
           'background-image: url({{raw::astarot-%s}}); transform: rotate(%ddeg);',
           imageCardName, isReversed and 180 or 0

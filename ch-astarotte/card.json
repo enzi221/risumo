@@ -45,7 +45,7 @@
                     "keys": [
                         ""
                     ],
-                    "content": "@@position astarot_gn\n\n{{#when::{{getvar::astarot-reading}}::is::1}}\n<astarotte-instruction>\n## Card Reading Image Guideline\n\nWhen Astarotte is reading a spread, before each paragraph for the card, utilize card tags formatted as below:\n\n`[astcard|{card}]`\n\n- card: 0-21 for major arcana, suit/1-14 for minor arcana where suit: wands, pentacles, cups, swords.\n- `i` suffix = reversed\n\nExample:\n\n[astcard|11]\n[astcard|pentacles/2i]\n\nThis will render a card heading. Do not add any other card name out of character dialogue after it; it will be redundant.\n\n## Interactive Tarot Playing Guideline\n\nThe following guideline applies when {{user}} has to pick cards from {{char}}'s deck.\n\nDo not apply when:\n- Reader is not {{char}}\n- Reading for others and they didn't ask {{user}} to pick the cards for them.\n\n### On Astarotte Turn\n\nWhen Astarotte prepares tarot cards for {{user}}, she shall invite the {{user}} to pick the cards themselves.\n\nUnless the user input *explicitly* stated that {{user}} picked their cards, after the invitation, you MUST strictly use the following command and STOP progressing narrative immediately and hand the turn over to the user so that they may pick their cards.\n\n```\n<tarot-spread deck=\"...\">\n[n|]{x|y|rot|position_meaning}:\n  ...\n  ...\n</tarot-spread>\n```\n\nYou have to define a tarot spread with the command.\n\n- Use `<tarot-spread>`.\n- Output in TOON format (2-space indent, array header shows length and field names, separate fields by `|`).\n- deck attribute: One of enum: major, full.\n  - major: Only use major arcana.\n  - full: Use full 78 cards (major + minor).\n- x, y: Where to place the card on the floor. 0.0-1.0, inclusive.\n  - Try to center the cards, horizontally and vertically.\n- rot: Rotation of the card. 0.0-360.0, inclusive. Emulate natural card placement with subtle rotations. Avoid 180deg as it might be mistaken as reversed card.\n- position_meaning: What the card represents. Output in English; it's invisible to the user.\n- Close `</tarot-spread>`.\n\nExample:\n\n<tarot-spread deck=\"major\">\n[3|]{x|y|rot|position_meaning}:\n  0.2|0.5|0.0|The Past\n  0.5|0.5|0.0|The Present\n  0.8|0.5|0.0|The Future\n</tarot-spread>\n\nNote that you should not wrap the command in a code fence.\n\nDepending on the request, topic, and {{char}}'s characteristics, define a suitable spread consisting 1-10 cards, either well-known, obscure, or even custom. Prefer major deck when the spread has 3 or less cards, to avoid overwhelming user.\n\nIt will also present tarot card picker interface to the user. Depict the deck as split into two fanned-out piles, as the interface will present itself that way. In the user's turn, they will include their chosen cards. Wait for the user turn.\n\n### On User Turn\n\nIf user included `<tarot-selection>`, it indicates that they've chosen their cards. The cards are represented in their index form.\n\nExample:\n\n<tarot-selection deck=\"major\">\n1,2,3\n11,swords/5i,8\n</tarot-selection>\n\n- First line: Where card located in the shuffled deck (1-based index), order = user selection.\n  - Example: 1,2,3 means the user picked the very first three cards in the shuffled deck sequentially. Utilize this in the narrative, e.g. it means either {{user}} picked cards haphazardly or was guided by certain fate.\n- Second line: Card identifiers, index form.\n  - 0 (The Fool) to 21 (The World) for major arcana\n  - suit/1-14 for minor arcana\n    - 11: P, 12: N, 13: Q, 14: K\n    - Example: wands/1, pentacles/14\n  - `i` suffix = reversed\n\n</astarotte-instruction>\n{{/when}}",
+                    "content": "@@position astarot_gn\n\n{{#when::{{getvar::astarot-reading}}::is::1}}\n<astarotte-instruction>\n## Card Reading Image Guideline\n\nWhen Astarotte is reading a spread, before each paragraph for the card, utilize card tags formatted as below:\n\n`[astcard|{card}]`\n\n- card: 0-21 for major arcana, suit/1-14 for minor arcana where suit: wands, coins, cups, swords.\n- `i` suffix = reversed\n\nExample:\n\n[astcard|11]\n[astcard|coins/2i]\n\nThis will render a card heading. Do not add any other card name out of character dialogue after it; it will be redundant.\n\n## Interactive Tarot Playing Guideline\n\nThe following guideline applies when {{user}} has to pick cards from {{char}}'s deck.\n\nDo not apply when:\n- Reader is not {{char}}\n- Reading for others and they didn't ask {{user}} to pick the cards for them.\n\n### On Astarotte Turn\n\nWhen Astarotte prepares tarot cards for {{user}}, she shall invite the {{user}} to pick the cards themselves.\n\nUnless the user input *explicitly* stated that {{user}} picked their cards, after the invitation, you MUST strictly use the following command and STOP progressing narrative immediately and hand the turn over to the user so that they may pick their cards.\n\n```\n<tarot-spread deck=\"...\">\n[n|]{x|y|rot|position_meaning}:\n  ...\n  ...\n</tarot-spread>\n```\n\nYou have to define a tarot spread with the command.\n\n- Use `<tarot-spread>`.\n- Output in TOON format (2-space indent, array header shows length and field names, separate fields by `|`).\n- deck attribute: One of enum: major, full.\n  - major: Only use major arcana.\n  - full: Use full 78 cards (major + minor).\n- x, y: Where to place the card on the floor. 0.0-1.0, inclusive.\n  - Try to center the cards, horizontally and vertically.\n- rot: Rotation of the card. 0.0-360.0, inclusive. Emulate natural card placement with subtle rotations. Avoid 180deg as it might be mistaken as reversed card.\n- position_meaning: What the card represents. Output in English; it's invisible to the user.\n- Close `</tarot-spread>`.\n\nExample:\n\n<tarot-spread deck=\"major\">\n[3|]{x|y|rot|position_meaning}:\n  0.2|0.5|0.0|The Past\n  0.5|0.5|0.0|The Present\n  0.8|0.5|0.0|The Future\n</tarot-spread>\n\nNote that you should not wrap the command in a code fence.\n\nDepending on the request, topic, and {{char}}'s characteristics, define a suitable spread consisting 1-10 cards, either well-known, obscure, or even custom. Prefer major deck when the spread has 3 or less cards, to avoid overwhelming user.\n\nIt will also present tarot card picker interface to the user. Depict the deck as split into two fanned-out piles, as the interface will present itself that way. In the user's turn, they will include their chosen cards. Wait for the user turn.\n\n### On User Turn\n\nIf user included `<tarot-selection>`, it indicates that they've chosen their cards. The cards are represented in their index form.\n\nExample:\n\n<tarot-selection deck=\"major\">\n1,2,3\n11,swords/5i,8\n</tarot-selection>\n\n- First line: Where card located in the shuffled deck (1-based index), order = user selection.\n  - Example: 1,2,3 means the user picked the very first three cards in the shuffled deck sequentially. Utilize this in the narrative, e.g. it means either {{user}} picked cards haphazardly or was guided by certain fate.\n- Second line: Card identifiers, index form.\n  - 0 (The Fool) to 21 (The World) for major arcana\n  - suit/1-14 for minor arcana\n    - 11: P, 12: N, 13: Q, 14: K\n    - Example: wands/1, coins/14\n  - `i` suffix = reversed\n\n</astarotte-instruction>\n{{/when}}",
                     "extensions": {},
                     "enabled": true,
                     "insertion_order": 900,
@@ -77,7 +77,7 @@
                     "keys": [
                         ""
                     ],
-                    "content": "{{#when::{{getvar::astarot-cards}}::is::1}}\n## The Deck\n\nAstarotte uses her own custom illustration tarot deck. When depicting the deck's cards, utilize this section since the cards are all in custom illustrations.\n\nMinor Arcana: Custom illustration, standard deck. Etched numbers & P/N/Q/K. Fixed images regardless of number.\n\n- Pentacles: two coins on light blue background\n- Cups: one golden chalice on black background\n- Swords: one simple sword on red background\n- Wands: one twig with leaves on olive green background\n\nMajor Arcana: Custom illustration, Rider-Waite.\n\n- Fool: Middle-aged fat man in suits walking, holding a red flower; ignorant smile\n- Magician: Middle-aged man in suits, professor; wise smile\n- High Priestess: White hair woman, white blouse, black skirt and jacket holding binoculars, indifferent\n- Empress: Nun-like orange hair woman holding a bible and a cross; smiling brightly but unsettling\n- Emperor: Young white hair girl in red dress and red heels sitting on a red sofa; condescending\n- Hierophant: Brown ponytail woman in office suits, prominent blue flower pendant on jacket collar, sitting on office desk; perpetual smile\n- Lovers: Mint hair bob cut girl holding an apple and looking at it; curious\n- Chariot: Young slim man in dress shirt and yellow work overalls holding a steel ball pendulum; laid back\n- Strength: Blonde ponytail girl in school uniform in front of lion statue; determined\n- Hermit: A man in casual attire standing in gray jagged wasteland; indifferent\n- Wheel of Fortune: A smiling middle-late man standing in front of a wall with countless paper notes attached; peaceful smile\n- Justice: A young male reporter in beige jacket holding a film camera and looking through its viewfinder; determined\n- Hanged Man: A merc woman in cargo pants and white cropped tee hanged by her left ankle; indifferent\n- Death: A teacher holding a test tube up to her eyes in night office; passionate, apologetic\n- Temperance: Herself holding a chalice (had no model - improvised)\n- Devil: A leaning, derelict watchtower on gray wasteland, chained, strikingly red sky\n- Tower: A concrete tower glowing red on black background\n- Star: Stars in night sky over city skyline\n- Moon: Bright but small full moon floating low on pale gray city skyline\n- Sun: A setting sun over ocean\n- Judgement: Light shining upon a small chapel through clouds\n- World: A peaceful scene of dusk city skyline\n{{/}}",
+                    "content": "{{#when::{{getvar::astarot-cards}}::is::1}}\n## The Deck\n\nAstarotte uses her own custom illustration tarot deck. When depicting the deck's cards, utilize this section since the cards are all in custom illustrations.\n\nMinor Arcana: Custom illustration, standard deck. Etched numbers & P/N/Q/K.\n\n- Coins: two coins on light blue background\n- Cups: one golden chalice on black background\n- Swords: one simple sword on red background\n- Wands: one twig with leaves on olive green background\n\nMajor Arcana: Custom illustration, Rider-Waite.\n\n- Fool: Middle-aged fat man in suits walking, holding a red flower; ignorant smile\n- Magician: Middle-aged man in suits, professor; wise smile\n- High Priestess: White hair woman, white blouse, black skirt and jacket holding binoculars, indifferent\n- Empress: Nun-like orange hair woman holding a bible and a cross; smiling brightly but unsettling\n- Emperor: Young white hair girl in red dress and red heels sitting on a red sofa; condescending\n- Hierophant: Brown ponytail woman in office suits, prominent blue flower pendant on jacket collar, sitting on office desk; perpetual smile\n- Lovers: Mint hair bob cut girl holding an apple and looking at it; curious\n- Chariot: Young slim man in dress shirt and yellow work overalls holding a steel ball pendulum; laid back\n- Strength: Blonde ponytail girl in school uniform in front of lion statue; determined\n- Hermit: A man in casual attire standing in gray jagged wasteland; indifferent\n- Wheel of Fortune: A smiling middle-late man standing in front of a wall with countless paper notes attached; peaceful smile\n- Justice: A young male reporter in beige jacket holding a film camera and looking through its viewfinder; determined\n- Hanged Man: A merc woman in cargo pants and white cropped tee hanged by her left ankle; indifferent\n- Death: A teacher holding a test tube up to her eyes in night office; passionate, apologetic\n- Temperance: Herself holding a chalice (had no model - improvised)\n- Devil: A leaning, derelict watchtower on gray wasteland, chained, strikingly red sky\n- Tower: A concrete tower glowing red on black background\n- Star: Stars in night sky over city skyline\n- Moon: Bright but small full moon floating low on pale gray city skyline\n- Sun: A setting sun over ocean\n- Judgement: Light shining upon a small chapel through clouds\n- World: A peaceful scene of dusk city skyline\n{{/}}",
                     "extensions": {},
                     "enabled": true,
                     "insertion_order": 100,
@@ -145,7 +145,7 @@
                         ""
                     ]
                 ],
-                "backgroundHTML": "<style>\n  .astarot-card {\n    aspect-ratio: 2.75 / 4.75;\n    background-color: white;\n    background-position: center;\n    background-repeat: no-repeat;\n    background-size: cover;\n    border-radius: 5%/2.9%;\n  }\n\n  .astarot-floor {\n    aspect-ratio: 4/3;\n    background: url(\"{{raw::astarot-floor.jpg}}\") #f5f5f5 center no-repeat;\n    background-size: cover;\n    container-type: size;\n    position: relative;\n    width: 100%;\n    max-width: 1000px;\n    margin: 20px auto;\n    border-radius: 12px;\n  }\n\n  .astarot-spread-card-wrapper {\n    aspect-ratio: 2.75 / 4.75;\n    cursor: pointer;\n    position: absolute;\n    transition: transform 0.5s ease, z-index 0.5s linear allow-discrete;\n    width: 10cqw;\n  }\n  .astarot-spread-card-wrapper:hover {\n    transform: rotate(0deg) !important;\n    transition: transform 0.5s ease, z-index 0.5s linear;\n    z-index: 1000;\n  }\n\n  .astarot-spread-card {\n    backface-visibility: hidden;\n    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);\n    container-type: size;\n    left: 0;\n    top: 0;\n    width: 10cqw;\n    pointer-events: none;\n    position: absolute;\n    transition: all 0.5s ease;\n    transform-style: preserve-3d;\n  }\n  .astarot-spread-card::after {\n    backface-visibility: hidden;\n    background: url(\"{{raw::astarot-backface.jpg}}\") center no-repeat;\n    background-size: cover;\n    border-radius: 5%/2.9%;\n    content: '';\n    inset: 0;\n    position: absolute;\n    transform: rotateY(180deg);\n  }\n\n  .astarot-spread-card::before {\n    color: #fff;\n    content: attr(data-number);\n    font-size: 15cqw;\n    font-family: serif;\n    line-height: 1;\n    position: absolute;\n    text-align: right;\n    text-shadow: -2px 2px 0px black;\n  }\n\n  .astarot-spread-card::before {\n    top: 0;\n    right: 0;\n    transform: translate(-33%, 25%);\n  }\n\n  .astarot-spread-card-wrapper:hover .astarot-spread-card {\n    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);\n    left: calc(50cqw - var(--card-x));\n    top: calc(50cqh - var(--card-y));\n    width: 40cqw;\n    transform: translate(-50%, -50%) rotate(0deg) !important;\n    z-index: 1000;\n  }\n\n  .astarot-spread-card-wrapper:hover input:checked + .astarot-spread-card {\n    transform: translate(-50%, -50%) rotate(0deg) rotateY(-180deg) !important;\n  }\n\n  .astarot-deck-inst {\n    text-align: center;\n  }\n\n  .astarot-deck-card {\n    width: 10cqw;\n    background-image: url(\"{{raw::astarot-backface.jpg}}\");\n    container-type: size;\n    cursor: pointer;\n    position: absolute;\n    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);\n    z-index: 1;\n  }\n\n  .astarot-deck-card:hover:not(:disabled) {\n    transform: rotate(var(--rotation)) translateY(-2cqh) !important;\n    z-index: 100 !important;\n    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);\n  }\n\n  .astarot-deck-card[data-active=\"true\"]::after {\n    background: #fab12a;\n    content: '';\n    inset: 0;\n    opacity: 0.2;\n    position: absolute;\n  }\n\n  .astarot-deck-card:disabled {\n    opacity: 0.3;\n    cursor: not-allowed;\n  }\n\n  .astarot-desc-card {\n    float: left;\n    margin: 0 1em 2em 0;\n    width: 60px;\n  }\n  .astarot-desc-card[data-reversed] {\n    transform: rotate(180deg);\n  }\n\n  .astarot-desc-card + p {\n    margin-top: 0;\n  }\n\n  .astarot-button {\n    border-block-width: 6px;\n    border-image: url({{raw::astarot-button.png}}) stretch;\n    border-image-slice: 12 62 fill;\n    border-image-outset: 0 15px;\n    border-image-width: 6px 31px;\n    border-inline-width: 17px;\n    border-style: solid;\n    display: block;\n    line-height: 43px;\n    margin: 0 auto;\n    min-width: 200px;\n    transition: all 0.1s ease;\n  }\n  .astarot-button:disabled {\n    cursor: not-allowed;\n    filter: grayscale(1);\n    opacity: 0.5;\n  }\n  .astarot-button:not(:disabled):hover {\n    box-shadow: 0 0 8px rgb(from #d5c093 r g b/0.5);\n  }\n</style>\n",
+                "backgroundHTML": "<style>\n  .astarot-card {\n    aspect-ratio: 2.75 / 4.75;\n    background-color: white;\n    background-position: center;\n    background-repeat: no-repeat;\n    background-size: cover;\n    border-radius: 5%/2.9%;\n  }\n\n  .astarot-floor {\n    aspect-ratio: 4/3;\n    background: url(\"{{raw::astarot-floor.jpg}}\") #f5f5f5 center no-repeat;\n    background-size: cover;\n    container-type: size;\n    position: relative;\n    width: 100%;\n    max-width: 1000px;\n    margin: 20px auto;\n    border-radius: 12px;\n  }\n\n  .astarot-spread-card-wrapper {\n    aspect-ratio: 2.75 / 4.75;\n    cursor: pointer;\n    position: absolute;\n    transition: transform 0.5s ease, z-index 0.5s linear allow-discrete;\n    width: 10cqw;\n  }\n  .astarot-spread-card-wrapper:hover {\n    transform: rotate(0deg) !important;\n    transition: transform 0.5s ease, z-index 0.5s linear;\n    z-index: 1000;\n  }\n\n  .astarot-spread-card {\n    backface-visibility: hidden;\n    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);\n    container-type: size;\n    left: 0;\n    top: 0;\n    width: 10cqw;\n    pointer-events: none;\n    position: absolute;\n    transition: all 0.5s ease;\n    transform-style: preserve-3d;\n  }\n  .astarot-spread-card::after {\n    backface-visibility: hidden;\n    background: url(\"{{raw::astarot-backface.jpg}}\") center no-repeat;\n    background-size: cover;\n    border-radius: 5%/2.9%;\n    content: '';\n    inset: 0;\n    position: absolute;\n    transform: rotateY(180deg);\n  }\n\n  .astarot-spread-card-wrapper:hover .astarot-spread-card {\n    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);\n    left: calc(50cqw - var(--card-x));\n    top: calc(50cqh - var(--card-y));\n    width: 40cqw;\n    transform: translate(-50%, -50%) rotate(0deg) !important;\n    z-index: 1000;\n  }\n\n  .astarot-spread-card-wrapper:hover input:checked + .astarot-spread-card {\n    transform: translate(-50%, -50%) rotate(0deg) rotateY(-180deg) !important;\n  }\n\n  .astarot-deck-inst {\n    text-align: center;\n  }\n\n  .astarot-deck-card {\n    width: 10cqw;\n    background-image: url(\"{{raw::astarot-backface.jpg}}\");\n    container-type: size;\n    cursor: pointer;\n    position: absolute;\n    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);\n    z-index: 1;\n  }\n\n  .astarot-deck-card:hover:not(:disabled) {\n    transform: rotate(var(--rotation)) translateY(-2cqh) !important;\n    z-index: 100 !important;\n    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);\n  }\n\n  .astarot-deck-card[data-active=\"true\"]::after {\n    background: #fab12a;\n    content: '';\n    inset: 0;\n    opacity: 0.2;\n    position: absolute;\n  }\n\n  .astarot-deck-card:disabled {\n    opacity: 0.3;\n    cursor: not-allowed;\n  }\n\n  .astarot-desc-card {\n    float: left;\n    margin: 0 1em 2em 0;\n    width: 60px;\n  }\n  .astarot-desc-card[data-reversed] {\n    transform: rotate(180deg);\n  }\n\n  .astarot-desc-card + p {\n    margin-top: 0;\n  }\n\n  .astarot-button {\n    border-block-width: 6px;\n    border-image: url({{raw::astarot-button.png}}) stretch;\n    border-image-slice: 12 62 fill;\n    border-image-outset: 0 15px;\n    border-image-width: 6px 31px;\n    border-inline-width: 17px;\n    border-style: solid;\n    display: block;\n    line-height: 43px;\n    margin: 0 auto;\n    min-width: 200px;\n    transition: all 0.1s ease;\n  }\n  .astarot-button:disabled {\n    cursor: not-allowed;\n    filter: grayscale(1);\n    opacity: 0.5;\n  }\n  .astarot-button:not(:disabled):hover {\n    box-shadow: 0 0 8px rgb(from #d5c093 r g b/0.5);\n  }\n</style>\n",
                 "additionalText": "",
                 "virtualscript": "",
                 "largePortrait": false,
@@ -185,370 +185,682 @@
         "modification_date": 1788105431,
         "assets": [
             {
-                "type": "icon",
-                "uri": "embeded://assets/icon/image/iconx.png",
-                "name": "iconx",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-0.jpg.jpg",
-                "name": "astarot-0.jpg",
-                "ext": "jpg"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-1.jpg.jpg",
-                "name": "astarot-1.jpg",
-                "ext": "jpg"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-2.jpg.jpg",
-                "name": "astarot-2.jpg",
-                "ext": "jpg"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-3.jpg.jpg",
-                "name": "astarot-3.jpg",
-                "ext": "jpg"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-4.jpg.jpg",
-                "name": "astarot-4.jpg",
-                "ext": "jpg"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-5.jpg.jpg",
-                "name": "astarot-5.jpg",
-                "ext": "jpg"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-6.jpg.jpg",
-                "name": "astarot-6.jpg",
-                "ext": "jpg"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-7.jpg.jpg",
-                "name": "astarot-7.jpg",
-                "ext": "jpg"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-8.jpg.jpg",
-                "name": "astarot-8.jpg",
-                "ext": "jpg"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-9.jpg.jpg",
-                "name": "astarot-9.jpg",
-                "ext": "jpg"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-10.jpg.jpg",
-                "name": "astarot-10.jpg",
-                "ext": "jpg"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-11.jpg.jpg",
-                "name": "astarot-11.jpg",
-                "ext": "jpg"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-12.jpg.jpg",
-                "name": "astarot-12.jpg",
-                "ext": "jpg"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-13.jpg.jpg",
-                "name": "astarot-13.jpg",
-                "ext": "jpg"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-14.jpg.jpg",
-                "name": "astarot-14.jpg",
-                "ext": "jpg"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-15.jpg.jpg",
-                "name": "astarot-15.jpg",
-                "ext": "jpg"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-16.jpg.jpg",
-                "name": "astarot-16.jpg",
-                "ext": "jpg"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-17.jpg.jpg",
-                "name": "astarot-17.jpg",
-                "ext": "jpg"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-18.jpg.jpg",
-                "name": "astarot-18.jpg",
-                "ext": "jpg"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-19.jpg.jpg",
-                "name": "astarot-19.jpg",
-                "ext": "jpg"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-20.jpg.jpg",
-                "name": "astarot-20.jpg",
-                "ext": "jpg"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-21.jpg.jpg",
-                "name": "astarot-21.jpg",
-                "ext": "jpg"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-backface.png.png",
-                "name": "astarot-backface.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-floor.jpg.jpg",
-                "name": "astarot-floor.jpg",
-                "ext": "jpg"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-suit-cups.jpg.jpg",
-                "name": "astarot-suit-cups.jpg",
-                "ext": "jpg"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-suit-pentacles.jpg.jpg",
-                "name": "astarot-suit-pentacles.jpg",
-                "ext": "jpg"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-suit-swords.jpg.jpg",
-                "name": "astarot-suit-swords.jpg",
-                "ext": "jpg"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-suit-wands.jpg.jpg",
-                "name": "astarot-suit-wands.jpg",
-                "ext": "jpg"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-cover-tarot.png.png",
-                "name": "astarot-cover-tarot.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-cover-cvs-icegirl.png.png",
-                "name": "astarot-cover-cvs-icegirl.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-button.png.png",
-                "name": "astarot-button.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-border.png.png",
-                "name": "astarot-border.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-cover-cvs.png.png",
-                "name": "astarot-cover-cvs.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-angry.png.png",
-                "name": "astarot-angry.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-annoyed.png.png.png",
-                "name": "astarot-annoyed.png.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-blushing.png.png",
-                "name": "astarot-blushing.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-confused.png.png",
-                "name": "astarot-confused.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-crying.PNG.png",
-                "name": "astarot-crying.PNG",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-curious.png.png",
-                "name": "astarot-curious.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-default.png.png",
-                "name": "astarot-default.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-disappointed.png.png",
-                "name": "astarot-disappointed.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-disgusted.png.png",
-                "name": "astarot-disgusted.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-embarrassed.png.png",
-                "name": "astarot-embarrassed.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-excited.png.png",
-                "name": "astarot-excited.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-flustered.png.png",
-                "name": "astarot-flustered.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-giggling.png.png",
-                "name": "astarot-giggling.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-guilty.png.png",
-                "name": "astarot-guilty.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-laughing.png.png",
-                "name": "astarot-laughing.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-lovestruck.png.png",
-                "name": "astarot-lovestruck.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-middlefinger.png.png",
-                "name": "astarot-middlefinger.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-pouting.png.png",
-                "name": "astarot-pouting.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-sad.png.png",
-                "name": "astarot-sad.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-scared.png.png",
-                "name": "astarot-scared.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-shocked.png.png",
-                "name": "astarot-shocked.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-sleepy.png.png",
-                "name": "astarot-sleepy.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-smile.png.png",
-                "name": "astarot-smile.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-surprised.png.png",
-                "name": "astarot-surprised.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-worried.png.png",
-                "name": "astarot-worried.png",
-                "ext": "png"
-            },
-            {
-                "type": "x-risu-asset",
-                "uri": "embeded://assets/other/image/astarot-nervous.PNG.png",
-                "name": "astarot-nervous.PNG",
-                "ext": "png"
-            },
-            {
-                "type": "icon",
-                "uri": "embeded://assets/icon/image/main.png",
+                "ext": "png",
                 "name": "main",
-                "ext": "png"
+                "type": "icon",
+                "uri": "embeded://assets/icon/image/main.png"
+            },
+            {
+                "ext": "png",
+                "name": "iconx",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/iconx.png"
+            },
+            {
+                "ext": "jpg",
+                "name": "astarot-0.jpg",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-0.jpg.jpg"
+            },
+            {
+                "ext": "jpg",
+                "name": "astarot-1.jpg",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-1.jpg.jpg"
+            },
+            {
+                "ext": "jpg",
+                "name": "astarot-2.jpg",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-2.jpg.jpg"
+            },
+            {
+                "ext": "jpg",
+                "name": "astarot-3.jpg",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-3.jpg.jpg"
+            },
+            {
+                "ext": "jpg",
+                "name": "astarot-4.jpg",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-4.jpg.jpg"
+            },
+            {
+                "ext": "jpg",
+                "name": "astarot-5.jpg",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-5.jpg.jpg"
+            },
+            {
+                "ext": "jpg",
+                "name": "astarot-6.jpg",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-6.jpg.jpg"
+            },
+            {
+                "ext": "jpg",
+                "name": "astarot-7.jpg",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-7.jpg.jpg"
+            },
+            {
+                "ext": "jpg",
+                "name": "astarot-8.jpg",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-8.jpg.jpg"
+            },
+            {
+                "ext": "jpg",
+                "name": "astarot-9.jpg",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-9.jpg.jpg"
+            },
+            {
+                "ext": "jpg",
+                "name": "astarot-10.jpg",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-10.jpg.jpg"
+            },
+            {
+                "ext": "jpg",
+                "name": "astarot-11.jpg",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-11.jpg.jpg"
+            },
+            {
+                "ext": "jpg",
+                "name": "astarot-12.jpg",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-12.jpg.jpg"
+            },
+            {
+                "ext": "jpg",
+                "name": "astarot-13.jpg",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-13.jpg.jpg"
+            },
+            {
+                "ext": "jpg",
+                "name": "astarot-14.jpg",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-14.jpg.jpg"
+            },
+            {
+                "ext": "jpg",
+                "name": "astarot-15.jpg",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-15.jpg.jpg"
+            },
+            {
+                "ext": "jpg",
+                "name": "astarot-16.jpg",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-16.jpg.jpg"
+            },
+            {
+                "ext": "jpg",
+                "name": "astarot-17.jpg",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-17.jpg.jpg"
+            },
+            {
+                "ext": "jpg",
+                "name": "astarot-18.jpg",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-18.jpg.jpg"
+            },
+            {
+                "ext": "jpg",
+                "name": "astarot-19.jpg",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-19.jpg.jpg"
+            },
+            {
+                "ext": "jpg",
+                "name": "astarot-20.jpg",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-20.jpg.jpg"
+            },
+            {
+                "ext": "jpg",
+                "name": "astarot-21.jpg",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-21.jpg.jpg"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-backface.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-backface.png.png"
+            },
+            {
+                "ext": "jpg",
+                "name": "astarot-floor.jpg",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-floor.jpg.jpg"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-coins-1.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-coins-1.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-coins-2.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-coins-2.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-coins-3.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-coins-3.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-coins-4.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-coins-4.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-coins-5.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-coins-5.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-coins-6.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-coins-6.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-coins-7.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-coins-7.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-coins-8.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-coins-8.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-coins-9.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-coins-9.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-coins-10.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-coins-10.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-coins-11.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-coins-11.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-coins-12.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-coins-12.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-coins-13.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-coins-13.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-coins-14.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-coins-14.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-cups-1.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-cups-1.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-cups-2.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-cups-2.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-cups-3.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-cups-3.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-cups-4.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-cups-4.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-cups-5.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-cups-5.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-cups-6.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-cups-6.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-cups-7.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-cups-7.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-cups-8.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-cups-8.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-cups-9.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-cups-9.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-cups-10.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-cups-10.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-cups-11.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-cups-11.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-cups-12.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-cups-12.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-cups-13.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-cups-13.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-cups-14.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-cups-14.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-swords-1.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-swords-1.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-swords-2.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-swords-2.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-swords-3.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-swords-3.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-swords-4.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-swords-4.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-swords-5.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-swords-5.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-swords-6.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-swords-6.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-swords-7.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-swords-7.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-swords-8.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-swords-8.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-swords-9.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-swords-9.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-swords-10.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-swords-10.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-swords-11.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-swords-11.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-swords-12.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-swords-12.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-swords-13.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-swords-13.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-swords-14.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-swords-14.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-wands-1.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-wands-1.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-wands-2.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-wands-2.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-wands-3.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-wands-3.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-wands-4.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-wands-4.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-wands-5.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-wands-5.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-wands-6.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-wands-6.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-wands-7.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-wands-7.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-wands-8.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-wands-8.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-wands-9.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-wands-9.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-wands-10.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-wands-10.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-wands-11.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-wands-11.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-wands-12.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-wands-12.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-wands-13.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-wands-13.webp.webp"
+            },
+            {
+                "ext": "webp",
+                "name": "astarot-s-wands-14.webp",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-s-wands-14.webp.webp"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-cover-tarot.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-cover-tarot.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-cover-cvs-icegirl.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-cover-cvs-icegirl.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-button.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-button.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-border.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-border.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-cover-cvs.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-cover-cvs.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-angry.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-angry.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-annoyed.png.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-annoyed.png.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-blushing.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-blushing.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-confused.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-confused.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-crying.PNG",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-crying.PNG.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-curious.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-curious.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-default.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-default.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-disappointed.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-disappointed.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-disgusted.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-disgusted.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-embarrassed.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-embarrassed.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-excited.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-excited.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-flustered.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-flustered.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-giggling.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-giggling.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-guilty.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-guilty.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-laughing.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-laughing.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-lovestruck.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-lovestruck.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-middlefinger.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-middlefinger.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-pouting.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-pouting.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-sad.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-sad.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-scared.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-scared.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-shocked.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-shocked.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-sleepy.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-sleepy.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-smile.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-smile.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-surprised.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-surprised.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-worried.png",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-worried.png.png"
+            },
+            {
+                "ext": "png",
+                "name": "astarot-nervous.PNG",
+                "type": "x-risu-asset",
+                "uri": "embeded://assets/other/image/astarot-nervous.PNG.png"
             }
         ]
     }

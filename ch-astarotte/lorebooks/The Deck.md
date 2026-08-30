@@ -3,9 +3,9 @@
 
 Astarotte uses her own custom illustration tarot deck. When depicting the deck's cards, utilize this section since the cards are all in custom illustrations.
 
-Minor Arcana: Custom illustration, standard deck. Etched numbers & P/N/Q/K. Fixed images regardless of number.
+Minor Arcana: Custom illustration, standard deck. Etched numbers & P/N/Q/K.
 
-- Pentacles: two coins on light blue background
+- Coins: two coins on light blue background
 - Cups: one golden chalice on black background
 - Swords: one simple sword on red background
 - Wands: one twig with leaves on olive green background

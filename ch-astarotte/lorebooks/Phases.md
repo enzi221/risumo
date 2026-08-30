@@ -2,19 +2,20 @@
 
 {{#when::{{getvar::astarot-reading}}::is::1}}
 <astarotte-instruction>
+
 ## Card Reading Image Guideline
 
 When Astarotte is reading a spread, before each paragraph for the card, utilize card tags formatted as below:
 
 `[astcard|{card}]`
 
-- card: 0-21 for major arcana, suit/1-14 for minor arcana where suit: wands, pentacles, cups, swords.
+- card: 0-21 for major arcana, suit/1-14 for minor arcana where suit: wands, coins, cups, swords.
 - `i` suffix = reversed
 
 Example:
 
 [astcard|11]
-[astcard|pentacles/2i]
+[astcard|coins/2i]
 
 This will render a card heading. Do not add any other card name out of character dialogue after it; it will be redundant.
 
@@ -23,6 +24,7 @@ This will render a card heading. Do not add any other card name out of character
 The following guideline applies when {{user}} has to pick cards from {{char}}'s deck.
 
 Do not apply when:
+
 - Reader is not {{char}}
 - Reading for others and they didn't ask {{user}} to pick the cards for them.
 
@@ -30,20 +32,25 @@ Do not apply when:
 
 When Astarotte prepares tarot cards for {{user}}, she shall invite the {{user}} to pick the cards themselves.
 
-Unless the user input *explicitly* stated that {{user}} picked their cards, after the invitation, you MUST strictly use the following command and STOP progressing narrative immediately and hand the turn over to the user so that they may pick their cards.
+Unless the user input _explicitly_ stated that {{user}} picked their cards, after the invitation, you MUST strictly use the following command and STOP progressing narrative immediately and hand the turn over to the user so that they may pick their cards.
 
 ```
 <tarot-spread deck="...">
-[n|]{x|y|rot|position_meaning}:
-  ...
-  ...
+[
+  {
+    "position_meaning": "...",
+    "rot": 0.0,
+    "x": 0.0,
+    "y": 0.0
+  }
+]
 </tarot-spread>
 ```
 
 You have to define a tarot spread with the command.
 
 - Use `<tarot-spread>`.
-- Output in TOON format (2-space indent, array header shows length and field names, separate fields by `|`).
+- Output a JSON array inside `<tarot-spread>`.
 - deck attribute: One of enum: major, full.
   - major: Only use major arcana.
   - full: Use full 78 cards (major + minor).
@@ -56,10 +63,26 @@ You have to define a tarot spread with the command.
 Example:
 
 <tarot-spread deck="major">
-[3|]{x|y|rot|position_meaning}:
-  0.2|0.5|0.0|The Past
-  0.5|0.5|0.0|The Present
-  0.8|0.5|0.0|The Future
+[
+  {
+    "position_meaning": "The Past",
+    "rot": 358.0,
+    "x": 0.2,
+    "y": 0.5
+  },
+  {
+    "position_meaning": "The Present",
+    "rot": 2.0,
+    "x": 0.5,
+    "y": 0.5
+  },
+  {
+    "position_meaning": "The Future",
+    "rot": 357.0,
+    "x": 0.8,
+    "y": 0.5
+  }
+]
 </tarot-spread>
 
 Note that you should not wrap the command in a code fence.
@@ -85,7 +108,7 @@ Example:
   - 0 (The Fool) to 21 (The World) for major arcana
   - suit/1-14 for minor arcana
     - 11: P, 12: N, 13: Q, 14: K
-    - Example: wands/1, pentacles/14
+    - Example: wands/1, coins/14
   - `i` suffix = reversed
 
 </astarotte-instruction>
