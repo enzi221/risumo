@@ -1,0 +1,407 @@
+{
+  "CSS": "style.html",
+  "assets": [
+    {
+      "extension": "png",
+      "file": "assets/icon/image/iconx.png",
+      "name": "iconx"
+    },
+    {
+      "extension": "jpg",
+      "file": "assets/other/image/astarot-0.jpg.jpg",
+      "name": "astarot-0.jpg"
+    },
+    {
+      "extension": "jpg",
+      "file": "assets/other/image/astarot-1.jpg.jpg",
+      "name": "astarot-1.jpg"
+    },
+    {
+      "extension": "jpg",
+      "file": "assets/other/image/astarot-2.jpg.jpg",
+      "name": "astarot-2.jpg"
+    },
+    {
+      "extension": "jpg",
+      "file": "assets/other/image/astarot-3.jpg.jpg",
+      "name": "astarot-3.jpg"
+    },
+    {
+      "extension": "jpg",
+      "file": "assets/other/image/astarot-4.jpg.jpg",
+      "name": "astarot-4.jpg"
+    },
+    {
+      "extension": "jpg",
+      "file": "assets/other/image/astarot-5.jpg.jpg",
+      "name": "astarot-5.jpg"
+    },
+    {
+      "extension": "jpg",
+      "file": "assets/other/image/astarot-6.jpg.jpg",
+      "name": "astarot-6.jpg"
+    },
+    {
+      "extension": "jpg",
+      "file": "assets/other/image/astarot-7.jpg.jpg",
+      "name": "astarot-7.jpg"
+    },
+    {
+      "extension": "jpg",
+      "file": "assets/other/image/astarot-8.jpg.jpg",
+      "name": "astarot-8.jpg"
+    },
+    {
+      "extension": "jpg",
+      "file": "assets/other/image/astarot-9.jpg.jpg",
+      "name": "astarot-9.jpg"
+    },
+    {
+      "extension": "jpg",
+      "file": "assets/other/image/astarot-10.jpg.jpg",
+      "name": "astarot-10.jpg"
+    },
+    {
+      "extension": "jpg",
+      "file": "assets/other/image/astarot-11.jpg.jpg",
+      "name": "astarot-11.jpg"
+    },
+    {
+      "extension": "jpg",
+      "file": "assets/other/image/astarot-12.jpg.jpg",
+      "name": "astarot-12.jpg"
+    },
+    {
+      "extension": "jpg",
+      "file": "assets/other/image/astarot-13.jpg.jpg",
+      "name": "astarot-13.jpg"
+    },
+    {
+      "extension": "jpg",
+      "file": "assets/other/image/astarot-14.jpg.jpg",
+      "name": "astarot-14.jpg"
+    },
+    {
+      "extension": "jpg",
+      "file": "assets/other/image/astarot-15.jpg.jpg",
+      "name": "astarot-15.jpg"
+    },
+    {
+      "extension": "jpg",
+      "file": "assets/other/image/astarot-16.jpg.jpg",
+      "name": "astarot-16.jpg"
+    },
+    {
+      "extension": "jpg",
+      "file": "assets/other/image/astarot-17.jpg.jpg",
+      "name": "astarot-17.jpg"
+    },
+    {
+      "extension": "jpg",
+      "file": "assets/other/image/astarot-18.jpg.jpg",
+      "name": "astarot-18.jpg"
+    },
+    {
+      "extension": "jpg",
+      "file": "assets/other/image/astarot-19.jpg.jpg",
+      "name": "astarot-19.jpg"
+    },
+    {
+      "extension": "jpg",
+      "file": "assets/other/image/astarot-20.jpg.jpg",
+      "name": "astarot-20.jpg"
+    },
+    {
+      "extension": "jpg",
+      "file": "assets/other/image/astarot-21.jpg.jpg",
+      "name": "astarot-21.jpg"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-backface.png.png",
+      "name": "astarot-backface.png"
+    },
+    {
+      "extension": "jpg",
+      "file": "assets/other/image/astarot-floor.jpg.jpg",
+      "name": "astarot-floor.jpg"
+    },
+    {
+      "extension": "jpg",
+      "file": "assets/other/image/astarot-suit-cups.jpg.jpg",
+      "name": "astarot-suit-cups.jpg"
+    },
+    {
+      "extension": "jpg",
+      "file": "assets/other/image/astarot-suit-pentacles.jpg.jpg",
+      "name": "astarot-suit-pentacles.jpg"
+    },
+    {
+      "extension": "jpg",
+      "file": "assets/other/image/astarot-suit-swords.jpg.jpg",
+      "name": "astarot-suit-swords.jpg"
+    },
+    {
+      "extension": "jpg",
+      "file": "assets/other/image/astarot-suit-wands.jpg.jpg",
+      "name": "astarot-suit-wands.jpg"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-cover-tarot.png.png",
+      "name": "astarot-cover-tarot.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-cover-cvs-icegirl.png.png",
+      "name": "astarot-cover-cvs-icegirl.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-button.png.png",
+      "name": "astarot-button.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-border.png.png",
+      "name": "astarot-border.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-cover-cvs.png.png",
+      "name": "astarot-cover-cvs.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-angry.png.png",
+      "name": "astarot-angry.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-annoyed.png.png.png",
+      "name": "astarot-annoyed.png.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-blushing.png.png",
+      "name": "astarot-blushing.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-confused.png.png",
+      "name": "astarot-confused.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-crying.PNG.png",
+      "name": "astarot-crying.PNG"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-curious.png.png",
+      "name": "astarot-curious.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-default.png.png",
+      "name": "astarot-default.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-disappointed.png.png",
+      "name": "astarot-disappointed.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-disgusted.png.png",
+      "name": "astarot-disgusted.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-embarrassed.png.png",
+      "name": "astarot-embarrassed.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-excited.png.png",
+      "name": "astarot-excited.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-flustered.png.png",
+      "name": "astarot-flustered.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-giggling.png.png",
+      "name": "astarot-giggling.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-guilty.png.png",
+      "name": "astarot-guilty.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-laughing.png.png",
+      "name": "astarot-laughing.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-lovestruck.png.png",
+      "name": "astarot-lovestruck.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-middlefinger.png.png",
+      "name": "astarot-middlefinger.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-pouting.png.png",
+      "name": "astarot-pouting.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-sad.png.png",
+      "name": "astarot-sad.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-scared.png.png",
+      "name": "astarot-scared.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-shocked.png.png",
+      "name": "astarot-shocked.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-sleepy.png.png",
+      "name": "astarot-sleepy.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-smile.png.png",
+      "name": "astarot-smile.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-surprised.png.png",
+      "name": "astarot-surprised.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-worried.png.png",
+      "name": "astarot-worried.png"
+    },
+    {
+      "extension": "png",
+      "file": "assets/other/image/astarot-nervous.PNG.png",
+      "name": "astarot-nervous.PNG"
+    }
+  ],
+  "card": "card.json",
+  "creator": "",
+  "description": "\n# `en`\n ",
+  "folders": [],
+  "hideIcon": false,
+  "icon": "assets/icon/image/main.png",
+  "lorebook": [
+    {
+      "alwaysActive": true,
+      "bookVersion": 2,
+      "comment": "Assets",
+      "file": "lorebooks/Assets.md",
+      "insertOrder": 800,
+      "key": "",
+      "mode": "normal",
+      "secondaryKey": "",
+      "selective": false,
+      "useRegex": false
+    },
+    {
+      "alwaysActive": true,
+      "bookVersion": 2,
+      "comment": "Phases",
+      "file": "lorebooks/Phases.md",
+      "insertOrder": 900,
+      "key": "",
+      "mode": "normal",
+      "secondaryKey": "",
+      "selective": false,
+      "useRegex": false
+    },
+    {
+      "alwaysActive": true,
+      "bookVersion": 2,
+      "comment": "Stats",
+      "file": "lorebooks/Stats.md",
+      "insertOrder": 1000,
+      "key": "",
+      "mode": "normal",
+      "secondaryKey": "",
+      "selective": false,
+      "useRegex": false
+    },
+    {
+      "alwaysActive": true,
+      "bookVersion": 2,
+      "comment": "The Deck",
+      "file": "lorebooks/The Deck.md",
+      "insertOrder": 100,
+      "key": "",
+      "mode": "normal",
+      "secondaryKey": "",
+      "selective": false,
+      "useRegex": false
+    },
+    {
+      "alwaysActive": false,
+      "bookVersion": 2,
+      "comment": "lb-xnai.lb.extra",
+      "file": "lorebooks/lb-xnai.lb.extra.md",
+      "insertOrder": 100,
+      "key": "",
+      "mode": "normal",
+      "secondaryKey": "",
+      "selective": false,
+      "useRegex": false
+    }
+  ],
+  "lowLevelAccess": false,
+  "name": "Astarotte",
+  "regex": [
+    "regex/_온보딩 _onboard.md",
+    "regex/---------------.md",
+    "regex/AstImgBk.md",
+    "regex/AstImgDp.md",
+    "regex/AstImgEx.md",
+    "regex/AstImgIgnore.md",
+    "regex/CardDp.md",
+    "regex/ConfDp.md",
+    "regex/ConfIgnore.md",
+    "regex/DeckIgnore.md",
+    "regex/PresetIgnore.md",
+    "regex/RealTimeHide.md",
+    "regex/RealTimeIns.md",
+    "regex/SelectionHide.md",
+    "regex/SpreadCacheHide.md",
+    "regex/SpreadCacheIgnore.md",
+    "regex/SpreadHide.md",
+    "regex/StatsDp.md"
+  ],
+  "tags": [],
+  "triggers": [
+    {
+      "bundle": false,
+      "comment": "",
+      "conditions": [],
+      "lowLevelAccess": false,
+      "lua": "triggers/trigger-1.lua",
+      "type": "start"
+    }
+  ],
+  "version": ""
+}

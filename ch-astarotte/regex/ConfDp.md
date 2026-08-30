@@ -1,10 +1,25 @@
-{{#when::{{? {{chat_index}} > {{? {{lastmessageid}}-1}}}}}}
+---
+ableFlag: false
+comment: ConfDp
+type: editdisplay
+---
+
+IN:
+<astarot-conf img="([\d\w\-]+)" />
+OUT:
+{{#when::{{? {{chat_index}} > {{? {{lastmessageid}}-5}}}}}}
 <details class="astarot-panel" open>
   <summary class="astarot-summary">
-    <img class="astarot-cover" src="{{raw::$1}}" />
-    <div class="astarot-title-overlay">
-      /설정 or /config ▼
-    </div>
+    {{#when::{{chat_index}}::is::-1}}
+      <img class="astarot-cover" src="{{raw::$1}}" />
+      <div class="astarot-title-overlay">
+        /설정 or /config ▼
+      </div>
+    {{:else}}
+      <div class="astarot-title-overlay">
+        /설정 or /config ▼
+      </div>
+    {{/when}}
   </summary>
   <div class="astarot-content-wrapper">
     <div class="astarot-controls-section">
@@ -31,13 +46,14 @@
             <button class="astarot-btn" {{#when::{{getvar::astarot-asset}}::is::1}}data-active{{/when}} risu-trigger="toggleImage">이미지 표시</button>
             <button class="astarot-btn" {{#when::{{getvar::astarot-hover}}::is::1}}data-active{{/when}} {{#when::{{getvar::astarot-asset}}::is::0}}disabled{{/when}} risu-trigger="toggleHover">호버 확대</button>
             <button class="astarot-btn" {{#when::{{getvar::astarot-infdist}}::is::1}}data-active{{/when}} {{#when::{{getvar::astarot-asset}}::is::0}}disabled{{/when}} risu-trigger="toggleInfdist">무제한 렌더링</button>
+            <button class="astarot-btn" {{#when::{{getvar::astarot-align}}::is::1}}data-active{{/when}} {{#when::{{getvar::astarot-asset}}::is::0}}disabled{{/when}} risu-trigger="toggleAlign">중앙 정렬</button>
           </div>
         </div>
       </div>
     </div>
   </div>
 </details>
-{{#when {{greater::{{chat_index}}::0}}}}
+{{#when {{greater::{{chat_index}}::-1}}}}
 <button class="astarot-button" risu-trigger="closeConf" style="margin-top:8px">
   설정 닫기
 </button>
@@ -87,26 +103,23 @@
   }
 
   .astarot-title-overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
+    align-items: flex-end;
     width: 100%;
-    height: 80px;
     background: linear-gradient(to top, rgba(15, 12, 21, 0.95), transparent);
     display: flex;
     justify-content: center;
-    align-items: flex-end;
-    padding-bottom: 20px;
-    z-index: 3;
     color: var(--primary-gold);
     font-weight: 700;
     font-size: 1.2rem;
     letter-spacing: 3px;
+    padding: 20px 0;
     text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    z-index: 3;
   }
-
-  .astarot-panel[open] .astarot-summary::after {
-      transform: rotate(180deg);
+  .astarot-cover + .astarot-title-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
   }
 
   .astarot-content-wrapper {
@@ -216,3 +229,4 @@
     }
   }
 </style>
+
