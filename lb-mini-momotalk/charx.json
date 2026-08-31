@@ -1,0 +1,31 @@
+{
+  "CSS": "style.html",
+  "description": "♦️미니보드, 모모톡, for 미니보드 4.1.1+",
+  "hideIcon": false,
+  "lorebook": [
+    {
+      "alwaysActive": false,
+      "comment": "lb-mini.renderer",
+      "file": "lorebooks/renderer.lua",
+      "insertOrder": 200
+    },
+    {
+      "alwaysActive": false,
+      "comment": "LICENSE",
+      "file": "LICENSE.md",
+      "insertOrder": 199
+    }
+  ],
+  "lowLevelAccess": false,
+  "name": "♦️미니보드 렌더러 · 모모톡 1.0.0",
+  "namespace": "lb-mini-momotalk",
+  "regex": [
+    "regex/display-change-board-icon.md",
+    "regex/display-reroll-icon.md",
+    "regex/display-speech-bubble-icon.md",
+    "regex/display-thumbs-down-icon.md",
+    "regex/display-thumbs-up-icon.md",
+    "regex/display-write-icon.md"
+  ],
+  "version": "1.0.0"
+}

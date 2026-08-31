@@ -1,0 +1,803 @@
+<style>
+  @font-face {
+    font-display: swap;
+    font-family: 'GyeonggiMillenniumTitle';
+    font-weight: 300;
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2410-3@1.0/Title_Light.woff') format('woff');
+  }
+
+  [data-id='lb-mini-momotalk'] {
+    --lb-momo-border: #d8e0e5;
+    --lb-momo-avatar: #f3b7c7;
+    --lb-momo-avatar-border: #fbe3e9;
+    --lb-momo-entry-dark: #ff6b9d;
+    --lb-momo-entry-light: #ff005e;
+    --lb-momo-list-bg: #f2f8f8;
+    --lb-momo-navy: #52647a;
+    --lb-momo-navy-dark: #435469;
+    --lb-momo-sidebar: #53667d;
+    --lb-momo-text: #424649;
+    --lb-momo-text-soft: #77818b;
+    --lb-momo-theme: #ff87a5;
+    --lb-momo-theme-light: #f69ab0;
+    --theme:
+      {{#if_pure {{? {{getglobalvar::toggle_lb-mini.theme}}=0 }} }}'♦️'{{/if}}
+      {{#if_pure {{? {{getglobalvar::toggle_lb-mini.theme}}=1 }} }}'💎'{{/if}}
+      {{#if_pure {{? {{getglobalvar::toggle_lb-mini.theme}}=2 }} }}'✨'{{/if}}
+      {{#if_pure {{? {{getglobalvar::toggle_lb-mini.theme}}=3 }} }}'🌳'{{/if}};
+    --icon: var(--theme);
+    color: var(--lb-momo-text);
+    font-family: 'GyeonggiMillenniumTitle', sans-serif;
+    font-weight: 300;
+  }
+
+  @container style(--theme: '💎') {
+    [data-id='lb-mini-momotalk'] > * {
+      --lb-momo-avatar: #9fc6dc;
+      --lb-momo-avatar-border: #e1eef4;
+      --lb-momo-entry-dark: #4299e1;
+      --lb-momo-entry-light: #007bff;
+      --lb-momo-theme: #5a95c0;
+      --lb-momo-theme-light: #78afd0;
+    }
+  }
+
+  @container style(--theme: '✨') {
+    [data-id='lb-mini-momotalk'] > * {
+      --lb-momo-avatar: #e8cf8d;
+      --lb-momo-avatar-border: #f6edcf;
+      --lb-momo-entry-dark: #ffd700;
+      --lb-momo-entry-light: #d4af37;
+      --lb-momo-theme: #cda43d;
+      --lb-momo-theme-light: #ddbc5d;
+    }
+  }
+
+  @container style(--theme: '🌳') {
+    [data-id='lb-mini-momotalk'] > * {
+      --lb-momo-avatar: #a8ceb2;
+      --lb-momo-avatar-border: #e2efe5;
+      --lb-momo-entry-dark: #81c784;
+      --lb-momo-entry-light: #4caf50;
+      --lb-momo-theme: #5f9f74;
+      --lb-momo-theme-light: #7eb68e;
+    }
+  }
+
+  .lb-momo-light > * {
+    --accent: var(--lb-momo-entry-light);
+    --bg: #ffffff;
+    --fg: #282a35;
+  }
+
+  .lb-momo-dark > * {
+    --accent: var(--lb-momo-entry-dark);
+    --bg: #20212b;
+    --fg: #e8e8e8;
+  }
+
+  .lb-momo-root,
+  .lb-momo-root * {
+    color: inherit;
+    font-family: 'GyeonggiMillenniumTitle', sans-serif;
+    line-height: 1.2;
+  }
+
+  .lb-momo-opener {
+    --mo-bg: var(--bg);
+    --mo-fg: var(--accent);
+    color: var(--accent);
+  }
+
+  .lb-momo-dialog:popover-open {
+    background: #ffffff;
+    border: 0;
+    border-radius: 8px;
+    box-shadow: 0 18px 55px #17202a66;
+    color: var(--lb-momo-text);
+    display: grid;
+    grid-template-rows: 54px minmax(0, 1fr);
+    height: min(76vh, 620px);
+    inset: 0;
+    margin: auto;
+    max-height: calc(100vh - 24px);
+    max-width: calc(100vw - 24px);
+    overflow: hidden;
+    padding: 0;
+    width: min(980px, calc(100vw - 24px));
+  }
+
+  .lb-momo-list-toggle,
+  .lb-momo-post-radio {
+    display: none;
+  }
+
+  .lb-momo-topbar {
+    align-items: center;
+    background: linear-gradient(180deg, var(--lb-momo-theme) 0%, var(--lb-momo-theme-light) 100%);
+    color: #ffffff;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 54px;
+    height: 54px;
+  }
+
+  .lb-momo-brand {
+    align-items: center;
+    display: grid;
+    grid-template-columns: 25px minmax(0, max-content) 22px;
+    padding: 0 15px;
+  }
+
+  .lb-momo-brand::before {
+    color: #ffffff;
+    content: '❖';
+    font-size: 22px;
+    line-height: 1;
+  }
+
+  .lb-momo-brand > strong {
+    font-size: 21px;
+    line-height: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .lb-momo-close {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    height: 54px;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .lb-momo-close > svg {
+    height: 22px;
+    width: 22px;
+  }
+
+  .lb-momo-body {
+    display: grid;
+    grid-template-columns: 74px minmax(250px, 38%) minmax(0, 1fr);
+    min-height: 0;
+  }
+
+  .lb-momo-sidebar {
+    background: var(--lb-momo-sidebar);
+    display: grid;
+    grid-auto-rows: 74px;
+    min-height: 0;
+  }
+
+  .lb-momo-side-button {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    color: #dce4ea;
+    cursor: pointer;
+    display: grid;
+    font-size: 29px;
+    justify-items: center;
+    padding: 0;
+  }
+
+  .lb-momo-side-button > svg {
+    height: 27px;
+    width: 27px;
+  }
+
+  .lb-momo-side-button-active {
+    background: #657b94;
+    color: #ffffff;
+    cursor: default;
+  }
+
+  .lb-momo-list-toggle-button {
+    cursor: pointer;
+  }
+
+  .lb-momo-list-scrim {
+    display: none;
+  }
+
+  .lb-momo-list-pane {
+    background: var(--lb-momo-list-bg);
+    border-right: 1px solid var(--lb-momo-border);
+    display: grid;
+    grid-template-rows: 58px minmax(0, 1fr);
+    min-width: 0;
+  }
+
+  .lb-momo-list-header {
+    align-items: center;
+    background: #f2f8f8;
+    border-bottom: 1px solid var(--lb-momo-border);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: 0 12px 0 16px;
+  }
+
+  .lb-momo-list-header > strong {
+    font-size: 15px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .lb-momo-list-actions {
+    align-items: center;
+    display: grid;
+    gap: 6px;
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+  }
+
+  .lb-momo-list-button {
+    background: #ffffff;
+    border: 1px solid var(--lb-momo-border);
+    border-radius: 3px;
+    box-shadow: 0 2px 4px #52647a1f;
+    color: var(--lb-momo-navy);
+    cursor: pointer;
+    display: grid;
+    height: 32px;
+    place-items: center;
+    transform: skewX(-10deg);
+    width: 42px;
+  }
+
+  .lb-momo-list-button > svg {
+    height: 15px;
+    transform: skewX(10deg);
+    width: 15px;
+  }
+
+  .lb-momo-post-list {
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .lb-momo-post-row {
+    background: #f2f8f8;
+    border-bottom: 1px solid #e5eaed;
+    cursor: pointer;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: 14px 14px 13px;
+  }
+
+  .lb-momo-post-author {
+    color: var(--lb-momo-text);
+    font-size: 14px;
+    font-weight: 700;
+    overflow: hidden;
+    padding-right: 8px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .lb-momo-post-time {
+    color: var(--lb-momo-text-soft);
+    font-size: 11px;
+  }
+
+  .lb-momo-post-preview {
+    color: var(--lb-momo-text-soft);
+    font-size: 13px;
+    font-weight: 700;
+    grid-column: 1 / -1;
+    margin-top: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .lb-momo-empty-list,
+  .lb-momo-empty-view {
+    color: var(--lb-momo-text-soft);
+    display: grid;
+    min-height: 140px;
+    padding: 20px;
+    place-items: center;
+    text-align: center;
+  }
+
+  .lb-momo-view-pane {
+    background: #ffffff;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .lb-momo-post-panel {
+    display: none;
+    grid-template-rows: 58px minmax(0, 1fr);
+    height: 100%;
+    min-height: 0;
+  }
+
+  .lb-momo-view-header {
+    align-items: center;
+    border-bottom: 1px solid var(--lb-momo-border);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0 15px;
+  }
+
+  .lb-momo-view-heading {
+    display: grid;
+    min-width: 0;
+  }
+
+  .lb-momo-view-heading > strong {
+    font-size: 15px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .lb-momo-view-heading > span {
+    color: var(--lb-momo-text-soft);
+    font-size: 11px;
+    margin-top: 3px;
+  }
+
+  .lb-momo-thread {
+    min-height: 0;
+    overflow-y: auto;
+    padding: 16px 18px 28px 14px;
+  }
+
+  .lb-momo-main-post,
+  .lb-momo-comment {
+    align-items: start;
+    display: grid;
+    grid-template-columns: 45px minmax(0, 1fr);
+    margin-bottom: 14px;
+  }
+
+  .lb-momo-comment {
+    margin-bottom: 8px;
+  }
+
+  .lb-momo-avatar {
+    background: var(--lb-momo-avatar);
+    border: 3px solid var(--lb-momo-avatar-border);
+    border-radius: 50%;
+    color: #ffffff;
+    display: grid;
+    font-size: 16px;
+    font-weight: 800;
+    height: 34px;
+    place-items: center;
+    width: 34px;
+  }
+
+  .lb-momo-avatar-main {
+    background: var(--lb-momo-theme);
+  }
+
+  .lb-momo-message {
+    min-width: 0;
+  }
+
+  .lb-momo-message-author {
+    font-size: 13px;
+    font-weight: 700;
+    margin: 0 0 4px 3px;
+  }
+
+  .lb-momo-post-bubble {
+    background: var(--lb-momo-navy);
+    border-radius: 0 5px 5px;
+    color: #ffffff;
+    display: inline-block;
+    flex: 0 1 auto;
+    max-width: min(92%, 560px);
+    min-width: 0;
+    padding: 9px 12px;
+    position: relative;
+  }
+
+  .lb-momo-post-bubble::before {
+    border-bottom: 7px solid transparent;
+    border-right: 8px solid var(--lb-momo-navy);
+    border-top: 0 solid transparent;
+    content: '';
+    left: -7px;
+    position: absolute;
+    top: 0;
+  }
+
+  .lb-momo-post-bubble > p {
+    color: inherit !important;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin: 0 !important;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .lb-momo-score {
+    align-items: center;
+    color: var(--lb-momo-text-soft);
+    display: flex;
+    font-size: 11px;
+    gap: 7px;
+  }
+
+  .lb-momo-score-item {
+    align-items: center;
+    display: flex;
+    gap: 3px;
+  }
+
+  .lb-momo-score-item > svg {
+    height: 12px;
+    width: 12px;
+  }
+
+  .lb-momo-score-row {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+    margin: 5px 0 0 3px;
+  }
+
+  .lb-momo-post-delete {
+    background: transparent;
+    border: 0;
+    color: var(--lb-momo-text-soft);
+    cursor: pointer;
+    font-size: 10px;
+    padding: 0;
+  }
+
+  .lb-momo-comment-divider {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+    margin: 12px 0 10px 45px;
+  }
+
+  .lb-momo-comment-divider::after {
+    background: var(--lb-momo-border);
+    content: '';
+    flex: 1;
+    height: 1px;
+  }
+
+  .lb-momo-comment-divider > span {
+    color: var(--lb-momo-text-soft);
+    font-size: 11px;
+  }
+
+  .lb-momo-comment-row {
+    align-items: flex-end;
+    display: flex;
+    min-width: 0;
+  }
+
+  .lb-momo-comment-meta {
+    color: var(--lb-momo-text-soft);
+    display: grid;
+    flex: 0 0 auto;
+    font-size: 10px;
+    justify-items: start;
+    padding: 0 0 2px 7px;
+  }
+
+  .lb-momo-text-action {
+    background: transparent;
+    border: 0;
+    color: var(--lb-momo-text-soft);
+    cursor: pointer;
+    font-size: 10px;
+    padding: 2px 0 0;
+  }
+
+  .lb-momo-no-comments {
+    color: var(--lb-momo-text-soft);
+    font-size: 12px;
+    padding: 16px 0 16px 45px;
+  }
+
+  .lb-momo-reply {
+    background: #e4edf2;
+    border: 1px solid #cbd4da;
+    border-radius: 7px;
+    color: var(--lb-momo-text);
+    display: grid;
+    box-sizing: border-box;
+    margin: 12px 0 0 45px;
+    min-width: 0;
+    padding: 11px 13px 13px;
+    text-align: left;
+    width: auto;
+  }
+
+  .lb-momo-reply-heading {
+    align-items: center;
+    border-bottom: 1px solid #cbd4da;
+    color: var(--lb-momo-navy-dark);
+    display: flex;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 0 0 7px;
+  }
+
+  .lb-momo-reply-heading::before {
+    background: #5a95c0;
+    content: '';
+    display: inline-block;
+    height: 1em;
+    margin-right: 8px;
+    width: 3px;
+  }
+
+  .lb-momo-reply-field {
+    background: #ffffff;
+    border: 1px solid #bdcbd1;
+    border-radius: 7px;
+    box-shadow: 0 2px 5px #52647a24;
+    box-sizing: border-box;
+    color: var(--lb-momo-text-soft);
+    cursor: pointer;
+    font-size: 13px;
+    margin-top: 9px;
+    padding: 13px 14px;
+    text-align: center;
+    width: 100%;
+  }
+
+  @media (hover: hover) {
+    .lb-momo-list-button:hover {
+      background: #f8fafb;
+      border-color: #b5c5cd;
+    }
+
+    .lb-momo-post-row:hover {
+      background: #eef3f5;
+    }
+
+    .lb-momo-side-button:hover {
+      background: #60758d;
+    }
+
+    .lb-momo-post-delete:hover,
+    .lb-momo-text-action:hover {
+      color: var(--lb-momo-theme);
+    }
+
+    .lb-momo-reply-field:hover {
+      background: #f8fafb;
+      border-color: #b5c5cd;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .lb-momo-dialog:popover-open {
+      height: min(88vh, 700px);
+    }
+
+    .lb-momo-body {
+      grid-template-columns: 58px minmax(180px, 38%) minmax(0, 1fr);
+    }
+
+    .lb-momo-sidebar {
+      grid-auto-rows: 62px;
+    }
+
+    .lb-momo-side-button {
+      font-size: 24px;
+    }
+
+    .lb-momo-list-header,
+    .lb-momo-view-header {
+      padding-left: 10px;
+      padding-right: 8px;
+    }
+
+    .lb-momo-post-row {
+      padding-left: 9px;
+      padding-right: 9px;
+    }
+
+    .lb-momo-thread {
+      padding-left: 9px;
+      padding-right: 9px;
+    }
+
+    .lb-momo-reply {
+      margin-left: 45px;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .lb-momo-dialog:popover-open {
+      border-radius: 0;
+      height: 100vh;
+      max-height: 100vh;
+      max-width: 100vw;
+      width: 100vw;
+    }
+
+    .lb-momo-brand > strong {
+      font-size: 18px;
+    }
+
+    .lb-momo-body {
+      grid-template-columns: 48px minmax(0, 1fr);
+      position: relative;
+    }
+
+    .lb-momo-sidebar {
+      grid-auto-rows: 54px;
+      position: relative;
+      z-index: 4;
+    }
+
+    .lb-momo-side-button > svg {
+      height: 21px;
+      width: 21px;
+    }
+
+    .lb-momo-list-pane {
+      bottom: 0;
+      grid-template-rows: 52px minmax(0, 1fr);
+      left: 48px;
+      position: absolute;
+      top: 0;
+      transform: translateX(-100%);
+      transition: transform 200ms ease, visibility 0s linear 200ms;
+      visibility: hidden;
+      width: min(286px, calc(100% - 48px));
+      z-index: 3;
+    }
+
+    .lb-momo-list-scrim {
+      background: #26374642;
+      bottom: 0;
+      cursor: pointer;
+      display: block;
+      grid-column: 2;
+      left: 48px;
+      opacity: 0;
+      pointer-events: none;
+      position: absolute;
+      right: 0;
+      top: 0;
+      transition: opacity 200ms ease;
+      z-index: 2;
+    }
+
+    .lb-momo-list-toggle:checked ~ .lb-momo-body .lb-momo-list-pane {
+      transform: translateX(0);
+      transition: transform 200ms ease, visibility 0s;
+      visibility: visible;
+    }
+
+    .lb-momo-list-toggle:checked ~ .lb-momo-body .lb-momo-list-scrim {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .lb-momo-list-toggle:checked ~ .lb-momo-body .lb-momo-list-toggle-button {
+      background: #657b94;
+    }
+
+    .lb-momo-post-panel {
+      grid-template-rows: 52px minmax(0, 1fr);
+    }
+
+    .lb-momo-list-header {
+      grid-template-columns: minmax(0, 1fr) auto;
+      padding-left: 7px;
+      padding-right: 8px;
+    }
+
+    .lb-momo-list-header > strong {
+      font-size: 12px;
+    }
+
+    .lb-momo-list-button {
+      display: grid;
+      height: 30px;
+      width: 38px;
+    }
+
+    .lb-momo-post-row {
+      padding: 10px 6px;
+    }
+
+    .lb-momo-post-author {
+      font-size: 12px;
+    }
+
+    .lb-momo-post-preview {
+      font-size: 11px;
+    }
+
+    .lb-momo-post-time {
+      display: none;
+    }
+
+    .lb-momo-view-header {
+      padding-left: 7px;
+      padding-right: 5px;
+    }
+
+    .lb-momo-view-pane {
+      grid-column: 2;
+    }
+
+    .lb-momo-view-heading > strong {
+      font-size: 12px;
+    }
+
+    .lb-momo-view-heading > span {
+      font-size: 10px;
+      margin-top: 2px;
+    }
+
+    .lb-momo-thread {
+      padding: 10px 7px 24px;
+    }
+
+    .lb-momo-reply {
+      margin: 12px 0 0 34px;
+      padding: 8px;
+    }
+
+    .lb-momo-reply-field {
+      font-size: 11px;
+      padding: 10px 8px;
+    }
+
+    .lb-momo-main-post,
+    .lb-momo-comment {
+      grid-template-columns: 34px minmax(0, 1fr);
+    }
+
+    .lb-momo-avatar {
+      border-width: 2px;
+      font-size: 12px;
+      height: 26px;
+      width: 26px;
+    }
+
+    .lb-momo-post-bubble {
+      max-width: 98%;
+      padding: 7px 9px;
+    }
+
+    .lb-momo-post-bubble > p {
+      font-size: 12px;
+    }
+
+    .lb-momo-comment-divider {
+      margin-left: 34px;
+    }
+
+    .lb-momo-comment-row {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .lb-momo-comment-meta {
+      align-items: center;
+      display: flex;
+      gap: 6px;
+      padding-left: 3px;
+      padding-top: 3px;
+    }
+
+    .lb-momo-comment-meta .lb-momo-text-action {
+      padding: 0;
+    }
+  }
+</style>
