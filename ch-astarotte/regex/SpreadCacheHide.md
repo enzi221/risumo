@@ -1,10 +1,10 @@
 ---
-ableFlag: false
+ableFlag: true
 comment: SpreadCacheHide
+flag: gm
 type: editdisplay
 ---
 
 IN:
-<tarot-spread-cache>(?:[\s\S]*?)</tarot-spread-cache>\n?
+^<tarot-spread-cache>[^\r\n]*</tarot-spread-cache>[ \t]*\r?\n?
 OUT:
-

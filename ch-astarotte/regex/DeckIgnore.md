@@ -1,10 +1,10 @@
 ---
-ableFlag: false
+ableFlag: true
 comment: DeckIgnore
+flag: gm
 type: editprocess
 ---
 
 IN:
-<tarot-deck\s*([^>]+)?>(?:[\s\S]*?)</tarot-deck>\n?
+^<tarot-deck(?:[ \t]+[^>\r\n]*)?>[^\r\n]*</tarot-deck>[ \t]*\r?\n?
 OUT:
-

@@ -1,7 +1,7 @@
 ---
 ableFlag: false
 comment: AstImgBk
-type: disabled
+type: editdisplay
 ---
 
 IN:
@@ -9,5 +9,4 @@ IN:
 OUT:
 
 $1
-
 

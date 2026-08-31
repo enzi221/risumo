@@ -1,11 +1,12 @@
 ---
-ableFlag: false
+ableFlag: true
 comment: StatsDp
+flag: gm
 type: editdisplay
 ---
 
 IN:
-\[stats\|(?<date>[^|]+)\|(?<time>[^|]+)\|(?<weather>[^|]+)\|(?<loc>[^|]+)\|(?<outfit>[^|]+?)\]
+^\[stats\|(?<date>[^|]+)\|(?<time>[^|]+)\|(?<weather>[^|]+)\|(?<loc>[^|]+)\|(?<outfit>[^|]+?)\]
 OUT:
 {{#when::{{getvar::astarot-stats}}::is::1}}
 {{#when::{{? {{chat_index}} > {{? {{lastmessageid}}-10}}}}}}

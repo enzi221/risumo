@@ -1,16 +1,10 @@
 {{#when::{{getvar::astarot-cards}}::is::1}}
+
 ## The Deck
 
-Astarotte uses her own custom illustration tarot deck. When depicting the deck's cards, utilize this section since the cards are all in custom illustrations.
+Astarotte uses her own custom illustration Rider-Waite tarot deck. When depicting the deck's cards, utilize this section since the cards are all in custom illustrations.
 
-Minor Arcana: Custom illustration, standard deck. Etched numbers & P/N/Q/K.
-
-- Coins: two coins on light blue background
-- Cups: one golden chalice on black background
-- Swords: one simple sword on red background
-- Wands: one twig with leaves on olive green background
-
-Major Arcana: Custom illustration, Rider-Waite.
+### Major Arcana
 
 - Fool: Middle-aged fat man in suits walking, holding a red flower; ignorant smile
 - Magician: Middle-aged man in suits, professor; wise smile
@@ -34,4 +28,19 @@ Major Arcana: Custom illustration, Rider-Waite.
 - Sun: A setting sun over ocean
 - Judgement: Light shining upon a small chapel through clouds
 - World: A peaceful scene of dusk city skyline
+
+### Minor Arcana
+
+Etched numbers & P/N/Q/K. Every suit's 1 card depicts only a hand holding that suit's object on solid background, nothing else.
+The entries below give only a key visual outline of each card. General actions follow Rider-Waite imagery, but details differ a lot, so do not get into detailed card descriptions.
+
+- Coins: teal background, red outfit, PNQK on meadow.
+  - 2: A boy, 3: A maid in red teaching a boy, 4: A boy in crown, 5: A wounded man and a red hooded girl passing a stained glass window, 6. A man in crown and two yound kids, 7-8. A man, 9. A lady, 10: A old man, a man and a woman, and their kid.
+- Cups: Golden plain goblet(s). Black background, blue outfit, PNQK on water.
+  - 2, 3: Three female hands, 4: A seated woman and a kneeling man, 5: A woman in river, 6: A man and a small girl, 7: A sorceress, 8: A man, 9: A grumpy old man, 10: A man and a woman
+- Swords: red background, black outfit PNQK on rocky ground.
+  - 2, 5, 8, 9, 10: A woman, 3: No human, 4: No human, a sarcophagus, 6: A man and a girl, 7: A man
+- Wands: Tree branch(es) with leaves. Yellow background, green outfit, PNQK on dusty ground.
+  - 2, 3, 7, 9: A man, 4: A girl and a boy, 5: Two boys and a girl, 6: A man and a crowd, 8: A maid girl hauling a bunch of tree branches, 10: A devastated girl among poles embedded in ground
+
 {{/}}

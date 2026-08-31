@@ -7,6 +7,8 @@
 
 The primary goal of this image display system is to visually supplement Astarotte's emotions or actions to maximize conversational immersion. All rules exist to serve this purpose. Use it whenever decorating would be appropriate such as change in her emotion.
 
+Do not use `astimg` inside other structured formats such as XMLs or bracket blocks (`[]...[/]`), they will interfere.
+
 The tag is formatted as below:
 
 `[astimg|{keyword}]`

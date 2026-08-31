@@ -1,4 +1,12 @@
 <style>
+  @font-face {
+    font-display: swap;
+    font-family: 'Mona10x12';
+    font-style: normal;
+    font-weight: 400;
+    src: url('https://cdn.jsdelivr.net/gh/MonadABXY/mona-font/web/Mona10x12.woff2') format('woff');
+  }
+
   .astarot-card {
     aspect-ratio: 2.75 / 4.75;
     background-color: white;
@@ -10,7 +18,7 @@
 
   .astarot-floor {
     aspect-ratio: 4/3;
-    background: url("{{raw::astarot-floor.jpg}}") #f5f5f5 center no-repeat;
+    background: url('{{raw::astarot-floor.jpg}}') #f5f5f5 center no-repeat;
     background-size: cover;
     container-type: size;
     position: relative;
@@ -24,36 +32,93 @@
     aspect-ratio: 2.75 / 4.75;
     cursor: pointer;
     position: absolute;
-    transition: transform 0.5s ease, z-index 0.5s linear allow-discrete;
+    transition:
+      transform 0.5s ease,
+      z-index 0.5s linear allow-discrete;
     width: 10cqw;
   }
   .astarot-spread-card-wrapper:hover {
     transform: rotate(0deg) !important;
-    transition: transform 0.5s ease, z-index 0.5s linear;
+    transition:
+      transform 0.5s ease,
+      z-index 0.5s linear;
     z-index: 1000;
   }
 
   .astarot-spread-card {
-    backface-visibility: hidden;
+    aspect-ratio: 2.75 / 4.75;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
     container-type: size;
     left: 0;
-    top: 0;
-    width: 10cqw;
     pointer-events: none;
     position: absolute;
-    transition: all 0.5s ease;
+    top: 0;
     transform-style: preserve-3d;
+    transition: all 0.5s ease;
+    width: 10cqw;
   }
-  .astarot-spread-card::after {
+
+  .astarot-spread-card-front,
+  .astarot-spread-card-back {
     backface-visibility: hidden;
-    background: url("{{raw::astarot-backface.jpg}}") center no-repeat;
-    background-size: cover;
-    border-radius: 5%/2.9%;
-    content: '';
     inset: 0;
     position: absolute;
+    width: 100%;
+  }
+
+  .astarot-spread-card-back {
+    align-items: flex-start;
+    background: url('{{raw::astarot-backface.jpg}}') center / cover;
+    box-sizing: border-box;
+    color: #b9fff5;
+    display: flex;
+    flex-direction: column;
+    gap: 3cqw;
+    justify-content: flex-end;
+    letter-spacing: 0.08em;
+    padding: 8cqw;
+    text-align: left;
+    text-shadow:
+      1px 0 rgb(255 77 226 / 0.45),
+      -1px 0 rgb(63 255 240 / 0.45);
     transform: rotateY(180deg);
+  }
+  .astarot-spread-card-back::before {
+    background: linear-gradient(120deg, transparent 25%, rgb(79 255 236 / 0.14), transparent 70%), linear-gradient(rgb(8 11 28 / 0.58), rgb(20 7 32 / 0.58));
+    border: 1px solid rgb(125 255 238 / 0.5);
+    border-radius: inherit;
+    box-shadow:
+      inset 0 0 20px rgb(74 255 232 / 0.12),
+      0 0 12px rgb(205 92 255 / 0.18);
+    box-sizing: border-box;
+    content: '';
+    inset: 0;
+    pointer-events: none;
+    position: absolute;
+  }
+  .astarot-spread-card-back::after {
+    background: repeating-linear-gradient(0deg, rgb(130 255 245 / 0.03) 0, rgb(130 255 245 / 0.03) 1px, transparent 1px, transparent 4px);
+    content: '';
+    inset: 0;
+    pointer-events: none;
+    position: absolute;
+  }
+
+  .astarot-spread-card-meta,
+  .astarot-spread-card-meaning {
+    font-family: 'Mona10x12', monospace !important;
+    position: relative;
+    z-index: 1;
+  }
+  .astarot-spread-card-meta {
+    font-size: clamp(7px, 3.5cqw, 14px);
+  }
+  .astarot-spread-card-meaning {
+    font-size: clamp(10px, 7cqw, 28px);
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+    text-transform: uppercase;
+    word-break: keep-all;
   }
 
   .astarot-spread-card-wrapper:hover .astarot-spread-card {
@@ -68,6 +133,61 @@
   .astarot-spread-card-wrapper:hover input:checked + .astarot-spread-card {
     transform: translate(-50%, -50%) rotate(0deg) rotateY(-180deg) !important;
   }
+  .astarot-spread-card-wrapper:hover input:checked + .astarot-spread-card .astarot-spread-card-back::before,
+  .astarot-spread-card-wrapper:hover input:checked + .astarot-spread-card .astarot-spread-card-back::after {
+    animation: astarot-hologram-overlay-in 180ms steps(1, end) 250ms both;
+  }
+  .astarot-spread-card-wrapper:hover input:checked + .astarot-spread-card .astarot-spread-card-back > * {
+    animation: astarot-hologram-text-in 220ms steps(1, end) 430ms both;
+  }
+
+  @keyframes astarot-hologram-overlay-in {
+    0% {
+      opacity: 0;
+    }
+    15% {
+      opacity: 0.9;
+    }
+    28% {
+      opacity: 0.25;
+    }
+    45% {
+      opacity: 1;
+    }
+    60% {
+      opacity: 0.55;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes astarot-hologram-text-in {
+    0% {
+      filter: brightness(2.2) contrast(1.4);
+      opacity: 0;
+      transform: translateX(-2px);
+    }
+    18% {
+      opacity: 0.9;
+    }
+    30% {
+      opacity: 0.15;
+    }
+    48% {
+      filter: brightness(1.8) contrast(1.2);
+      opacity: 1;
+      transform: translateX(1px);
+    }
+    62% {
+      opacity: 0.45;
+    }
+    100% {
+      filter: none;
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
 
   .astarot-deck-inst {
     text-align: center;
@@ -75,7 +195,7 @@
 
   .astarot-deck-card {
     width: 10cqw;
-    background-image: url("{{raw::astarot-backface.jpg}}");
+    background-image: url('{{raw::astarot-backface.jpg}}');
     container-type: size;
     cursor: pointer;
     position: absolute;
@@ -85,11 +205,10 @@
 
   .astarot-deck-card:hover:not(:disabled) {
     transform: rotate(var(--rotation)) translateY(-2cqh) !important;
-    z-index: 100 !important;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }
 
-  .astarot-deck-card[data-active="true"]::after {
+  .astarot-deck-card[data-active='true']::after {
     background: #fab12a;
     content: '';
     inset: 0;
@@ -102,17 +221,32 @@
     cursor: not-allowed;
   }
 
+  .astarot-desc {
+    display: grid;
+    gap: 0 1em;
+    grid-template-columns: 60px minmax(0, 1fr);
+    margin: 0 0 2em;
+  }
+
+  .astarot-desc-body {
+    grid-column: 2;
+    min-width: 0;
+  }
+  .astarot-desc-body > :first-child {
+    margin-top: 0;
+  }
+  .astarot-desc-body > :last-child {
+    margin-bottom: 0;
+  }
+
   .astarot-desc-card {
-    float: left;
-    margin: 0 1em 2em 0;
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0;
     width: 60px;
   }
   .astarot-desc-card[data-reversed] {
     transform: rotate(180deg);
-  }
-
-  .astarot-desc-card + p {
-    margin-top: 0;
   }
 
   .astarot-button {

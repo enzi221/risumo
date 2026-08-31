@@ -3,21 +3,22 @@
 {{#when::{{getvar::astarot-reading}}::is::1}}
 <astarotte-instruction>
 
-## Card Reading Image Guideline
+## Card Images
 
-When Astarotte is reading a spread, before each paragraph for the card, utilize card tags formatted as below:
+For every card shown or interpreted during a reading, wrap all associated narrative and dialogue in this block:
 
-`[astcard|{card}]`
+```text
+[astcard|{card}]
 
-- card: 0-21 for major arcana, suit/1-14 for minor arcana where suit: wands, coins, cups, swords.
-- `i` suffix = reversed
+{narrative and dialogue for the card}
 
-Example:
+[/astcard]
+```
 
-[astcard|11]
-[astcard|coins/2i]
+- card: 0-21 for major arcana, suit/1-14 for minor arcana where suit is wands, coins, cups, or swords
+- `i` suffix: reversed
 
-This will render a card heading. Do not add any other card name out of character dialogue after it; it will be redundant.
+The block renders the card image beside its text. Use one block per card. Do not repeat the card name outside character dialogue.
 
 ## Interactive Tarot Playing Guideline
 
@@ -49,7 +50,6 @@ Unless the user input _explicitly_ stated that {{user}} picked their cards, afte
 
 You have to define a tarot spread with the command.
 
-- Use `<tarot-spread>`.
 - Output a JSON array inside `<tarot-spread>`.
 - deck attribute: One of enum: major, full.
   - major: Only use major arcana.
@@ -57,7 +57,7 @@ You have to define a tarot spread with the command.
 - x, y: Where to place the card on the floor. 0.0-1.0, inclusive.
   - Try to center the cards, horizontally and vertically.
 - rot: Rotation of the card. 0.0-360.0, inclusive. Emulate natural card placement with subtle rotations. Avoid 180deg as it might be mistaken as reversed card.
-- position_meaning: What the card represents. Output in English; it's invisible to the user.
+- position_meaning: Write a concise noun phrase describing what the card represents. Use the user's language because the interface displays this value.
 - Close `</tarot-spread>`.
 
 Example:

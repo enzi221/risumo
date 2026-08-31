@@ -12,6 +12,28 @@ local function setTriggerId(tid)
   load(source[1].content, '@prelude', 't')()
 end
 
+-- 잼삼칠플아 생각 블록 안에서 노드 좀 열지 마...
+local function sanitizeThoughts(data)
+  local thoughts = prelude.queryNodes('Thoughts', data)
+
+  for i = #thoughts, 1, -1 do
+    local node = thoughts[i]
+    local content = node.content:gsub('[<>%[%]]', '')
+    local replacement = node.openTag .. content .. '</Thoughts>'
+    data = data:sub(1, node.rangeStart - 1) .. replacement .. data:sub(node.rangeEnd + 1)
+  end
+
+  return data
+end
+
+listenEdit(
+  'editOutput',
+  function(tid, data)
+    setTriggerId(tid)
+    return sanitizeThoughts(data)
+  end
+)
+
 local function shuffleDeck(deck)
   local shuffled = { table.unpack(deck) }
   for i = #shuffled, 2, -1 do
@@ -178,9 +200,8 @@ end
 
 local function renderSelection(spreadData, selectionData)
   local spread = json.decode(spreadData)
-  -- 1 = selection order
-  -- 2 = real selection
-  local selectedCards = prelude.split(prelude.trim(selectionData), '\n')[2]
+  local selectionLines = prelude.split(prelude.trim(selectionData), '\n')
+  local selectedCards = selectionLines[2]
   local cards = prelude.split(selectedCards, ',')
 
   local card_es = {}
@@ -226,11 +247,21 @@ local function renderSelection(spreadData, selectionData)
         hidden = true,
         type = 'checkbox',
       },
-      h.div['astarot-card astarot-spread-card'] {
-        style = string.format(
-          'background-image: url({{raw::astarot-%s}}); transform: rotate(%ddeg);',
-          imageCardName, isReversed and 180 or 0
-        ),
+      h.div['astarot-spread-card'] {
+        h.div['astarot-card astarot-spread-card-front'] {
+          style = string.format(
+            'background-image: url({{raw::astarot-%s}}); transform: rotate(%ddeg);',
+            imageCardName, isReversed and 180 or 0
+          ),
+        },
+        h.div['astarot-card astarot-spread-card-back'] {
+          h.span['astarot-spread-card-meta'] {
+            string.format('%02d / %s', i, isReversed and 'REVERSED' or 'UPRIGHT'),
+          },
+          h.strong['astarot-spread-card-meaning'] {
+            position.position_meaning or 'Unknown position',
+          },
+        },
       }
     })
   end
