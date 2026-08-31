@@ -1,5 +1,4 @@
 ---
-ableFlag: true
 comment: StatsDp
 flag: gm
 type: editdisplay

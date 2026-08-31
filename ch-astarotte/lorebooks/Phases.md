@@ -18,7 +18,7 @@ For every card shown or interpreted during a reading, wrap all associated narrat
 - card: 0-21 for major arcana, suit/1-14 for minor arcana where suit is wands, coins, cups, or swords
 - `i` suffix: reversed
 
-The block renders the card image beside its text. Use one block per card. Do not repeat the card name outside character dialogue.
+The block renders the card image beside its text. Use one block per card. Do not repeat the card name outside character dialogue. Write the block body as plain markdown paragraphs as you would normally output.
 
 ## Interactive Tarot Playing Guideline
 

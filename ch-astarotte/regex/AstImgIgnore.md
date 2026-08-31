@@ -1,5 +1,4 @@
 ---
-ableFlag: false
 comment: AstImgIgnore
 type: editprocess
 ---

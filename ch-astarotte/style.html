@@ -18,7 +18,7 @@
 
   .astarot-floor {
     aspect-ratio: 4/3;
-    background: url('{{raw::astarot-floor.jpg}}') #f5f5f5 center no-repeat;
+    background: url('{{raw::astarot-floor}}') #f5f5f5 center no-repeat;
     background-size: cover;
     container-type: size;
     position: relative;
@@ -68,7 +68,7 @@
 
   .astarot-spread-card-back {
     align-items: flex-start;
-    background: url('{{raw::astarot-backface.jpg}}') center / cover;
+    background: url('{{raw::astarot-backface}}') center / cover;
     box-sizing: border-box;
     color: #b9fff5;
     display: flex;
@@ -105,7 +105,8 @@
   }
 
   .astarot-spread-card-meta,
-  .astarot-spread-card-meaning {
+  .astarot-spread-card-meaning,
+  .astarot-spread-card-name {
     font-family: 'Mona10x12', monospace !important;
     position: relative;
     z-index: 1;
@@ -119,6 +120,10 @@
     overflow-wrap: anywhere;
     text-transform: uppercase;
     word-break: keep-all;
+  }
+  .astarot-spread-card-name {
+    font-size: clamp(7px, 3.5cqw, 14px);
+    letter-spacing: 0.08em;
   }
 
   .astarot-spread-card-wrapper:hover .astarot-spread-card {
@@ -193,9 +198,14 @@
     text-align: center;
   }
 
+  .astarot-selection-tip {
+    font-size: 0.9em;
+    text-align: center;
+  }
+
   .astarot-deck-card {
     width: 10cqw;
-    background-image: url('{{raw::astarot-backface.jpg}}');
+    background-image: url('{{raw::astarot-backface}}');
     container-type: size;
     cursor: pointer;
     position: absolute;
@@ -251,7 +261,7 @@
 
   .astarot-button {
     border-block-width: 6px;
-    border-image: url({{raw::astarot-button.png}}) stretch;
+    border-image: url({{raw::astarot-button}}) stretch;
     border-image-slice: 12 62 fill;
     border-image-outset: 0 15px;
     border-image-width: 6px 31px;

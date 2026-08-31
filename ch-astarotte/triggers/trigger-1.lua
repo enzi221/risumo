@@ -56,6 +56,25 @@ local majorArcana = {
   "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21"
 }
 
+local majorArcanaNames = {
+  'THE FOOL', 'THE MAGICIAN', 'THE HIGH PRIESTESS', 'THE EMPRESS', 'THE EMPEROR',
+  'THE HIEROPHANT', 'THE LOVERS', 'THE CHARIOT', 'STRENGTH', 'THE HERMIT',
+  'WHEEL OF FORTUNE', 'JUSTICE', 'THE HANGED MAN', 'DEATH', 'TEMPERANCE',
+  'THE DEVIL', 'THE TOWER', 'THE STAR', 'THE MOON', 'THE SUN', 'JUDGEMENT', 'THE WORLD'
+}
+
+local minorArcanaRanks = {
+  'ACE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN',
+  'EIGHT', 'NINE', 'TEN', 'PAGE', 'KNIGHT', 'QUEEN', 'KING'
+}
+
+local minorArcanaSuits = {
+  coins = 'COINS',
+  cups = 'CUPS',
+  swords = 'SWORDS',
+  wands = 'WANDS',
+}
+
 local minorArcana = {
   "wands/1", "wands/2", "wands/3", "wands/4", "wands/5", "wands/6", "wands/7",
   "wands/8", "wands/9", "wands/10", "wands/11", "wands/12", "wands/13", "wands/14",
@@ -84,6 +103,22 @@ local function getMajorDeck()
     table.insert(deck, card)
   end
   return deck
+end
+
+local function getCardDisplayName(cardName)
+  local majorNumber = tonumber(cardName)
+  if majorNumber then
+    return majorArcanaNames[majorNumber + 1] or cardName
+  end
+
+  local suit, rank = cardName:match('^(%a+)/(%d+)$')
+  local rankName = minorArcanaRanks[tonumber(rank)]
+  local suitName = minorArcanaSuits[suit]
+  if rankName and suitName then
+    return rankName .. ' OF ' .. suitName
+  end
+
+  return cardName
 end
 
 local function printDeck()
@@ -261,15 +296,23 @@ local function renderSelection(spreadData, selectionData)
           h.strong['astarot-spread-card-meaning'] {
             position.position_meaning or 'Unknown position',
           },
+          h.span['astarot-spread-card-name'] {
+            getCardDisplayName(cardName),
+          },
         },
       }
     })
   end
 
-  local html = h.section['astarot-floor-container'] {
-    h.div['astarot-floor'] {
-      card_es
-    }
+  local html = h.div {
+    h.section['astarot-floor-container'] {
+      h.div['astarot-floor'] {
+        card_es
+      }
+    },
+    h.p['astarot-selection-tip'] {
+      '팁: 입력 없이 제출하거나, 카드를 어떻게 뽑았는지 혹은 어떤 반응을 보였는지 입력 후 제출하세요.',
+    },
   }
 
   return tostring(html)

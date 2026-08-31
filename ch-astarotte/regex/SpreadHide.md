@@ -1,5 +1,4 @@
 ---
-ableFlag: true
 comment: SpreadHide
 flag: gm
 type: editdisplay

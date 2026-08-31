@@ -1,5 +1,4 @@
 ---
-ableFlag: true
 comment: SelectionHide
 flag: gm
 type: editdisplay

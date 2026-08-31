@@ -1,5 +1,4 @@
 ---
-ableFlag: false
 comment: /온보딩 /onboard
 type: editinput
 ---

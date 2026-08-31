@@ -3,571 +3,581 @@
   "assets": [
     {
       "extension": "png",
-      "file": "assets/icon/image/iconx.png",
+      "file": "assets/other/image/iconx",
       "name": "iconx"
     },
     {
       "extension": "jpg",
-      "file": "assets/other/image/astarot-0.jpg.jpg",
-      "name": "astarot-0.jpg"
+      "file": "assets/other/image/astarot-0",
+      "name": "astarot-0"
     },
     {
       "extension": "jpg",
-      "file": "assets/other/image/astarot-1.jpg.jpg",
-      "name": "astarot-1.jpg"
+      "file": "assets/other/image/astarot-1",
+      "name": "astarot-1"
     },
     {
       "extension": "jpg",
-      "file": "assets/other/image/astarot-2.jpg.jpg",
-      "name": "astarot-2.jpg"
+      "file": "assets/other/image/astarot-2",
+      "name": "astarot-2"
     },
     {
       "extension": "jpg",
-      "file": "assets/other/image/astarot-3.jpg.jpg",
-      "name": "astarot-3.jpg"
+      "file": "assets/other/image/astarot-3",
+      "name": "astarot-3"
     },
     {
       "extension": "jpg",
-      "file": "assets/other/image/astarot-4.jpg.jpg",
-      "name": "astarot-4.jpg"
+      "file": "assets/other/image/astarot-4",
+      "name": "astarot-4"
     },
     {
       "extension": "jpg",
-      "file": "assets/other/image/astarot-5.jpg.jpg",
-      "name": "astarot-5.jpg"
+      "file": "assets/other/image/astarot-5",
+      "name": "astarot-5"
     },
     {
       "extension": "jpg",
-      "file": "assets/other/image/astarot-6.jpg.jpg",
-      "name": "astarot-6.jpg"
+      "file": "assets/other/image/astarot-6",
+      "name": "astarot-6"
     },
     {
       "extension": "jpg",
-      "file": "assets/other/image/astarot-7.jpg.jpg",
-      "name": "astarot-7.jpg"
+      "file": "assets/other/image/astarot-7",
+      "name": "astarot-7"
     },
     {
       "extension": "jpg",
-      "file": "assets/other/image/astarot-8.jpg.jpg",
-      "name": "astarot-8.jpg"
+      "file": "assets/other/image/astarot-8",
+      "name": "astarot-8"
     },
     {
       "extension": "jpg",
-      "file": "assets/other/image/astarot-9.jpg.jpg",
-      "name": "astarot-9.jpg"
+      "file": "assets/other/image/astarot-9",
+      "name": "astarot-9"
     },
     {
       "extension": "jpg",
-      "file": "assets/other/image/astarot-10.jpg.jpg",
-      "name": "astarot-10.jpg"
+      "file": "assets/other/image/astarot-10",
+      "name": "astarot-10"
     },
     {
       "extension": "jpg",
-      "file": "assets/other/image/astarot-11.jpg.jpg",
-      "name": "astarot-11.jpg"
+      "file": "assets/other/image/astarot-11",
+      "name": "astarot-11"
     },
     {
       "extension": "jpg",
-      "file": "assets/other/image/astarot-12.jpg.jpg",
-      "name": "astarot-12.jpg"
+      "file": "assets/other/image/astarot-12",
+      "name": "astarot-12"
     },
     {
       "extension": "jpg",
-      "file": "assets/other/image/astarot-13.jpg.jpg",
-      "name": "astarot-13.jpg"
+      "file": "assets/other/image/astarot-13",
+      "name": "astarot-13"
     },
     {
       "extension": "jpg",
-      "file": "assets/other/image/astarot-14.jpg.jpg",
-      "name": "astarot-14.jpg"
+      "file": "assets/other/image/astarot-14",
+      "name": "astarot-14"
     },
     {
       "extension": "jpg",
-      "file": "assets/other/image/astarot-15.jpg.jpg",
-      "name": "astarot-15.jpg"
+      "file": "assets/other/image/astarot-15",
+      "name": "astarot-15"
     },
     {
       "extension": "jpg",
-      "file": "assets/other/image/astarot-16.jpg.jpg",
-      "name": "astarot-16.jpg"
+      "file": "assets/other/image/astarot-16",
+      "name": "astarot-16"
     },
     {
       "extension": "jpg",
-      "file": "assets/other/image/astarot-17.jpg.jpg",
-      "name": "astarot-17.jpg"
+      "file": "assets/other/image/astarot-17",
+      "name": "astarot-17"
     },
     {
       "extension": "jpg",
-      "file": "assets/other/image/astarot-18.jpg.jpg",
-      "name": "astarot-18.jpg"
+      "file": "assets/other/image/astarot-18",
+      "name": "astarot-18"
     },
     {
       "extension": "jpg",
-      "file": "assets/other/image/astarot-19.jpg.jpg",
-      "name": "astarot-19.jpg"
+      "file": "assets/other/image/astarot-19",
+      "name": "astarot-19"
     },
     {
       "extension": "jpg",
-      "file": "assets/other/image/astarot-20.jpg.jpg",
-      "name": "astarot-20.jpg"
+      "file": "assets/other/image/astarot-20",
+      "name": "astarot-20"
     },
     {
       "extension": "jpg",
-      "file": "assets/other/image/astarot-21.jpg.jpg",
-      "name": "astarot-21.jpg"
+      "file": "assets/other/image/astarot-21",
+      "name": "astarot-21"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-backface.png.png",
-      "name": "astarot-backface.png"
+      "file": "assets/other/image/astarot-backface",
+      "name": "astarot-backface"
     },
     {
       "extension": "jpg",
-      "file": "assets/other/image/astarot-floor.jpg.jpg",
-      "name": "astarot-floor.jpg"
+      "file": "assets/other/image/astarot-floor",
+      "name": "astarot-floor"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-coins-1.webp",
-      "name": "astarot-s-coins-1.webp"
+      "file": "assets/other/image/astarot-s-coins-1",
+      "name": "astarot-s-coins-1"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-coins-2.webp",
-      "name": "astarot-s-coins-2.webp"
+      "file": "assets/other/image/astarot-s-coins-2",
+      "name": "astarot-s-coins-2"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-coins-3.webp",
-      "name": "astarot-s-coins-3.webp"
+      "file": "assets/other/image/astarot-s-coins-3",
+      "name": "astarot-s-coins-3"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-coins-4.webp",
-      "name": "astarot-s-coins-4.webp"
+      "file": "assets/other/image/astarot-s-coins-4",
+      "name": "astarot-s-coins-4"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-coins-5.webp",
-      "name": "astarot-s-coins-5.webp"
+      "file": "assets/other/image/astarot-s-coins-5",
+      "name": "astarot-s-coins-5"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-coins-6.webp",
-      "name": "astarot-s-coins-6.webp"
+      "file": "assets/other/image/astarot-s-coins-6",
+      "name": "astarot-s-coins-6"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-coins-7.webp",
-      "name": "astarot-s-coins-7.webp"
+      "file": "assets/other/image/astarot-s-coins-7",
+      "name": "astarot-s-coins-7"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-coins-8.webp",
-      "name": "astarot-s-coins-8.webp"
+      "file": "assets/other/image/astarot-s-coins-8",
+      "name": "astarot-s-coins-8"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-coins-9.webp",
-      "name": "astarot-s-coins-9.webp"
+      "file": "assets/other/image/astarot-s-coins-9",
+      "name": "astarot-s-coins-9"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-coins-10.webp",
-      "name": "astarot-s-coins-10.webp"
+      "file": "assets/other/image/astarot-s-coins-10",
+      "name": "astarot-s-coins-10"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-coins-11.webp",
-      "name": "astarot-s-coins-11.webp"
+      "file": "assets/other/image/astarot-s-coins-11",
+      "name": "astarot-s-coins-11"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-coins-12.webp",
-      "name": "astarot-s-coins-12.webp"
+      "file": "assets/other/image/astarot-s-coins-12",
+      "name": "astarot-s-coins-12"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-coins-13.webp",
-      "name": "astarot-s-coins-13.webp"
+      "file": "assets/other/image/astarot-s-coins-13",
+      "name": "astarot-s-coins-13"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-coins-14.webp",
-      "name": "astarot-s-coins-14.webp"
+      "file": "assets/other/image/astarot-s-coins-14",
+      "name": "astarot-s-coins-14"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-cups-1.webp",
-      "name": "astarot-s-cups-1.webp"
+      "file": "assets/other/image/astarot-s-cups-1",
+      "name": "astarot-s-cups-1"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-cups-2.webp",
-      "name": "astarot-s-cups-2.webp"
+      "file": "assets/other/image/astarot-s-cups-2",
+      "name": "astarot-s-cups-2"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-cups-3.webp",
-      "name": "astarot-s-cups-3.webp"
+      "file": "assets/other/image/astarot-s-cups-3",
+      "name": "astarot-s-cups-3"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-cups-4.webp",
-      "name": "astarot-s-cups-4.webp"
+      "file": "assets/other/image/astarot-s-cups-4",
+      "name": "astarot-s-cups-4"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-cups-5.webp",
-      "name": "astarot-s-cups-5.webp"
+      "file": "assets/other/image/astarot-s-cups-5",
+      "name": "astarot-s-cups-5"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-cups-6.webp",
-      "name": "astarot-s-cups-6.webp"
+      "file": "assets/other/image/astarot-s-cups-6",
+      "name": "astarot-s-cups-6"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-cups-7.webp",
-      "name": "astarot-s-cups-7.webp"
+      "file": "assets/other/image/astarot-s-cups-7",
+      "name": "astarot-s-cups-7"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-cups-8.webp",
-      "name": "astarot-s-cups-8.webp"
+      "file": "assets/other/image/astarot-s-cups-8",
+      "name": "astarot-s-cups-8"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-cups-9.webp",
-      "name": "astarot-s-cups-9.webp"
+      "file": "assets/other/image/astarot-s-cups-9",
+      "name": "astarot-s-cups-9"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-cups-10.webp",
-      "name": "astarot-s-cups-10.webp"
+      "file": "assets/other/image/astarot-s-cups-10",
+      "name": "astarot-s-cups-10"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-cups-11.webp",
-      "name": "astarot-s-cups-11.webp"
+      "file": "assets/other/image/astarot-s-cups-11",
+      "name": "astarot-s-cups-11"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-cups-12.webp",
-      "name": "astarot-s-cups-12.webp"
+      "file": "assets/other/image/astarot-s-cups-12",
+      "name": "astarot-s-cups-12"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-cups-13.webp",
-      "name": "astarot-s-cups-13.webp"
+      "file": "assets/other/image/astarot-s-cups-13",
+      "name": "astarot-s-cups-13"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-cups-14.webp",
-      "name": "astarot-s-cups-14.webp"
+      "file": "assets/other/image/astarot-s-cups-14",
+      "name": "astarot-s-cups-14"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-swords-1.webp",
-      "name": "astarot-s-swords-1.webp"
+      "file": "assets/other/image/astarot-s-swords-1",
+      "name": "astarot-s-swords-1"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-swords-2.webp",
-      "name": "astarot-s-swords-2.webp"
+      "file": "assets/other/image/astarot-s-swords-2",
+      "name": "astarot-s-swords-2"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-swords-3.webp",
-      "name": "astarot-s-swords-3.webp"
+      "file": "assets/other/image/astarot-s-swords-3",
+      "name": "astarot-s-swords-3"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-swords-4.webp",
-      "name": "astarot-s-swords-4.webp"
+      "file": "assets/other/image/astarot-s-swords-4",
+      "name": "astarot-s-swords-4"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-swords-5.webp",
-      "name": "astarot-s-swords-5.webp"
+      "file": "assets/other/image/astarot-s-swords-5",
+      "name": "astarot-s-swords-5"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-swords-6.webp",
-      "name": "astarot-s-swords-6.webp"
+      "file": "assets/other/image/astarot-s-swords-6",
+      "name": "astarot-s-swords-6"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-swords-7.webp",
-      "name": "astarot-s-swords-7.webp"
+      "file": "assets/other/image/astarot-s-swords-7",
+      "name": "astarot-s-swords-7"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-swords-8.webp",
-      "name": "astarot-s-swords-8.webp"
+      "file": "assets/other/image/astarot-s-swords-8",
+      "name": "astarot-s-swords-8"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-swords-9.webp",
-      "name": "astarot-s-swords-9.webp"
+      "file": "assets/other/image/astarot-s-swords-9",
+      "name": "astarot-s-swords-9"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-swords-10.webp",
-      "name": "astarot-s-swords-10.webp"
+      "file": "assets/other/image/astarot-s-swords-10",
+      "name": "astarot-s-swords-10"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-swords-11.webp",
-      "name": "astarot-s-swords-11.webp"
+      "file": "assets/other/image/astarot-s-swords-11",
+      "name": "astarot-s-swords-11"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-swords-12.webp",
-      "name": "astarot-s-swords-12.webp"
+      "file": "assets/other/image/astarot-s-swords-12",
+      "name": "astarot-s-swords-12"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-swords-13.webp",
-      "name": "astarot-s-swords-13.webp"
+      "file": "assets/other/image/astarot-s-swords-13",
+      "name": "astarot-s-swords-13"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-swords-14.webp",
-      "name": "astarot-s-swords-14.webp"
+      "file": "assets/other/image/astarot-s-swords-14",
+      "name": "astarot-s-swords-14"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-wands-1.webp",
-      "name": "astarot-s-wands-1.webp"
+      "file": "assets/other/image/astarot-s-wands-1",
+      "name": "astarot-s-wands-1"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-wands-2.webp",
-      "name": "astarot-s-wands-2.webp"
+      "file": "assets/other/image/astarot-s-wands-2",
+      "name": "astarot-s-wands-2"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-wands-3.webp",
-      "name": "astarot-s-wands-3.webp"
+      "file": "assets/other/image/astarot-s-wands-3",
+      "name": "astarot-s-wands-3"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-wands-4.webp",
-      "name": "astarot-s-wands-4.webp"
+      "file": "assets/other/image/astarot-s-wands-4",
+      "name": "astarot-s-wands-4"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-wands-5.webp",
-      "name": "astarot-s-wands-5.webp"
+      "file": "assets/other/image/astarot-s-wands-5",
+      "name": "astarot-s-wands-5"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-wands-6.webp",
-      "name": "astarot-s-wands-6.webp"
+      "file": "assets/other/image/astarot-s-wands-6",
+      "name": "astarot-s-wands-6"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-wands-7.webp",
-      "name": "astarot-s-wands-7.webp"
+      "file": "assets/other/image/astarot-s-wands-7",
+      "name": "astarot-s-wands-7"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-wands-8.webp",
-      "name": "astarot-s-wands-8.webp"
+      "file": "assets/other/image/astarot-s-wands-8",
+      "name": "astarot-s-wands-8"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-wands-9.webp",
-      "name": "astarot-s-wands-9.webp"
+      "file": "assets/other/image/astarot-s-wands-9",
+      "name": "astarot-s-wands-9"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-wands-10.webp",
-      "name": "astarot-s-wands-10.webp"
+      "file": "assets/other/image/astarot-s-wands-10",
+      "name": "astarot-s-wands-10"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-wands-11.webp",
-      "name": "astarot-s-wands-11.webp"
+      "file": "assets/other/image/astarot-s-wands-11",
+      "name": "astarot-s-wands-11"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-wands-12.webp",
-      "name": "astarot-s-wands-12.webp"
+      "file": "assets/other/image/astarot-s-wands-12",
+      "name": "astarot-s-wands-12"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-wands-13.webp",
-      "name": "astarot-s-wands-13.webp"
+      "file": "assets/other/image/astarot-s-wands-13",
+      "name": "astarot-s-wands-13"
     },
     {
       "extension": "webp",
-      "file": "assets/other/image/astarot-s-wands-14.webp",
-      "name": "astarot-s-wands-14.webp"
+      "file": "assets/other/image/astarot-s-wands-14",
+      "name": "astarot-s-wands-14"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-cover-tarot.png.png",
-      "name": "astarot-cover-tarot.png"
+      "file": "assets/other/image/astarot-cover-tarot",
+      "name": "astarot-cover-tarot"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-cover-cvs-icegirl.png.png",
-      "name": "astarot-cover-cvs-icegirl.png"
+      "file": "assets/other/image/astarot-cover-cvs-icegirl",
+      "name": "astarot-cover-cvs-icegirl"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-button.png.png",
-      "name": "astarot-button.png"
+      "file": "assets/other/image/astarot-button",
+      "name": "astarot-button"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-border.png.png",
-      "name": "astarot-border.png"
+      "file": "assets/other/image/astarot-border",
+      "name": "astarot-border"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-cover-cvs.png.png",
-      "name": "astarot-cover-cvs.png"
+      "file": "assets/other/image/astarot-cover-cvs",
+      "name": "astarot-cover-cvs"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-angry.png.png",
-      "name": "astarot-angry.png"
+      "file": "assets/other/image/astarot-angry",
+      "name": "astarot-angry"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-annoyed.png.png.png",
-      "name": "astarot-annoyed.png.png"
+      "file": "assets/other/image/astarot-annoyed",
+      "name": "astarot-annoyed"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-blushing.png.png",
-      "name": "astarot-blushing.png"
+      "file": "assets/other/image/astarot-blushing",
+      "name": "astarot-blushing"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-confused.png.png",
-      "name": "astarot-confused.png"
+      "file": "assets/other/image/astarot-confused",
+      "name": "astarot-confused"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-crying.PNG.png",
-      "name": "astarot-crying.PNG"
+      "file": "assets/other/image/astarot-crying",
+      "name": "astarot-crying"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-curious.png.png",
-      "name": "astarot-curious.png"
+      "file": "assets/other/image/astarot-curious",
+      "name": "astarot-curious"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-default.png.png",
-      "name": "astarot-default.png"
+      "file": "assets/other/image/astarot-default",
+      "name": "astarot-default"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-disappointed.png.png",
-      "name": "astarot-disappointed.png"
+      "file": "assets/other/image/astarot-disappointed",
+      "name": "astarot-disappointed"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-disgusted.png.png",
-      "name": "astarot-disgusted.png"
+      "file": "assets/other/image/astarot-disgusted",
+      "name": "astarot-disgusted"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-embarrassed.png.png",
-      "name": "astarot-embarrassed.png"
+      "file": "assets/other/image/astarot-embarrassed",
+      "name": "astarot-embarrassed"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-excited.png.png",
-      "name": "astarot-excited.png"
+      "file": "assets/other/image/astarot-excited",
+      "name": "astarot-excited"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-flustered.png.png",
-      "name": "astarot-flustered.png"
+      "file": "assets/other/image/astarot-flustered",
+      "name": "astarot-flustered"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-giggling.png.png",
-      "name": "astarot-giggling.png"
+      "file": "assets/other/image/astarot-giggling",
+      "name": "astarot-giggling"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-guilty.png.png",
-      "name": "astarot-guilty.png"
+      "file": "assets/other/image/astarot-guilty",
+      "name": "astarot-guilty"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-laughing.png.png",
-      "name": "astarot-laughing.png"
+      "file": "assets/other/image/astarot-laughing",
+      "name": "astarot-laughing"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-lovestruck.png.png",
-      "name": "astarot-lovestruck.png"
+      "file": "assets/other/image/astarot-lovestruck",
+      "name": "astarot-lovestruck"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-middlefinger.png.png",
-      "name": "astarot-middlefinger.png"
+      "file": "assets/other/image/astarot-middlefinger",
+      "name": "astarot-middlefinger"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-pouting.png.png",
-      "name": "astarot-pouting.png"
+      "file": "assets/other/image/astarot-pouting",
+      "name": "astarot-pouting"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-sad.png.png",
-      "name": "astarot-sad.png"
+      "file": "assets/other/image/astarot-sad",
+      "name": "astarot-sad"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-scared.png.png",
-      "name": "astarot-scared.png"
+      "file": "assets/other/image/astarot-scared",
+      "name": "astarot-scared"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-shocked.png.png",
-      "name": "astarot-shocked.png"
+      "file": "assets/other/image/astarot-shocked",
+      "name": "astarot-shocked"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-sleepy.png.png",
-      "name": "astarot-sleepy.png"
+      "file": "assets/other/image/astarot-sleepy",
+      "name": "astarot-sleepy"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-smile.png.png",
-      "name": "astarot-smile.png"
+      "file": "assets/other/image/astarot-smile",
+      "name": "astarot-smile"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-surprised.png.png",
-      "name": "astarot-surprised.png"
+      "file": "assets/other/image/astarot-surprised",
+      "name": "astarot-surprised"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-worried.png.png",
-      "name": "astarot-worried.png"
+      "file": "assets/other/image/astarot-worried",
+      "name": "astarot-worried"
     },
     {
       "extension": "png",
-      "file": "assets/other/image/astarot-nervous.PNG.png",
-      "name": "astarot-nervous.PNG"
+      "file": "assets/other/image/astarot-nervous",
+      "name": "astarot-nervous"
     }
   ],
-  "card": "card.json",
+  "card": {
+    "alternate_greetings": [
+      "alternate_greetings/1.md",
+      "alternate_greetings/2.md",
+      "alternate_greetings/3.md",
+      "alternate_greetings/4.md"
+    ],
+    "description": "description.md",
+    "file": "card.json",
+    "first_mes": "first_mes.md"
+  },
   "creator": "",
   "description": "\n# `en`\n ",
   "folders": [],
   "hideIcon": false,
-  "icon": "assets/icon/image/main.png",
+  "icon": "assets/icon/image/main",
   "lorebook": [
     {
       "alwaysActive": true,

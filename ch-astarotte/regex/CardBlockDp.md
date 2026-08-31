@@ -1,5 +1,4 @@
 ---
-ableFlag: true
 comment: CardBlockDp
 flag: gm<cbs>
 type: editdisplay

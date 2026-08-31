@@ -1,5 +1,4 @@
 ---
-ableFlag: false
 comment: AstImgBk
 type: editdisplay
 ---
@@ -7,6 +6,5 @@ type: editdisplay
 IN:
 (\[astimg\|(?<emotion>\w+)\])
 OUT:
-
 $1
 

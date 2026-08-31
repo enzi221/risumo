@@ -1,5 +1,4 @@
 ---
-ableFlag: false
 comment: AstImgDp
 type: editdisplay
 ---
@@ -11,7 +10,7 @@ OUT:
 {{#when::{{? {{getvar::astarot-infdist}} == 1}}::or::{{? {{chat_index}} > {{? {{lastmessageid}}-10}}}}}}
 <div class="astarot-img-root">
   <div class="astarot-img-clip">
-    <img alt="" class="astarot-img" src="{{raw::astarot-$<emotion>.png}}" />
+    <img alt="" class="astarot-img" src="{{raw::astarot-$<emotion>}}" />
   </div>
 </div>
 {{/when}}
@@ -35,7 +34,7 @@ OUT:
 
   .astarot-img-root::before {
     border: 10px solid;
-    border-image: url({{raw::astarot-border.png}}) stretch;
+    border-image: url({{raw::astarot-border}}) stretch;
     border-image-outset: var(--py) 0;
     border-image-slice: 119 90;
     border-image-width: 59.5px 45px;

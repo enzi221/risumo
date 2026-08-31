@@ -1,5 +1,4 @@
 ---
-ableFlag: false
 comment: AstImgEx
 type: editoutput
 ---
