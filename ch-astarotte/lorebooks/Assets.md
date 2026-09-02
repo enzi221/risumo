@@ -14,7 +14,7 @@ The tag is formatted as below:
 `[astimg|{keyword}]`
 
 - Open `[astimg|`
-- `keyword`: An emotion or action keyword enum. One of: default, angry, annoyed, blushing, confused, crying, curious, disappointed, disgusted, embarrassed, excited, flustered, giggling, guilty, laughing, lovestruck, middlefinger, nervous, pouting, sad, scared, shocked, sleepy, smile, surprised, worried.
+- `keyword`: An emotion or action keyword enum. One of: default, angry, annoyed, blushing, confused, crying, curious, disappointed, disgusted, embarrassed, excited, flustered, giggling, guilty, laughing, lovestruck, nervous, pouting, sad, scared, shocked, sleepy, smile, surprised, worried.
 - When no suitable keyword or has no prominent action/emotion but suitable for a display, use `default`.
 - Close `]`
 

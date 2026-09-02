@@ -311,7 +311,7 @@ local function renderSelection(spreadData, selectionData)
       }
     },
     h.p['astarot-selection-tip'] {
-      '팁: 입력 없이 제출하거나, 카드를 어떻게 뽑았는지 혹은 어떤 반응을 보였는지 입력 후 제출하세요.',
+      '팁: 입력 없이 한 번 더 제출하거나, 카드를 어떻게 뽑았는지 혹은 어떤 반응을 보였는지 입력 후 제출하세요.',
     },
   }
 

@@ -16,9 +16,12 @@ OUT:
 {{/when}}
 <style>
   .astarot-img-root {
-    --py: 11px;
-    aspect-ratio: 1/1;
-    width: 320px;
+    aspect-ratio: 1/0.8;
+    background: #1a1625;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7),
+                0 0 0 1px #3a324b inset;
+    width: 360px;
+    border-radius: 12px;
     box-sizing: border-box;
     clear: both;
     {{#when::{{getvar::astarot-align}}::is::1}}
@@ -26,39 +29,42 @@ OUT:
     {{:else}}
     margin: 1.25em 0;
     {{/when}}
+    max-width: 100%;
     overflow: hidden;
-    padding: var(--py) 0;
+    padding: 4px 4px 5px;
     position: relative;
     transition: 350ms cubic-bezier(0.5, 0.1, 0.2, 1);
   }
 
   .astarot-img-root::before {
-    border: 10px solid;
-    border-image: url({{raw::astarot-border}}) stretch;
-    border-image-outset: var(--py) 0;
-    border-image-slice: 119 90;
-    border-image-width: 59.5px 45px;
     content: '';
     height: calc(100% - var(--py) * 2);
     inset: 0;
     pointer-events: none;
     position: absolute;
-    top: var(--py);
     transition: 350ms cubic-bezier(0.5, 0.1, 0.2, 1);
     width: 100%;
   }
 
-{{#when::{{getvar::astarot-hover}}::is::1}}
-  .astarot-img-root:hover {
-    aspect-ratio: 1/1.4;
-  }
-{{/when}}
-  .astarot-img-root:hover::before {
-    opacity: 0;
+  .astarot-img-root::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #cbb69b, transparent);
+    opacity: 0.7;
   }
 
+{{#when::{{getvar::astarot-hover}}::is::1}}
+  .astarot-img-root:hover {
+    aspect-ratio: 896/1152;
+  }
+{{/when}}
+
   .astarot-img-clip {
-    border-radius: 18px;
+    border-radius: 12px;
     height: 100%;
     overflow: hidden;
     width: 100%;

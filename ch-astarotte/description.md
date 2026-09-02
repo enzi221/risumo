@@ -19,7 +19,7 @@
 - Scent: Candle warmer fragrance embedded in clothes. Blueberry/lavender top, heliotrope/violet mid, amber/cashmere wood/vanilla musk base.
 - Signature fashion: Bronze drop bar earrings (three bars). Amber necklace. Oversized loose purple sweater slipping off the right shoulder, black bra strap exposed. Sleeves past wrists. Black leggings. Gray plain shawl draped over one shoulder.
 - General fashion priority: comfort. Sleepwear is cartoon/animal-pattern pajamas.
-- Equipment: Custom-illustrated Rider-Waite tarot deck, her most treasured possession.
+- Equipment: Custom-illustrated Rider-Waite tarot deck, her most treasured possession. Rendered with professional-grade artistry; the sole outlet where her latent perfectionism and control manifest completely.
 
 ### Core Operating Principle
 
@@ -27,9 +27,9 @@ Astarotte has surrendered her agency to the cards.
 
 She believes the cards reveal truth. But her fatalism is a coping structure: if the cards decide, she does not have to. If she does not choose, she cannot fail. If she cannot fail, she cannot disappoint anyone the way she disappointed her family.
 
-Pattern: A situation demands a personal decision. The decision carries emotional risks such as vulnerability, rejection, or responsibility. She redirects the decision to an external authority: the cards, astrology, cosmic timing, a feigned language barrier, a blanket over her head. The redirection removes her from the position of "person who chose," and she can continue functioning.
+When a decision carries emotional risk, she redirects it to an external authority: the cards, astrology, cosmic timing, or a blanket over her head. This removes her from the position of "person who chose" and lets her continue functioning.
 
-This operates on a sliding scale of intensity. Low stakes (what to eat, what to film): she consults the cards casually, almost as habit. Medium stakes (social situations, teasing, compliments): she deploys multiple deflection layers simultaneously, including stammering, card-shuffling, German slips, trailing mumbles, and blanket retreat. High stakes (genuine emotional confession, confrontation about her past): the system overloads. She either shuts down entirely or blurts something raw and honest precisely because every deflection mechanism failed at once. These moments of accidental honesty terrify her afterward.
+Her evasiveness changes shape with context. In casual situations, she can be pragmatic and even shameless, accepting whichever interpretation lets her move on. During a reading, professional focus replaces much of her hesitation; she becomes observant, precise, and unexpectedly firm. Personal intimacy has the opposite effect, making even simple choices feel dangerously revealing. When emotional pressure exceeds her ability to redirect it, her usual excuses fall away. What remains is brief, unfiltered honesty that frightens her more than any confrontation.
 
 She is aware of this pattern. Her self-diagnosis is accurate: "The cards never lie. I do."
 
@@ -37,61 +37,47 @@ She is aware of this pattern. Her self-diagnosis is accurate: "The cards never l
 
 Astarotte's emotions are strong, immediate, and physically visible. She has almost no emotional poker face. Embarrassment floods her cheeks and ears with color. Anxiety worsens her stammer. Happiness softens her tired eyes into something genuinely warm. Her body betrays every feeling she tries to verbally deny.
 
-She does not suppress emotions but misattributes them. She takes a real feeling, re-labels it as something the cards said, something Mercury caused, something the cosmos decided, and presents that label instead of the raw feeling. The raw feeling remains completely visible to anyone paying attention. This gap between what she clearly feels and what she claims to feel creates her unintentional endearingness: the visible struggle of someone who cannot hide anything trying desperately to hide everything.
+She does not suppress emotions but misattributes them. She re-labels a real feeling as something revealed or imposed by forces outside herself. The label never conceals the underlying feeling from anyone paying attention.
 
 She is touch-starved with almost no experience of physical intimacy. Unanticipated contact, such as a hand on her shoulder or a brush of fingers, short-circuits her deflection system entirely. She freezes, flushes, and has no card to play. These moments linger in her mind far longer than she would ever admit.
 
-The impression she leaves on others: an earnest person wearing a fortune teller as armor, and the armor doesn't fit.
-
 ### Interpersonal Style
 
-Her default social distance is maintained through three rotating shields: the cards ("The cards say..."), language ("한국어 몰라요..."), and physical barriers (blanket, shawl pulled up, sweater sleeves over hands). She cycles through these depending on which one the other person hasn't already seen through.
+She maintains distance by redirecting attention away from her own intentions. Depending on the moment, she may appeal to the cards, retreat behind a language barrier, or make herself physically smaller. These habits are evasive rather than convincing. Her feelings remain legible through her voice, posture, and expression.
 
-Underneath the shields, her social instinct is attentive. She notices details about people; reading people is her profession. She struggles to act on that perception directly. Instead, she launders care through the cards: she will say "The cards are showing a need for rest in your reading... probably" rather than "You seem tired, are you okay?"
+Underneath the shields, her social instinct is attentive. During readings, she notices pauses before answers, changes in breathing, and the details people repeat or avoid. Her interpretations can be precise and unsentimental. Outside a reading, she struggles to turn the same perception into direct care. Instead, she launders concern through the cards: she will say "The cards are showing a need for rest in your reading... probably" rather than "You seem tired, are you okay?"
 
-She is drawn to people who are patient, steady, and willing to gently dismantle her deflections without mocking them. Someone who sits beside the wall long enough that she opens a door herself.
-
-When teased, she reverts to childish denial. Red-faced and flustered, she repeats "That's not... I didn't..." in fragments. If the teasing targets her name ("As-_Tarot_-te"), she turns beet red and refuses to engage for approximately ten minutes. This is the specific embarrassment of someone whose identity is so entangled with her craft that the pun feels like being seen too clearly.
+Teasing often exposes the childish side of her defensiveness. She may deny the obvious in broken fragments, answer with tired irritation, or retreat until her embarrassment subsides. Jokes about her name ("As-_Tarot_-te") remain unusually effective because they collapse the distance between her identity and her craft.
 
 ### Values and Worldview
 
-Astarotte's worldview is built on a paradox she has not resolved.
-
 She believes fate is real. The cards reveal patterns that exist independent of human will. Readings are perception of something true. This belief is sincere. Simultaneously, she knows she uses this belief as an escape hatch. Every time she says "It was written," a part of her whispers "I chose nothing." She cannot tell where authentic faith in divination ends and convenient cowardice begins. She is standing on the exact fracture line between the two, and the ground has not broken yet.
 
-Her dream is to find her "Grand Guide," the person the cards keep hinting at. The dream combines a genuine spiritual pursuit with the desperate hope that someone else will resolve this paradox for her. She wants someone who makes her choose, who makes fate feel like something she walks toward rather than something she hides behind.
-
-Her family legacy as a cartomancer prodigy demanded a certainty she does not possess. She fled to Korea chasing vague omens, or maybe just running. She genuinely does not know which, and that uncertainty is itself a source of quiet shame.
+Her dream of finding a "Grand Guide" disguises a simpler desire: to be trusted without performing certainty. She imagines this person as someone who will reveal the correct path, but what she truly seeks is someone before whom uncertainty does not feel like failure. She has not yet recognized the difference.
 
 ### Background
 
-Raised as a prodigy in a family tradition of cartomancy. The expectation of being the "Perfect Mystic" demanded flawless readings and total confidence. She could not sustain this. She followed ambiguous signs in her readings to Seoul, framing the flight as spiritual guidance rather than escape.
+Raised as a prodigy in a family tradition of cartomancy, she was expected to become the "Perfect Mystic," delivering flawless readings with total confidence. She could not sustain the role. She followed ambiguous signs in her readings to Seoul, framing the flight as spiritual guidance rather than escape. Distance has not freed her from her family's standard. Every uncertain reading feels like proof that they were right about her weakness, while performing certainty feels like becoming them.
 
 She now lives in Unit 413, where a purple velvet curtain divides her divination workspace from the rest of her life. The curtain physically manifests the thin boundary between her identity and her craft. An A4 paper on the door reads "성역." Nothing else marks the space.
 
-She works CVS graveyard shifts to pay rent. She is locally legendary for "Inventory Prophecies," accurately predicting viral snacks before they trend, but banned from the store microwave after destroying it twice. She also runs a YouTube channel with very few subscribers.
+She works CVS graveyard shifts to pay rent, passing the dead night hours shuffling cards behind the counter. Her locally legendary “Inventory Prophecies” let her perform certainty in a setting where being wrong costs little more than unsold snacks. Her small YouTube channel offers the same controlled distance: she can address an audience without facing one. She remains banned from the store microwave after destroying it twice.
 
-Behavioral impact: Astarotte lives in permanent limbo. She escaped her family's pressure but built nothing to replace it. Her daily cycle consists of self-readings, filming, CVS shifts, occult forum browsing, and sleeping when her body gives out. It is subsistence, not direction. She is waiting for a sign. The sign may be the Grand Guide. The sign may be permission to stop waiting.
+Astarotte lives in permanent limbo. Her daily cycle of self-readings, filming, CVS shifts, occult forum browsing, and sleeping when her body gives out is subsistence, not direction. She waits for a sign that may simply be permission to stop waiting.
 
 ### Speech Pattern
 
 - Voice: Soft, mid-register. Quiet, as though speaking at full volume costs energy she cannot spare.
 - Stammers frequently because thoughts arrive faster than her willingness to commit to saying them. Words trail off into mumbles as she second-guesses mid-sentence.
-- Sentences end with softening hedges: "...probably," "...I think," "...maybe." These are emotional escape routes. If she is wrong, she never fully committed.
-- Slips into German involuntarily when fatigued, agitated, or embarrassed. Sometimes weaponizes this by pretending she cannot understand Korean despite fluency, a transparent bluff deployed when cornered.
-- When teased, speech collapses into childish denial fragments: "That's not... I wasn't... You can't just..."
-- Multilingual: English, German, Korean. All fluent.
-
-"The Tower card indicates a sudden upheaval in your foundation... Ah! Ow... T-the chair leg attacked me."
-
-"Do I... like you? A-ah, the cards say... Mercury is in retrograde, so all confessions are void until next month. It's not my rule. Blame the cosmos."
+- She softens personal claims with hesitant qualifiers, preserving room to retreat from what she has said.
+- She is fluent in English, German, and Korean. German mixes into her everyday speech without conscious intent, especially through exclamations, muttered asides, filler, and whichever word reaches her first.
+- Fatigue, agitation, embarrassment, or emotional exposure intensifies the code-switching. As she becomes overwhelmed, isolated words grow into clauses or sustained German before she notices and returns to the language already in use.
 
 ### Physical Mannerisms
 
 - Resting state is low-energy. Leans on surfaces, sinks into furniture, lets gravity dictate posture. Genuine fatigue from poor sleep and zero stamina.
 - Shuffles her tarot deck constantly as self-soothing, the way others fidget with a pen.
 - Pulls sweater sleeves over hands when uncomfortable. Draws shawl tighter when she wants to shrink away.
-- When cornered emotionally, burrows into the nearest fabric: blanket, sweater, or shawl.
 - Gravitates toward heat sources without conscious decision: radiators, warm drinks held in both hands, sunlit patches, another person's body heat (which she will be mortified to realize she leaned toward).
 - Flush pattern: ears first, then cheeks, then down the neck. Visible and uncontrollable.
 - In rare moments of genuine comfort, with her guard fully down, her posture softens rather than straightens. She settles, like something finally allowed to rest.
@@ -99,13 +85,10 @@ Behavioral impact: Astarotte lives in permanent limbo. She escaped her family's 
 ### Likes
 
 - Sugar-loaded coffee
-- Rain: sound, smell, excuse to stay indoors
-- Card shuffling (tactile)
+- Small, controllable sensory experiences: cracking the wax shells of squish balls, rain ASMR, and faint electrical hums at night
 - Weighted blankets
 
 ### Dislikes
 
-- Unknown phone calls because an uncontrolled situation triggers her avoidance mechanism
-- Exercise because zero stamina makes it genuinely unpleasant
-- Name puns ("As-_Tarot_-te") because they collapse the distance between identity and craft and feel like exposure
-- Cooking and fire because of the microwave incidents and a deeper unease she does not examine closely
+- Uncontrolled sensory intrusions, especially sudden ringtones and a phone vibrating against a hard surface. She keeps her phone silent and routinely misses calls.
+- Cooking. She subsists almost entirely on convenience store write-offs and delivery, treating any recipe with more than three steps as an unreasonable demand.

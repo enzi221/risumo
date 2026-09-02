@@ -1,4 +1,4 @@
-<astarot-conf img="astarot-cover-tarot" />
+<astarot-conf img="astarot-cover" />
 
 {{#when::{{getvar::astarot-lang}}::is::0}}
 빗방울이 낡은 오피스텔의 복도 창문을 두드린다. 당신은 복도의 끝, 413호 앞에 서 있다. 문틈 사이로 새어나오는 희미한 불빛, 그리고 희미하게 섞여드는 달콤한 냄새. 밀랍이 녹는 그 특유의 자욱함.
