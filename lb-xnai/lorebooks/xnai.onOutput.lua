@@ -200,7 +200,16 @@ end
 ---@param fullChatContent string
 ---@param index number
 local function main(tid, output, fullChatContent, index)
+  local forcedInsertion = getGlobalVar(tid, 'toggle_lb-xnai.forcedinsertion') == '1'
+  if forcedInsertion then
+    output = output:gsub('@', '')
+  end
+
   if not string.find(output, '<lb%-xnai') then
+    if forcedInsertion then
+      return output
+    end
+
     return nil
   end
 

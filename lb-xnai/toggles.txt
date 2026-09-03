@@ -5,9 +5,13 @@ lb-xnai.generation=이미지발동=select=즉시,누르면
 =프롬프트 생성 후 이미지까지 즉시 생성?=caption
 lb-xnai.nsfw=NSFW 프롬프트
 lb-xnai.jb=┗탈옥 (프레이야)
-=검열에 당한 게 아니라면 체크 해제=caption
+=모델 거부 완화. 무거움, 검열에 당한 게 아니라면 체크 해제=caption
+lb-xnai.forcedinsertion=┗태그 칼질
+=출력 필터 격파 시도. 무거움, 검열에 당한 게 아니라면 체크 해제=caption
+=⚠️반드시 생각 보조를 "생각만"으로 변경 후 사용할 것=caption
+=⚠️변경 시 삽화 메뉴에서 "캐릭터 태그 기록 삭제"할 것=caption
 lb-xnai.japanese=┗일본어 출력
-=외부 검열 약화, 품질 악화=caption
+=출력 필터 완화=caption
 =———————📒스타일=divider
 lb-xnai.preset=프　리　셋=text
 ="프리셋 X" 로어북 사용. "X" 부분만 입력. 기본 "1"=caption
@@ -45,7 +49,7 @@ lb-xnai.positive=긍정　프롬=textarea
 lb-xnai.negative=부정　프롬=textarea
 =항상 맨 뒤에 추가=caption
 ==divider
-=라이트보드 삽화 4.1.2—amonamona=caption
+=라이트보드 삽화 4.1.3—amonamona=caption
 ==groupEnd
 
 =🌠삽화 (고급)=group
@@ -78,5 +82,5 @@ lb-xnai.compat.weight=가　중　치=select=제거,Comfy
 =NAI 가중치를 제거하거나 변환=caption
 =ComfyUI 체크해야 적용=caption
 ==divider
-=라이트보드 삽화 4.1.2—amonamona=caption
+=라이트보드 삽화 4.1.3—amonamona=caption
 ==groupEnd
