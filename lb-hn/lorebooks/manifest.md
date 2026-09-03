@@ -1,4 +1,5 @@
 identifier=lb-hn
+friendlyName=헌터넷
 
 authorsNote=false
 charDesc=true

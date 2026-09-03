@@ -1,4 +1,5 @@
 identifier=lb-stats
+friendlyName=상태창
 
 authorsNote=true
 charDesc=true

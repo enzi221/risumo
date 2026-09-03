@@ -1,6 +1,6 @@
 --! Copyright (c) 2025-2026 amonamona
 --! CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
---! LightBoard Miniboard Renderer
+--! Lightboard Miniboard Renderer
 
 ---@class MiniboardRenderOptions
 ---@field chatIndex number

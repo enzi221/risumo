@@ -279,7 +279,7 @@ local function makePrompt(triggerId, man, fullChat, type, extras, chatOffset)
         if success then
           text = modifiedText
         else
-          print("[LightBoard Backend] Error in onInput for " .. identifier .. ": " .. tostring(modifiedText))
+          print("[Lightboard Backend] Error in onInput for " .. identifier .. ": " .. tostring(modifiedText))
         end
       end
       text = '\n<!-- Log #' .. adjustedIndex .. ' -->\n\n' .. text .. '\n<!-- /Log #' .. adjustedIndex .. ' -->'

@@ -11,7 +11,7 @@ local M = {}
 --- @return string modifiedChatContent, string? lbdataContent
 local function runSideEffectOnOutput(triggerId, man, pipelineResult, chatContent, chatIndex)
   if not man.onOutput then
-    print('[LightBoard Backend] Warning: sideEffect manifest ' .. man.identifier .. ' has no onOutput callback')
+    print('[Lightboard Backend] Warning: sideEffect manifest ' .. man.identifier .. ' has no onOutput callback')
     return chatContent, nil
   end
 
@@ -46,7 +46,7 @@ function M.handleSideEffectResult(triggerId, params)
   local resolved = lbdata.resolveTargets(latestChat)
 
   if not resolved.targetIdx then
-    params.onError('[LightBoard] sideEffect ' .. params.action .. ' 실패. 대상 채팅을 찾을 수 없습니다.')
+    params.onError('[Lightboard] sideEffect ' .. params.action .. ' 실패. 대상 채팅을 찾을 수 없습니다.')
     return false
   end
 
@@ -70,7 +70,7 @@ function M.handleSideEffectResult(triggerId, params)
     targetIdx)
 
   if not onOutputSuccess or not modifiedContent then
-    params.onError('[LightBoard] sideEffect 출력 처리 실패 (' .. params.identifier .. ').\n' .. tostring(modifiedContent))
+    params.onError('[Lightboard] sideEffect 출력 처리 실패 (' .. params.identifier .. ').\n' .. tostring(modifiedContent))
     return false
   end
 
@@ -136,10 +136,10 @@ function M.applySideEffects(triggerId, params)
     local result = batchResult.result
 
     if not ok then
-      alertError(triggerId, '[LightBoard] ' .. man.identifier .. ' 생성 실패.\n' .. tostring(result))
+      alertError(triggerId, '[Lightboard] ' .. man.identifier .. ' 생성 실패.\n' .. tostring(result))
       result = string.format('<lb-lazy id="%s" />', man.identifier)
     elseif not result or result == '' then
-      alertError(triggerId, '[LightBoard] ' .. man.identifier .. ' 생성 실패. 모델 응답이 비어있습니다.')
+      alertError(triggerId, '[Lightboard] ' .. man.identifier .. ' 생성 실패. 모델 응답이 비어있습니다.')
       result = string.format('<lb-lazy id="%s" />', man.identifier)
     end
 
@@ -149,7 +149,7 @@ function M.applySideEffects(triggerId, params)
   local fullChatNewest = getFullChat(triggerId)
   local resolved = lbdata.resolveTargets(fullChatNewest)
   if not resolved.targetIdx then
-    print('[LightBoard Backend] locateTargetChat returned nil')
+    print('[Lightboard Backend] locateTargetChat returned nil')
     return
   end
 
@@ -183,7 +183,7 @@ function M.applySideEffects(triggerId, params)
             table.insert(lbdataContents, lbdataResult)
           end
         else
-          alertError(triggerId, '[LightBoard] ' .. man.identifier .. ' 출력 처리 실패.\n' .. tostring(result))
+          alertError(triggerId, '[Lightboard] ' .. man.identifier .. ' 출력 처리 실패.\n' .. tostring(result))
           table.insert(lazyPlaceholders, string.format('<lb-lazy id="%s" />', man.identifier))
         end
       end

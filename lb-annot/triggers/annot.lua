@@ -1,6 +1,6 @@
 --! Copyright (c) 2026 amonamona
 --! CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
---! LightBoard Annot
+--! Lightboard Annot
 
 local triggerId = ''
 
@@ -259,7 +259,7 @@ local function main(data, chatIndex)
     if success then
       out = before .. after .. result
     else
-      print("[LightBoard] Annot collection render failed:", tostring(result))
+      print("[Lightboard] Annot collection render failed:", tostring(result))
     end
   end
 
@@ -269,7 +269,7 @@ local function main(data, chatIndex)
       if success then
         return result
       else
-        print("[LightBoard] Annot inline render failed:", tostring(result))
+        print("[Lightboard] Annot inline render failed:", tostring(result))
       end
       break
     end
@@ -292,7 +292,7 @@ listenEdit(
     if success then
       return result
     else
-      print('[LightBoard] Annot render failed:', tostring(result))
+      print('[Lightboard] Annot render failed:', tostring(result))
       return data
     end
   end

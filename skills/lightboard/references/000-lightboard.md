@@ -37,6 +37,7 @@ Use the following recommended fields for in-universe simulated data:
 
 ```
 identifier=mail-list
+friendlyName=Mail Inbox
 authorsNote=true
 charDesc=true
 loreBooks=true
@@ -47,6 +48,7 @@ All possible KVs:
 
 - authorsNote: boolean. Include author's note in requests? Default false.
 - charDesc: boolean. Default false.
+- friendlyName: string. Optional user-facing module name. The backend falls back to `identifier` when omitted.
 - personaDesc: boolean. Default false.
 - loreBooks: boolean. Default false.
 - maxCtx: integer. Maximum request context length. The backend provides a default through its toggle. Omit this field unless the frontend requires only recent chat context.
@@ -345,6 +347,7 @@ Read [Lightboard Prelude](000-prelude.md) for more.
 
 ## Lightboard Frontend Best Practices
 
+- Set `friendlyName` to a concise user-facing module name. Keep `identifier` as the stable machine-readable ID.
 - Use a clearly identifiable identifier
 - Use a structured data format, preferably JSON, TOON, or CSV
 - Define the data format clearly in `.lb.format`

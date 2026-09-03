@@ -31,7 +31,7 @@ local function cleanLLMResult(man, response)
 
     return cleanOutput
   else
-    print("[LightBoard Backend] Failed to get LLM response for " .. man.identifier .. ":\n" .. response.result)
+    print("[Lightboard Backend] Failed to get LLM response for " .. man.identifier .. ":\n" .. response.result)
     error('LLM 요청 실패. ' .. response.result)
   end
 end
@@ -61,7 +61,7 @@ function M.runPipeline(triggerId, man, fullChat, options)
     return '\n<lb-lazy id="' .. man.identifier .. '" />'
   end
   local prom = promptResult
-  print('[LightBoard Backend][VERBOSE] Prompt created.')
+  print('[Lightboard Backend][VERBOSE] Prompt created.')
 
   local maxRetries = tonumber(getGlobalVar(triggerId, C.CONFIG.MAX_RETRIES)) or 0
   local retryMode = getGlobalVar(triggerId, C.CONFIG.RETRY_MODE) or '0'
@@ -69,7 +69,7 @@ function M.runPipeline(triggerId, man, fullChat, options)
   local attempts = 0
 
   while true do
-    print('[LightBoard Backend][VERBOSE] Prompt submitted. Try #' .. attempts)
+    print('[Lightboard Backend][VERBOSE] Prompt submitted. Try #' .. attempts)
 
     --- @type '1'|'2'|nil
     --- @diagnostic disable-next-line: assign-type-mismatch
@@ -79,18 +79,18 @@ function M.runPipeline(triggerId, man, fullChat, options)
     if not llmSuccess then
       error('응답을 받지 못했습니다. ' .. tostring(llmResponse))
     end
-    print('[LightBoard Backend][VERBOSE] Received response.')
+    print('[Lightboard Backend][VERBOSE] Received response.')
 
     local processSuccess, processResult = pcall(cleanLLMResult, man, llmResponse)
     if not processSuccess then
       error('응답을 처리하지 못했습니다. ' .. tostring(processResult))
     end
-    print('[LightBoard Backend][VERBOSE] Response cleaned.')
+    print('[Lightboard Backend][VERBOSE] Response cleaned.')
 
     -- Reiteration: self-review loop before validation (skip on retries)
     if attempts == 0 then
       for ri = 1, man.reiteration or 0 do
-        print('[LightBoard Backend][VERBOSE] Reiteration ' .. ri .. '/' .. man.reiteration)
+        print('[Lightboard Backend][VERBOSE] Reiteration ' .. ri .. '/' .. man.reiteration)
 
         table.insert(prom, {
           content = processResult,
@@ -114,7 +114,7 @@ Carefully think, then if it is OK, output %s node without any changes. If it nee
         local reiterResponse = runLLM(triggerId, man, prom, nil)
         local reiterSuccess, reiterResult = pcall(cleanLLMResult, man, reiterResponse)
         if not reiterSuccess then
-          print('[LightBoard Backend] Reiteration ' ..
+          print('[Lightboard Backend] Reiteration ' ..
             ri .. ' failed for ' .. man.identifier .. ': ' .. tostring(reiterResult))
           break
         end
@@ -128,7 +128,7 @@ Carefully think, then if it is OK, output %s node without any changes. If it nee
     local valid = true
     local validationError = nil
 
-    print('[LightBoard Backend][VERBOSE] Response validating.')
+    print('[Lightboard Backend][VERBOSE] Response validating.')
 
     if not processResult or processResult == '' or processResult == null then
       valid = false
@@ -143,16 +143,16 @@ Carefully think, then if it is OK, output %s node without any changes. If it nee
           validationError = cleanErr:sub(#VALIDATION_ERROR_PREFIX + 1):match("^%s*(.-)%s*$")
         else
           -- assume success otherwise
-          print("[LightBoard] Validation script error in " .. man.identifier .. ": " .. tostring(err))
+          print("[Lightboard] Validation script error in " .. man.identifier .. ": " .. tostring(err))
         end
       end
     end
 
     if valid or attempts >= maxRetries then
       if valid then
-        print('[LightBoard Backend][VERBOSE] Validation complete.')
+        print('[Lightboard Backend][VERBOSE] Validation complete.')
       else
-        print('[LightBoard] Validation failed for ' ..
+        print('[Lightboard] Validation failed for ' ..
           man.identifier .. ' but max retries reached: ' .. tostring(validationError))
       end
 
@@ -161,7 +161,7 @@ Carefully think, then if it is OK, output %s node without any changes. If it nee
         if success and modifiedOutput and modifiedOutput ~= '' then
           processResult = modifiedOutput
         else
-          print("[LightBoard Backend] Failed processing (onOutput) for " ..
+          print("[Lightboard Backend] Failed processing (onOutput) for " ..
             man.identifier .. ": " .. tostring(modifiedOutput))
 
           local reason = success and '응답이 비어있습니다. 검열? 리퀘스트 로그를 확인하세요.' or tostring(modifiedOutput)
@@ -173,7 +173,7 @@ Carefully think, then if it is OK, output %s node without any changes. If it nee
     end
 
     attempts = attempts + 1
-    print("[LightBoard] Validation failed for " ..
+    print("[Lightboard] Validation failed for " ..
       man.identifier .. ". Retrying (" .. attempts .. "/" .. maxRetries .. "): " .. tostring(validationError))
 
     table.insert(prom, {

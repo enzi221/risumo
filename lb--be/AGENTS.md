@@ -1,6 +1,6 @@
-# LightBoard Backend
+# Lightboard Backend
 
-LightBoard is a framework that runs auxiliary LLM requests alongside the main chat model in Risuai. Frontend modules register manifests; the backend orchestrates prompt assembly, LLM calls, validation, and result insertion.
+Lightboard is a framework that runs auxiliary LLM requests alongside the main chat model in Risuai. Frontend modules register manifests; the backend orchestrates prompt assembly, LLM calls, validation, and result insertion.
 
 ## Architecture
 
@@ -54,15 +54,16 @@ Action string modifiers (prefixed before `#`): `preserve`, `immediate`, `id=<blo
 
 Manifests are stored as lorebooks keyed `manifest.lb`. Each manifest is a key=value text block. Key fields:
 
-| Field | Description |
-|---|---|
-| `identifier` | Unique module ID. Used as the XML tag name wrapping output. |
-| `mode` | LLM routing. `1` = primary, `2` = auxiliary. |
-| `maxCtx` | Max context tokens for this module. |
-| `maxLogs` | Max chat log entries to include. |
-| `lazy` | If true, skip LLM call during generation and emit a `<lb-lazy>` placeholder instead. |
-| `sideEffect` | If true, output is processed by `onOutput` callback to mutate chat directly. |
-| `insertOrder` | Controls ordering among manifests. Higher = earlier. |
+| Field         | Description                                                                          |
+| ------------- | ------------------------------------------------------------------------------------ |
+| `identifier`  | Unique module ID. Used as the XML tag name wrapping output.                          |
+| `friendlyName` | Optional display name. Command output falls back to `identifier` when omitted.       |
+| `mode`        | LLM routing. `1` = primary, `2` = auxiliary.                                         |
+| `maxCtx`      | Max context tokens for this module.                                                  |
+| `maxLogs`     | Max chat log entries to include.                                                     |
+| `lazy`        | If true, skip LLM call during generation and emit a `<lb-lazy>` placeholder instead. |
+| `sideEffect`  | If true, output is processed by `onOutput` callback to mutate chat directly.         |
+| `insertOrder` | Controls ordering among manifests. Higher = earlier.                                 |
 
 Optional callbacks loaded from lorebooks (`<id>.lb.<name>`): `onInput`, `onOutput`, `onValidate`, `onMutation`.
 
@@ -98,13 +99,13 @@ The prefill uses the `char` role. The optional prefill user response follows it 
 
 All stored as global variables (`toggle_lightboard.<key>`):
 
-| Key | Values | Default |
-|---|---|---|
-| `active` | `0` off, `1` on | `0` |
-| `position` | `0` append, `1` prepend, `2` separated | `0` |
-| `concurrent` | 1-5 | 1 |
-| `maxRetries` | 0+ | 0 |
-| `retryMode` | `0` same, `1` primary, `2` auxiliary | `0` |
+| Key          | Values                                 | Default |
+| ------------ | -------------------------------------- | ------- |
+| `active`     | `0` off, `1` on                        | `0`     |
+| `position`   | `0` append, `1` prepend, `2` separated | `0`     |
+| `concurrent` | 1-5                                    | 1       |
+| `maxRetries` | 0+                                     | 0       |
+| `retryMode`  | `0` same, `1` primary, `2` auxiliary   | `0`     |
 
 ## `listenEdit` Hook
 

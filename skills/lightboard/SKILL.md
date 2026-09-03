@@ -74,6 +74,7 @@ Use Lua to implement stateful buttons with `risu-trigger` or `risu-btn` and cust
 
 - To understand Risuai's Lua script environment, start with `references/000-lua.md`.
 - To understand Risuai's double-curly-brace templating language for lorebooks, background embeddings, and regex output values, read `references/000-cbs.md`.
+- To review feature availability by backend release, read `references/version-history.md`.
 
 For a complete Lightboard module development, read `references/000-lightboard.md`.
 

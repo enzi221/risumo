@@ -1,6 +1,6 @@
 --! Copyright (c) 2026 amonamona
 --! CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
---! LightBoard XNAI
+--! Lightboard XNAI
 
 --- TODO: Move to Prelude
 --- Strips a node block and returns its position.

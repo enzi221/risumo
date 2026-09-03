@@ -1,6 +1,6 @@
 --! Copyright (c) 2025-2026 amonamona
 --! CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
---! LightBoard Miniboard
+--! Lightboard Miniboard
 
 local triggerId = ''
 
@@ -68,13 +68,13 @@ local function loadRenderer(name)
 
   local chunk, loadError = load(book.content, '@' .. name, 't')
   if not chunk then
-    print('[LightBoard] Miniboard renderer compile failed:', tostring(loadError))
+    print('[Lightboard] Miniboard renderer compile failed:', tostring(loadError))
     return nil
   end
 
   local success, renderer = pcall(chunk)
   if not success or type(renderer) ~= 'function' then
-    print('[LightBoard] Miniboard renderer load failed:', tostring(renderer))
+    print('[Lightboard] Miniboard renderer load failed:', tostring(renderer))
     return nil
   end
 
@@ -120,7 +120,7 @@ local function main(data, chatIndex)
 
   local extractionSuccess, extractionResult = pcall(prelude.queryNodes, 'lb-mini', data)
   if not extractionSuccess then
-    print("[LightBoard] Miniboard extraction failed:", tostring(extractionResult))
+    print("[Lightboard] Miniboard extraction failed:", tostring(extractionResult))
     return data
   end
 
@@ -169,7 +169,7 @@ listenEdit(
     if success then
       return result
     else
-      print("[LightBoard] Miniboard display failed:", tostring(result))
+      print("[Lightboard] Miniboard display failed:", tostring(result))
       return data .. '<lb-lazy id="lb-mini">오류: ' .. result .. '</lb-lazy>'
     end
   end

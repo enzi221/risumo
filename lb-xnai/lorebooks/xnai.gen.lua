@@ -201,7 +201,7 @@ local function buildPresetPrompt(triggerId, desc)
     negativeNote = negativeNote ~= '' and negativeNote .. ', ' .. COMIC_NEGATIVE_PROMPT or COMIC_NEGATIVE_PROMPT
   end
 
-  ---@type LightBoardImage
+  ---@type LightboardImage
   local image = prelude.import(triggerId, 'lightboard.image')
   return image.applyImagePreset(triggerId, compiled, {
     characterDivider = comfy and getGlobalVar(triggerId, 'toggle_lb-xnai.compat.charDivider') == '1' and '\n\n' or ' | ',
@@ -225,7 +225,7 @@ local function generate(triggerId, desc)
     return error('이미지 프롬프트를 생성할 수 없습니다. 삽화 모듈 프리셋이 있나요?')
   end
 
-  ---@type LightBoardImage
+  ---@type LightboardImage
   local image = prelude.import(triggerId, 'lightboard.image')
   return image.generateImageFromPrompts(triggerId, prompts, {
     emptyPositive = '삽화 모듈 프리셋에 긍정 프롬프트가 없습니다.',

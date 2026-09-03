@@ -22,5 +22,5 @@ lb-annot.maxSaves=저장　개수=text
 lb-annot.context=컨　　　텍=select=포함,제거
 =제거 시 메인 모델이 주석을 볼 수 없음=caption
 ==divider
-=라이트보드 주석 4.0.0—amonamona=caption
+=라이트보드 주석 4.0.1—amonamona=caption
 ==groupEnd

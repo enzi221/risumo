@@ -196,6 +196,7 @@ Apply the Composition rules to the selected event. Make the acting, receiving, o
 Preserve character and environment continuity between Scenes from the same continuous event. Repeat a continuing detail in each later Scene where that detail remains visible, and update the tags when the visible state changes.
 
 {{#when::lb-xnai.scene.comic::tis::1}}
+
 #### Multi-Panel Scenes
 
 Compose every Scene as a multi-panel comic layout with two to four connected visual beats. Keep all panels within one Scene.

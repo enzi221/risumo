@@ -3,6 +3,7 @@
 --- @class Manifest
 --- @field authorsNote boolean
 --- @field charDesc boolean
+--- @field friendlyName string?
 --- @field identifier string
 --- @field insertOrder number
 --- @field lazy boolean

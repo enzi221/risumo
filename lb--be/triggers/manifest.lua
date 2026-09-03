@@ -28,17 +28,18 @@ local function loadCallback(triggerId, id, name)
       if ok2 and type(res) == "function" then
         return res
       end
-      print('[LightBoard Backend] Callback ' .. name .. ' load error for ' .. id, tostring(res))
+      print('[Lightboard Backend] Callback ' .. name .. ' load error for ' .. id, tostring(res))
       return
     end
-    print('[LightBoard Backend] Callback ' .. name .. ' load error for ' .. id, tostring(func))
+    print('[Lightboard Backend] Callback ' .. name .. ' load error for ' .. id, tostring(func))
   end
 end
 
---- Retrieves all LightBoard manifests.
+--- Retrieves all Lightboard manifests.
 --- @param triggerId string
+--- @param includeInactive boolean?
 --- @return Manifest[]
-local function getManifests(triggerId)
+local function getManifests(triggerId, includeInactive)
   local rawManifests = getLoreBooks(triggerId, "manifest.lb")
   local parsedManifests = {}
 
@@ -53,18 +54,19 @@ local function getManifests(triggerId)
       local id = tbl.identifier
       if id and id ~= "" then
         local prefix = "toggle_" .. id .. "."
+        tbl.friendlyName = tbl.friendlyName ~= '' and tbl.friendlyName or nil
 
         tbl.mode = getGlobalVar(triggerId, prefix .. "mode")
+        tbl.insertOrder = item.insertorder or 0
         if tbl.mode ~= '0' then
-          tbl.insertOrder                       = item.insertorder or 0
-          tbl.maxCtx                            = tonumber(tbl.maxCtx) or
+          tbl.maxCtx      = tonumber(tbl.maxCtx) or
               tonumber(getGlobalVar(triggerId, prefix .. "maxCtx"))
-          tbl.maxLogs                           = tonumber(tbl.maxLogs) or
+          tbl.maxLogs     = tonumber(tbl.maxLogs) or
               tonumber(getGlobalVar(triggerId, prefix .. "maxLogs"))
-          tbl.reiteration                       = tonumber(tbl.reiteration) or
+          tbl.reiteration = tonumber(tbl.reiteration) or
               tonumber(getGlobalVar(triggerId, prefix .. "reiteration")) or 0
 
-          local thoughts = getGlobalVar(triggerId, prefix .. "thoughts")
+          local thoughts  = getGlobalVar(triggerId, prefix .. "thoughts")
           if thoughts ~= '1' and thoughts ~= '2' then
             thoughts = '0'
           end
@@ -82,7 +84,9 @@ local function getManifests(triggerId)
           tbl.onOutput                          = loadCallback(triggerId, id, 'onOutput')
           tbl.onMutation                        = loadCallback(triggerId, id, 'onMutation')
           tbl.onValidate                        = loadCallback(triggerId, id, 'onValidate')
+        end
 
+        if tbl.mode ~= '0' or includeInactive then
           parsedManifests[#parsedManifests + 1] = tbl
         end
       end
@@ -94,6 +98,13 @@ local function getManifests(triggerId)
   end)
 
   return parsedManifests
+end
+
+--- Retrieves installed Lightboard manifests, including modules whose mode is off.
+--- @param triggerId string
+--- @return Manifest[]
+local function getConfiguredManifests(triggerId)
+  return getManifests(triggerId, true)
 end
 
 --- Retrieves a specific manifest by identifier.
@@ -108,6 +119,7 @@ local function getManifestByID(triggerId, identifier)
 end
 
 return {
-  list = getManifests,
   get = getManifestByID,
+  list = getManifests,
+  listConfigured = getConfiguredManifests,
 }

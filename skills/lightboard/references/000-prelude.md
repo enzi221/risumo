@@ -56,7 +56,7 @@ The prelude also provides the `h` hyperscript-like HTML rendering function. It a
 local function render(node)
   local rawContent = node.content
   if not rawContent or rawContent == "" then
-    return "[LightBoard Error: Empty Content]"
+    return "[Lightboard Error: Empty Content]"
   end
 
   local parsed = prelude.toon.decode(node.content)

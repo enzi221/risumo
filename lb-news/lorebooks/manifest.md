@@ -1,4 +1,5 @@
 identifier=lb-news
+friendlyName=뉴스
 
 authorsNote=true
 charDesc=true

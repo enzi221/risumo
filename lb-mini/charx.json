@@ -55,7 +55,7 @@
     }
   ],
   "lowLevelAccess": false,
-  "name": "🔦라이트보드 ♦️미니보드 4.1.1",
+  "name": "🔦라이트보드 ♦️미니보드 4.1.2",
   "namespace": "lb-mini",
   "regex": [
     "regex/filter-response.md",
@@ -73,5 +73,5 @@
       "type": "start"
     }
   ],
-  "version": "4.1.1"
+  "version": "4.1.2"
 }

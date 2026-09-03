@@ -381,7 +381,7 @@ listenEdit(
       return result
     end
 
-    print("[LightBoard] Illustration inline render failed:", tostring(result))
+    print("[Lightboard] Illustration inline render failed:", tostring(result))
     return data
   end
 )

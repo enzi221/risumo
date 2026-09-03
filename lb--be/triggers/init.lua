@@ -1,6 +1,6 @@
 --! Copyright (c) 2025-2026 amonamona
 --! CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
---! LightBoard Backend
+--! Lightboard Backend
 
 ---@diagnostic disable: lowercase-global
 
@@ -20,11 +20,13 @@ local function setTriggerId(tid)
   prelude.import(tid, 'toon.decode')
 end
 
-local manifest = require('./manifest')
-local sideeffect = require('./sideeffect')
-local lbdata = require('./lbdata')
-local pipeline = require('./pipeline')
 local C = require('./constants')
+local commands = require('./commands')
+local lbdata = require('./lbdata')
+local manifest = require('./manifest')
+local moduleopener = require('./moduleopener')
+local pipeline = require('./pipeline')
+local sideeffect = require('./sideeffect')
 
 --- Finds the last chat index with `char` role within a range.
 --- @param fullChat Chat[]
@@ -143,10 +145,10 @@ local main = async(function(manifests, chatContext, chatOffset, fullContext)
       local result = batchResult.result
 
       if not ok then
-        alertError(triggerId, '[LightBoard] ' .. man.identifier .. ' 생성 실패.\n' .. tostring(result))
+        alertError(triggerId, '[Lightboard] ' .. man.identifier .. ' 생성 실패.\n' .. tostring(result))
         result = string.format('<lb-lazy id="%s"></lb-lazy>', man.identifier)
       elseif not result or result == '' then
-        alertError(triggerId, '[LightBoard] ' .. man.identifier .. ' 생성 실패. 모델 응답이 비어있습니다.')
+        alertError(triggerId, '[Lightboard] ' .. man.identifier .. ' 생성 실패. 모델 응답이 비어있습니다.')
         result = string.format('<lb-lazy id="%s"></lb-lazy>', man.identifier)
       end
 
@@ -197,7 +199,7 @@ local main = async(function(manifests, chatContext, chatOffset, fullContext)
       end
     end
   else
-    print("[LightBoard] All normal manifests processed. No new content to add.")
+    print("[Lightboard] All normal manifests processed. No new content to add.")
   end
 
   local success, message = pcall(sideeffect.applySideEffects, triggerId, {
@@ -205,39 +207,47 @@ local main = async(function(manifests, chatContext, chatOffset, fullContext)
     sideEffectManifests = sideEffectManifests,
   })
   if not success then
-    error('[LightBoard Backend] SideEffect Error: ' .. tostring(message))
+    error('[Lightboard Backend] SideEffect Error: ' .. tostring(message))
   end
 end)
 
-onOutput = async(function(tid)
-  setTriggerId(tid)
+--- Inserts an empty LBDATA block at the configured output position.
+--- @param tid string
+--- @param chatContext Chat[]
+local function insertGenerationPlaceholder(tid, chatContext)
+  local lastChat = chatContext[#chatContext]
+  local insertedContent, addedAsChat = lbdata.insertLBDATA(tid, -1, lastChat.data)
 
+  -- context sync
+  if addedAsChat then
+    table.insert(chatContext, {
+      data = insertedContent,
+      role = 'char',
+    })
+  else
+    lastChat.data = insertedContent
+  end
+end
+
+--- Runs the automatic generation pipeline against the current chat.
+--- @param tid string
+--- @return boolean started
+local function runGeneration(tid)
   if getGlobalVar(tid, C.CONFIG.ACTIVE) == '0' then
-    return
+    return false
   end
 
   local manifests = manifest.list(triggerId)
   if #manifests == 0 then
-    return
+    return false
   end
 
   local chatContext, chatOffset, fullContext = getGenerationChatContext(manifests)
-  local lastChat = chatContext[#chatContext]
-  local position = getGlobalVar(tid, C.CONFIG.POSITION) or '0'
-  if position == '0' then
-    lastChat.data = lastChat.data .. '\n\n---\n[LBDATA START]\n[LBDATA END]\n---'
-    setChat(tid, -1, lastChat.data)
-  elseif position == '1' then
-    lastChat.data = '---\n[LBDATA START]\n[LBDATA END]\n---\n\n' .. lastChat.data
-    setChat(tid, -1, lastChat.data)
-  else
-    local placeholder = '---\n[LBDATA START]\n[LBDATA END]\n---'
-    addChat(tid, 'char', placeholder)
-    table.insert(chatContext, {
-      data = placeholder,
-      role = 'char',
-    })
+  if #chatContext == 0 then
+    return false
   end
+
+  insertGenerationPlaceholder(tid, chatContext)
 
   local success, result = pcall(function()
     local mainPromise = main(manifests, chatContext, chatOffset, fullContext)
@@ -245,9 +255,16 @@ onOutput = async(function(tid)
   end)
 
   if not success then
-    print('[LightBoard Backend] Backend Error: ' .. tostring(result))
-    alertError(tid, '[LightBoard] 백엔드 오류. 개발자에게 문의해주세요.\n' .. tostring(result))
+    print('[Lightboard Backend] Backend Error: ' .. tostring(result))
+    alertError(tid, '[Lightboard] 백엔드 오류. 개발자에게 문의해주세요.\n' .. tostring(result))
   end
+
+  return true
+end
+
+onOutput = async(function(tid)
+  setTriggerId(tid)
+  runGeneration(tid)
 end)
 
 ---@param identifier string module identifier
@@ -334,7 +351,7 @@ local function reroll(identifier, blockID)
     if isSeparated then
       setChat(triggerId, lbdataJsIdx, originalLbdataContent)
     end
-    alertError(triggerId, '[LightBoard] 리롤 실패 (' .. identifier .. ').\n' .. tostring(result))
+    alertError(triggerId, '[Lightboard] 리롤 실패 (' .. identifier .. ').\n' .. tostring(result))
     return
   end
 
@@ -451,13 +468,13 @@ Action: `%s`
 
   if not success then
     setChat(triggerId, jsIndex, originalContent)
-    alertError(triggerId, '[LightBoard] 상호작용 실패 (' .. identifier .. ').\n' .. tostring(result))
+    alertError(triggerId, '[Lightboard] 상호작용 실패 (' .. identifier .. ').\n' .. tostring(result))
     return
   end
 
   if not result or result == '' or result == null then
     setChat(triggerId, jsIndex, originalContent)
-    alertError(triggerId, "[LightBoard] 상호작용 불가. 모델 응답이 비어있거나 null입니다. 검열됐을 수 있습니다.")
+    alertError(triggerId, "[Lightboard] 상호작용 불가. 모델 응답이 비어있거나 null입니다. 검열됐을 수 있습니다.")
     return
   end
 
@@ -518,6 +535,10 @@ end
 onButtonClick = async(function(tid, code)
   setTriggerId(tid)
 
+  if moduleopener.handleButton(tid, code) then
+    return
+  end
+
   local prefix = "lb%-reroll__"
   local _, rerollPrefixEnd = string.find(code, prefix)
 
@@ -542,7 +563,7 @@ onButtonClick = async(function(tid, code)
 
     local success, result = pcall(reroll, identifier, blockID)
     if not success then
-      alertError(tid, "[LightBoard] 리롤 실패 (" .. identifier .. ").\n" .. tostring(result))
+      alertError(tid, "[Lightboard] 리롤 실패 (" .. identifier .. ").\n" .. tostring(result))
       return
     end
 
@@ -573,13 +594,13 @@ onButtonClick = async(function(tid, code)
 
     local mode = getGlobalVar(tid, C.CONFIG.ACTIVE) or "0"
     if mode == "0" then
-      alertNormal(tid, '[LightBoard] 상호작용 전에 백엔드 전원을 켜주세요.')
+      alertNormal(tid, '[Lightboard] 상호작용 전에 백엔드 전원을 켜주세요.')
       return
     end
 
     local modifiers = parseInteractionModifiers(action)
 
-    print('[LightBoard Backend][VERBOSE] Interaction ' .. action .. ' of ' .. identifier .. ' initiated.')
+    print('[Lightboard Backend][VERBOSE] Interaction ' .. action .. ' of ' .. identifier .. ' initiated.')
 
     if modifiers.immediate then
       addChat(tid, 'user', pendingMessage(identifier, '상호작용 중, 채팅을 보내거나 다른 작업을 하지 마세요...'))
@@ -588,7 +609,7 @@ onButtonClick = async(function(tid, code)
       -- #fullChat = pending message, #fullChat-1 = last char chat to modify
       local success, result = pcall(interact, fullChat, identifier, action, "", -2)
       if not success then
-        alertError(tid, "[LightBoard] 상호작용 실패 (" .. identifier .. ").\n" .. tostring(result))
+        alertError(tid, "[Lightboard] 상호작용 실패 (" .. identifier .. ").\n" .. tostring(result))
         return
       end
 
@@ -622,15 +643,20 @@ local function extractInteraction(chatData)
 end
 
 onStart = async(function(tid)
+  setTriggerId(tid)
+
+  local fullChat = getFullChat(tid)
+  local lastChat = fullChat[#fullChat]
+  print(lastChat.data)
+  if commands.handle(tid, lastChat and lastChat.data) then
+    return
+  end
+
   local mode = getGlobalVar(tid, C.CONFIG.ACTIVE) or "0"
   if mode == "0" then
     return
   end
 
-  setTriggerId(tid)
-
-  local fullChat = getFullChat(tid)
-  local lastChat = fullChat[#fullChat]
   local secondLastChat = fullChat[#fullChat - 1]
 
   -- Try: last chat is action (no direction)
@@ -641,7 +667,7 @@ onStart = async(function(tid)
     if success then
       removeChat(tid, -1)
     else
-      alertError(tid, "[LightBoard] 상호작용 " .. identifier .. " 실패. 개발자에게 문의하세요.\n" .. tostring(result))
+      alertError(tid, "[Lightboard] 상호작용 " .. identifier .. " 실패. 개발자에게 문의하세요.\n" .. tostring(result))
     end
     return
   end
@@ -668,9 +694,24 @@ onStart = async(function(tid)
     removeChat(tid, -2)
     removeChat(tid, -1)
   else
-    alertError(tid, "[LightBoard] 상호작용 " .. identifier .. " 실패. 개발자에게 문의하세요.\n" .. tostring(result))
+    alertError(tid, "[Lightboard] 상호작용 " .. identifier .. " 실패. 개발자에게 문의하세요.\n" .. tostring(result))
   end
 end)
+
+listenEdit(
+  'editDisplay',
+  function(tid, data, meta)
+    setTriggerId(tid)
+
+    local success, result = pcall(moduleopener.render, tid, data, meta)
+    if success then
+      return result
+    end
+
+    print('[Lightboard] Module opener render failed:', tostring(result))
+    return data
+  end
+)
 
 -- Extract LBDATA blocks, send as system messages
 listenEdit(

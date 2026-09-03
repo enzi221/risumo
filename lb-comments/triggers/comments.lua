@@ -1,6 +1,6 @@
 --! Copyright (c) 2025-2026 amonamona
 --! CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
---! LightBoard Comments
+--! Lightboard Comments
 
 local triggerId = ''
 
@@ -40,7 +40,7 @@ end
 local function render(node, chatIndex)
   local rawContent = node.content
   if not rawContent or rawContent == "" then
-    return "[LightBoard Error: Empty Content]"
+    return "[Lightboard Error: Empty Content]"
   end
 
   ---@class CommentsCommentData
@@ -285,7 +285,7 @@ listenEdit(
 
     local extractionSuccess, extractionResult = pcall(prelude.queryNodes, 'lb-comments', data)
     if not extractionSuccess then
-      print("[LightBoard] Comments extraction failed:", tostring(extractionResult))
+      print("[Lightboard] Comments extraction failed:", tostring(extractionResult))
       return data
     end
 

@@ -50,7 +50,7 @@
     }
   ],
   "lowLevelAccess": false,
-  "name": "🔦라이트보드 📰뉴스 4.0.0",
+  "name": "🔦라이트보드 📰뉴스 4.0.1",
   "namespace": "lb-news",
   "regex": [
     "regex/filter-response.md",
@@ -69,5 +69,5 @@
       "type": "start"
     }
   ],
-  "version": "4.0.0"
+  "version": "4.0.1"
 }

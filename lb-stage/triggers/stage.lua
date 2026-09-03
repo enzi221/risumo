@@ -1,6 +1,6 @@
 --! Copyright (c) 2025-2026 amonamona
 --! CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
---! LightBoard Stage
+--! Lightboard Stage
 
 local triggerId = ''
 
@@ -222,7 +222,7 @@ listenEdit(
     local node = nodes[1]
     local renderSuccess, rendered = pcall(render, node)
     if not renderSuccess then
-      print('[LightBoard] Stage render failed:', tostring(rendered))
+      print('[Lightboard] Stage render failed:', tostring(rendered))
       rendered = '<lb-lazy id="lb-stage">오류: ' .. tostring(rendered) .. '</lb-lazy>'
     elseif not rendered then
       return data

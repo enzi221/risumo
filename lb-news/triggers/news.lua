@@ -1,6 +1,6 @@
 --! Copyright (c) 2025-2026 amonamona
 --! CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
---! LightBoard News
+--! Lightboard News
 local triggerId = ''
 
 local function setTriggerId(tid)
@@ -79,7 +79,7 @@ end
 local function render(node)
   local rawContent = node.content
   if not rawContent or rawContent == "" then
-    return "[LightBoard Error: Empty Content]"
+    return "[Lightboard Error: Empty Content]"
   end
 
   ---@class NewsArticleData
@@ -247,7 +247,7 @@ local function main(data)
 
   local extractionSuccess, extractionResult = pcall(prelude.queryNodes, 'lb-news', data)
   if not extractionSuccess then
-    print("[LightBoard] News extraction failed:", tostring(extractionResult))
+    print("[Lightboard] News extraction failed:", tostring(extractionResult))
     return data
   end
 
@@ -292,7 +292,8 @@ local function stripRequestOnlyFields(content)
     if body:match('^headlineImage:%s*$') then
       section = 'headlineImage'
     else
-      local indent, topAdsPrefix, topAdsSuffix = body:match('^(%s*)(topAds%[%d+|%]%{)content|boxStyle|textStyle(%}:%s*)$')
+      local indent, topAdsPrefix, topAdsSuffix = body:match(
+      '^(%s*)(topAds%[%d+|%]%{)content|boxStyle|textStyle(%}:%s*)$')
       if topAdsPrefix then
         section = 'topAds'
         table.insert(result, indent .. topAdsPrefix .. 'content' .. topAdsSuffix .. newline)
@@ -359,7 +360,7 @@ listenEdit(
     if success then
       return result
     else
-      print("[LightBoard] News display failed:", tostring(result))
+      print("[Lightboard] News display failed:", tostring(result))
       return data .. '<lb-lazy id="lb-news">오류: ' .. result .. '</lb-lazy>'
     end
   end

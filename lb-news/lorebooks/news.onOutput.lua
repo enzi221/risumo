@@ -48,7 +48,7 @@ local function generateHeadlineImage(tid, node)
   imageState[id] = nil
   setState(tid, 'lb-news-images', imageState)
 
-  ---@type LightBoardImage
+  ---@type LightboardImage
   local image = prelude.import(tid, 'lightboard.image')
   local preset = getGlobalVar(tid, 'toggle_lb-news.image.preset')
   if type(preset) ~= 'string' or prelude.trim(preset) == '' or preset == 'null' then
@@ -62,13 +62,13 @@ local function generateHeadlineImage(tid, node)
     presetBookName = '프리셋 ' .. preset,
   })
   if not prompts then
-    print('[LightBoard] News headline image preset not found.')
+    print('[Lightboard] News headline image preset not found.')
     return
   end
 
   local generated, inlay = pcall(image.generateImageFromPrompts, tid, prompts)
   if not generated or not inlay or inlay == '' then
-    print('[LightBoard] News headline image generation failed:', tostring(inlay))
+    print('[Lightboard] News headline image generation failed:', tostring(inlay))
     return
   end
 

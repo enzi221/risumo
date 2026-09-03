@@ -1,4 +1,5 @@
 identifier=lb-xnai
+friendlyName=삽화
 authorsNote=true
 charDesc=true
 loreBooks=true

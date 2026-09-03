@@ -37,13 +37,13 @@ local function main(_, output)
   end
 
   if not body then
-    print('[LightBoard] No <lb-stage> block found')
+    print('[Lightboard] No <lb-stage> block found')
     return ''
   end
 
   local data = prelude.toon.decode(body.content)
   if not data or not data.objective or not data.phase or not data.episodes then
-    print('[LightBoard] Stage content invalid')
+    print('[Lightboard] Stage content invalid')
     return '<lb-lazy id="lb-stage" />'
   end
 

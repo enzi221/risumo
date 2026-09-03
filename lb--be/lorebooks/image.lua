@@ -233,7 +233,7 @@ local function generateImageFromPrompts(triggerId, prompts, errors)
   return inlay
 end
 
----@class LightBoardImage
+---@class LightboardImage
 ---@field applyImagePreset fun(triggerId: string, source: ImagePresetSource, options?: ImagePresetOptions): ImagePromptSet?
 ---@field generateImageFromPrompts fun(triggerId: string, prompts: ImagePromptSet, errors?: ImageGenerationErrors): string
 

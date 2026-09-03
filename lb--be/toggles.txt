@@ -24,5 +24,5 @@ lightboard.maxRetries=최대　시도=text
 lightboard.retryMode=시도　모델=select=모듈별 설정,메인 강제,보조 강제
 =보조 강제 권장=caption
 ==divider
-=라이트보드 백엔드 4.1.1—amonamona=caption
+=라이트보드 백엔드 4.2.0—amonamona=caption
 ==groupEnd

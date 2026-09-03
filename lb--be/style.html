@@ -66,6 +66,55 @@
       margin-left: 0.5em;
       width: 1em;
     }
+
+    .x-risu-lb-module-adder {
+      --mo-bg: transparent;
+      --mo-fg: var(--fg, var(--risu-theme-textcolor));
+
+      justify-content: center;
+      min-width: 3em;
+    }
+
+    .x-risu-lb-module-adder-menu:popover-open {
+      animation: lb-slidein 0.15s ease forwards;
+      background: var(--bg, var(--risu-theme-bgcolor));
+      border: 1px dashed var(--fg, var(--risu-theme-textcolor));
+      border-radius: 0.4em;
+      color: var(--fg, var(--risu-theme-textcolor));
+      display: flex;
+      flex-direction: column;
+      font-size: 0.8em;
+      margin-bottom: 0.5em;
+      padding: 0.5em 1em;
+      position-area: top span-right;
+      position-try: flip-block;
+      transform-origin: bottom center;
+    }
+
+    .x-risu-lb-module-adder-menu > button {
+      align-items: baseline;
+      color: inherit;
+      display: flex;
+      font-size: 1em;
+      gap: 0.5em;
+      padding: 0.5em 0;
+      text-align: left;
+      transition: opacity 0.15s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .x-risu-lb-module-adder-menu > button:hover {
+      opacity: 0.67;
+    }
+
+    .x-risu-lb-module-adder-menu > button:disabled {
+      cursor: not-allowed;
+      opacity: 0.35;
+    }
+
+    .x-risu-lb-module-adder-menu > button > small,
+    .x-risu-lb-module-adder-empty {
+      opacity: 0.67;
+    }
     /*#endregion*/
 
     /*#region old compat */
@@ -306,6 +355,16 @@
       margin-top: 8px;
     }
 
+    .x-risu-lb-command-heading {
+      font-size: 1.25em;
+      font-weight: 700;
+    }
+    .x-risu-lb-command pre {
+      font-family: monospace;
+      margin: 0 0 1em;
+      white-space: pre-wrap;
+    }
+
     :is(.x-risu-lb-dialog) {
       animation: lb-slidein 0.2s ease forwards;
       background: none;
@@ -346,5 +405,11 @@
         max-height: calc(100svh - 64px);
       }
     }
+  }
+
+  .lb-dangerous-cleaner {
+    background: red;
+    border-radius: 8px;
+    padding: 2px;
   }
 </style>

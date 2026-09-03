@@ -1,6 +1,6 @@
 --! Copyright (c) 2025-2026 amonamona
 --! CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
---! LightBoard Stats
+--! Lightboard Stats
 
 ---Renders a node into HTML.
 ---@param node Node
@@ -8,7 +8,7 @@
 local function render(triggerId, node)
   local rawContent = node.content
   if not rawContent or rawContent == "" then
-    return "[LightBoard Error: Empty Content]"
+    return "[Lightboard Error: Empty Content]"
   end
 
   ---@class StatsData
@@ -86,7 +86,7 @@ local function main(tid, data, chatIndex, chatLength)
 
   local extractionSuccess, extractionResult = pcall(prelude.queryNodes, 'lb-stats', data)
   if not extractionSuccess then
-    print("[LightBoard] Stats extraction failed:", tostring(extractionResult))
+    print("[Lightboard] Stats extraction failed:", tostring(extractionResult))
     return data
   end
 

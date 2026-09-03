@@ -40,19 +40,21 @@
     }
   ],
   "lowLevelAccess": true,
-  "name": "🔦라이트보드 - 4.1.1",
+  "name": "🔦라이트보드 - 4.2.0",
   "namespace": "lightboard",
   "regex": [
     "regex/remove-main-output.md",
     "regex/hide-default-cod.md",
     "regex/hide-platform-dividers-disabled.md",
     "regex/display-cleaner.md",
+    "regex/display-command.md",
     "regex/display-comment-icon.md",
     "regex/display-cross-icon.md",
     "regex/display-interaction-hints.md",
     "regex/display-pin-icon.md",
     "regex/display-platform-area.md",
     "regex/display-reroll-icon.md",
+    "regex/ignore-command.md",
     "regex/ignore-interaction-metadata.md",
     "regex/ignore-default-cod.md",
     "regex/ignore-empty-platform-area.md",
@@ -70,5 +72,5 @@
       "type": "start"
     }
   ],
-  "version": "4.1.1"
+  "version": "4.2.0"
 }

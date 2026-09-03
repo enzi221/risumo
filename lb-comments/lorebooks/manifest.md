@@ -1,4 +1,5 @@
 identifier=lb-comments
+friendlyName=댓글창
 
 authorsNote=false
 charDesc=true

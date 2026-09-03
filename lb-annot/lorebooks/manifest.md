@@ -1,4 +1,5 @@
 identifier=lb-annot
+friendlyName=주석
 authorsNote=true
 charDesc=true
 loreBooks=true

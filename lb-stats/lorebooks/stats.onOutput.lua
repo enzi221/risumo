@@ -33,7 +33,7 @@ local function main(_, output)
   end
 
   if not body then
-    print('[LightBoard] No <lb-stats> block found')
+    print('[Lightboard] No <lb-stats> block found')
     return ''
   end
 

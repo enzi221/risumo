@@ -129,6 +129,61 @@ function M.replaceLBDATA(text, inner)
   return text:sub(1, blockStart) .. '\n' .. trimmedInner .. text:sub(blockEnd)
 end
 
+--- Removes every complete LBDATA block and its surrounding divider when present.
+--- @param text string?
+--- @return string strippedText, boolean removed
+function M.stripLBDATA(text)
+  if not text or text == '' then
+    return text or '', false
+  end
+
+  local stripped = text
+  local removedCount = 0
+  local count
+
+  stripped, count = stripped:gsub(
+    '%-%-%-\r\n' .. C.LBDATA.PATTERN_START .. '.-' .. C.LBDATA.PATTERN_END .. '\r\n%-%-%-',
+    '')
+  removedCount = removedCount + count
+  stripped, count = stripped:gsub(
+    '%-%-%-\n' .. C.LBDATA.PATTERN_START .. '.-' .. C.LBDATA.PATTERN_END .. '\n%-%-%-',
+    '')
+  removedCount = removedCount + count
+  stripped, count = stripped:gsub(C.LBDATA.PATTERN_START .. '.-' .. C.LBDATA.PATTERN_END, '')
+  removedCount = removedCount + count
+
+  stripped = stripped:gsub('\r\n', '\n'):gsub('\n\n\n+', '\n\n')
+  return prelude.trim(stripped), removedCount > 0
+end
+
+--- Inserts an LBDATA block at the selected output position.
+--- @param triggerId string
+--- @param targetIndex number
+--- @param targetContent string
+--- @param inner string? prepopulates LBDATA body with this value
+--- @return string insertedContent, boolean addedAsChat
+function M.insertLBDATA(triggerId, targetIndex, targetContent, inner)
+  local trimmedInner = prelude.trim(inner or '')
+  local blockInner = trimmedInner ~= '' and '\n' .. trimmedInner or ''
+  local block = '---\n' .. C.LBDATA.START .. blockInner .. '\n' .. C.LBDATA.END .. '\n---'
+  local position = getGlobalVar(triggerId, C.CONFIG.POSITION) or '0'
+
+  if position == '2' then
+    addChat(triggerId, 'char', block)
+    return block, true
+  end
+
+  local insertedContent
+  if position == '1' then
+    insertedContent = block .. '\n\n' .. targetContent
+  else
+    insertedContent = targetContent .. '\n\n' .. block
+  end
+
+  setChat(triggerId, targetIndex, insertedContent)
+  return insertedContent, false
+end
+
 --- @class ResolvedTargets
 --- @field targetIdx number? 0-based JS index
 --- @field targetContent string?

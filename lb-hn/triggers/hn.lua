@@ -1,6 +1,6 @@
 --! Copyright (c) 2025-2026 amonamona
 --! CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
---! LightBoard HunterNet
+--! Lightboard HunterNet
 
 local triggerId = ''
 
@@ -76,7 +76,7 @@ end
 local function render(node, chatIndex)
   local rawContent = node.content
   if not rawContent or rawContent == "" then
-    return "[LightBoard Error: Empty Content]"
+    return "[Lightboard Error: Empty Content]"
   end
 
   ---@class HNCommentData
@@ -302,7 +302,7 @@ local function main(data, chatIndex)
 
   local extractionSuccess, extractionResult = pcall(prelude.queryNodes, 'lb-hn', data)
   if not extractionSuccess then
-    print("[LightBoard] HN extraction failed:", tostring(extractionResult))
+    print("[Lightboard] HN extraction failed:", tostring(extractionResult))
     return data
   end
 
@@ -335,7 +335,7 @@ listenEdit(
     if success then
       return result
     else
-      print('[LightBoard] HN display failed:', tostring(result))
+      print('[Lightboard] HN display failed:', tostring(result))
       return data .. '<lb-lazy id="lb-hn">오류: ' .. result .. '</lb-lazy>'
     end
   end

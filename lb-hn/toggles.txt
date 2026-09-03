@@ -15,5 +15,5 @@ lb-hn.thoughts=생각보조=select=적고 제거,생각만,안하기
 lb-hn.context=컨　　텍=select=포함,제거
 =제거 시 메인 모델이 게시판 내용을 볼 수 없음=caption
 ==divider
-=라이트보드 헌터넷 4.0.0—amonamona=caption
+=라이트보드 헌터넷 4.0.1—amonamona=caption
 ==groupEnd
