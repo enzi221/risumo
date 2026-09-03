@@ -1,3 +1,7 @@
+local function verbose(tid, ...)
+  prelude.verbose(tid, 'lb-xnai.onValidate', ...)
+end
+
 ---@param errors string[]
 ---@param character any
 ---@param label string
@@ -140,20 +144,25 @@ end
 
 local function main(tid, output)
   local nodes = prelude.queryNodes('lb-xnai', output)
+  verbose(tid, 'Validation started. nodes=' .. tostring(#nodes))
   if #nodes == 0 then
     error('InvalidOutput: Missing <lb-xnai> node.')
   end
 
   ---@type XNAIGen
   local gen = prelude.import(tid, 'lb-xnai.gen')
-  local comic = getGlobalVar(tid, 'toggle_lb-xnai.scene.comic') == '1'
+  local comicMode = getGlobalVar(tid, 'toggle_lb-xnai.scene.comic')
+  local comic = comicMode == '1' or comicMode == '2'
 
   local errors = {}
   validateNode(errors, nodes[#nodes], 'Output', gen, comic)
 
   if #errors > 0 then
+    verbose(tid, 'Validation failed. errors=' .. tostring(#errors))
     error('InvalidOutput: Malformed data. Aggregated errors:\n\n' .. table.concat(errors, '\n'))
   end
+
+  verbose(tid, 'Validation completed.')
 end
 
 return main

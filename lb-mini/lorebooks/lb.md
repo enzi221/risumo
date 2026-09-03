@@ -214,24 +214,26 @@ Major character (not protagonist) can't post/comment when preoccupied engaging P
 
 # Example
 
+Each leading `⇥` represents one TOON indentation level of exactly two spaces. Do not output `⇥`; use two ASCII spaces for each indentation level.
+
 ```
 <lb-mini name="..."{{#when::{{getglobalvar::toggle_lb-mini.sampling}}::is::1}} prob="0.00"{{/when}}>
 [2|]:
-  - author: ㅇㅇ
-    title: 시발 국대 실화냐?
-    time: 1시간 전
-    upvotes: 257
-    downvotes: 13
-    content: 야 이 ㅅㄲ들 개씹노잼이네ㅋㅋㅋ 아오 발암 걸릴 뻔ㅋㅋㅋㅋ 토토한 새기들 한강물 온도 재러 가자 ㅋㅋㅋ
-    comments[1|]{author|time|content}:
-      ㅇㅇ|50분 전|진짜 개노답ㅋㅋ 내가 이걸 보려고 야근하고 왔나 자괴감 든다 시발
-  - author: 늘보아빠
-    title: 이번에 새로 나온 그 폰 써보신 분 계신가요?
-    time: 1시간 전
-    upvotes: 7
-    downvotes: 0
-    content: 며칠째 고민 중인데, 실사용 후기가 궁금하네요. 카메라 성능이랑 배터리가 특히 어떤지 말씀해주시면 감사하겠습니다.
-    comments[0|]:
+⇥- author: ㅇㅇ
+⇥⇥title: 시발 국대 실화냐?
+⇥⇥time: 1시간 전
+⇥⇥upvotes: 257
+⇥⇥downvotes: 13
+⇥⇥content: 야 이 ㅅㄲ들 개씹노잼이네ㅋㅋㅋ 아오 발암 걸릴 뻔ㅋㅋㅋㅋ 토토한 새기들 한강물 온도 재러 가자 ㅋㅋㅋ
+⇥⇥comments[1|]{author|time|content}:
+⇥⇥⇥ㅇㅇ|50분 전|진짜 개노답ㅋㅋ 내가 이걸 보려고 야근하고 왔나 자괴감 든다 시발
+⇥- author: 늘보아빠
+⇥⇥title: 이번에 새로 나온 그 폰 써보신 분 계신가요?
+⇥⇥time: 1시간 전
+⇥⇥upvotes: 7
+⇥⇥downvotes: 0
+⇥⇥content: 며칠째 고민 중인데, 실사용 후기가 궁금하네요. 카메라 성능이랑 배터리가 특히 어떤지 말씀해주시면 감사하겠습니다.
+⇥⇥comments[0|]:
 </lb-mini>
 ```
 

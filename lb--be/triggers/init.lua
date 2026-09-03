@@ -600,7 +600,7 @@ onButtonClick = async(function(tid, code)
 
     local modifiers = parseInteractionModifiers(action)
 
-    print('[Lightboard Backend][VERBOSE] Interaction ' .. action .. ' of ' .. identifier .. ' initiated.')
+    prelude.verbose(tid, identifier, 'Interaction initiated. action=' .. action)
 
     if modifiers.immediate then
       addChat(tid, 'user', pendingMessage(identifier, '상호작용 중, 채팅을 보내거나 다른 작업을 하지 마세요...'))

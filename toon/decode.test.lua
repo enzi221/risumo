@@ -172,6 +172,20 @@ describe("nested objects", function()
     local toon_str = "a:\n  b:\n    c: deep"
     assertDeepEquals(toon.decode(toon_str), { a = { b = { c = "deep" } } }, "parse deeply nested objects")
   end)
+
+  it("parses visible indentation markers", function()
+    local toon_str = "a:\n⇥b:\n⇥⇥c: deep"
+    assertDeepEquals(toon.decode(toon_str), { a = { b = { c = "deep" } } }, "parse indentation markers")
+  end)
+
+  it("combines visible indentation markers with leading spaces", function()
+    local toon_str = "a:\n⇥b:\n⇥  c: deep"
+    assertDeepEquals(toon.decode(toon_str), { a = { b = { c = "deep" } } }, "parse mixed indentation")
+  end)
+
+  it("preserves visible indentation markers outside indentation", function()
+    assertDeepEquals(toon.decode("value: a⇥b"), { value = "a⇥b" }, "preserve marker in value")
+  end)
 end)
 
 describe("arrays of primitives", function()

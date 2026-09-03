@@ -98,6 +98,72 @@ local function getFlagToggle(triggerId, flagName)
   return getGlobalVar(triggerId, 'toggle_' .. flagName) == '1'
 end
 
+local LOG_LEVELS = {
+  INFO = 1,
+  NONE = 2,
+  VERBOSE = 0,
+}
+
+---@param triggerId string
+---@return integer
+local function getLogLevel(triggerId)
+  local rawLevel = getGlobalVar(triggerId, 'toggle_lightboard.logLevel')
+  local rawType = type(rawLevel)
+  local level = nil
+  if rawType == 'number' or rawType == 'string' then
+    level = tonumber(rawLevel)
+  end
+
+  if level ~= LOG_LEVELS.VERBOSE and level ~= LOG_LEVELS.INFO and level ~= LOG_LEVELS.NONE then
+    return LOG_LEVELS.VERBOSE
+  end
+
+  return level
+end
+
+---@param triggerId string
+---@param level 'VERBOSE'|'INFO'
+---@return boolean
+local function logEnabled(triggerId, level)
+  local requestedLevel = LOG_LEVELS[level]
+  if requestedLevel == nil or requestedLevel == LOG_LEVELS.NONE then
+    return false
+  end
+
+  return getLogLevel(triggerId) <= requestedLevel
+end
+
+---@param triggerId string
+---@param level 'VERBOSE'|'INFO'
+---@param scope string?
+---@param ... any
+local function writeLog(triggerId, level, scope, ...)
+  if not logEnabled(triggerId, level) then
+    return
+  end
+
+  local prefix = '[Lightboard][' .. level .. ']'
+  if scope and scope ~= '' then
+    prefix = prefix .. '[' .. tostring(scope) .. ']'
+  end
+
+  print(prefix, ...)
+end
+
+---@param triggerId string
+---@param scope string?
+---@param ... any
+local function info(triggerId, scope, ...)
+  writeLog(triggerId, 'INFO', scope, ...)
+end
+
+---@param triggerId string
+---@param scope string?
+---@param ... any
+local function verbose(triggerId, scope, ...)
+  writeLog(triggerId, 'VERBOSE', scope, ...)
+end
+
 ---@param openTagContent string
 ---@return string?
 local function extractTagName(openTagContent)
@@ -485,12 +551,15 @@ _ENV.prelude = {
   extractNodes = queryNodes,
   getFlagToggle = getFlagToggle,
   getPriorityLoreBook = getPriorityLoreBook,
+  info = info,
   import = import,
   locateTargetChat = locateTargetChat,
+  logEnabled = logEnabled,
   queryNodes = queryNodes,
   removeAllNodes = removeAllNodes,
   split = split,
   trim = trim,
+  verbose = verbose,
   -- deprecated
   extractBlocks = extractBlocks,
   parseBlock = parseBlock,

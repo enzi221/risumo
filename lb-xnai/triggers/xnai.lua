@@ -1,6 +1,14 @@
 local t_concat = table.concat
 local triggerId = ''
 
+local function info(...)
+  prelude.info(triggerId, 'lb-xnai', ...)
+end
+
+local function verbose(...)
+  prelude.verbose(triggerId, 'lb-xnai', ...)
+end
+
 local function setTriggerId(tid)
   triggerId = tid
   if type(prelude) ~= 'nil' then
@@ -39,13 +47,27 @@ end
 ---@class XNAIStackItem
 ---@field chatIndex number
 ---@field data XNAIStackData
+---@field operationID string?
+
+---@param chatIndex number
+---@param operationID string?
+---@param slot string?
+---@return string
+local function createGenerationCode(chatIndex, operationID, slot)
+  local code = t_concat({ 'lb-xnai-gen/', chatIndex, slot and ('_' .. slot) or '' })
+  if operationID then
+    return code .. '#' .. operationID
+  end
+
+  return code
+end
 
 ---@param desc XNAIDescriptor
 ---@return XNAIPromptSet
 local function buildRawPrompt(desc)
   ---@type XNAIGen
   local gen = prelude.import(triggerId, 'lb-xnai.gen')
-  return gen.buildRawPrompt(desc)
+  return gen.buildRawPrompt(triggerId, desc)
 end
 
 ---@param popID string
@@ -70,8 +92,9 @@ local function createFullsizePop(popID, inlay, promptPreview, toolbarItems)
 end
 
 ---@param chatIndex number
+---@param operationID string?
 ---@return any
-local function createModuleMenu(chatIndex)
+local function createModuleMenu(chatIndex, operationID)
   local menuID = t_concat({ 'lb-xnai-menu-', chatIndex })
 
   return h.div['lb-module-opener-root'] {
@@ -101,7 +124,7 @@ local function createModuleMenu(chatIndex)
       },
       h.button {
         popovertarget = menuID,
-        risu_btn = t_concat({ 'lb-xnai-gen/', chatIndex }),
+        risu_btn = createGenerationCode(chatIndex, operationID),
         type = 'button',
         h.lb_xnai_ff_icon { closed = true },
         '이미지 전체 생성',
@@ -133,6 +156,7 @@ local function renderInline(data, chatIndex, stackItem)
   for nodeIndex = #imageNodes, 1, -1 do
     local imageNode = imageNodes[nodeIndex]
     local slot = imageNode.attributes.scene
+    local operationID = imageNode.attributes.operation or (stackItem and stackItem.operationID)
     local inlay = prelude.trim(imageNode.content)
 
     local popID = t_concat({ 'lb-xnai-pop-', chatIndex, '-', nodeIndex })
@@ -144,7 +168,7 @@ local function renderInline(data, chatIndex, stackItem)
       if inlay == '' and stackItem and stackItem.data.scenes[slot] then
         local placeholderText = t_concat({ '씬 #', nodeIndex, ' 생성' })
         local placeholder = h.button['lb-xnai-placeholder'] {
-          risu_btn = t_concat({ 'lb-xnai-gen/', chatIndex, '_', slot }),
+          risu_btn = createGenerationCode(chatIndex, operationID, slot),
           type = 'button',
           t_concat({ '✦ ', placeholderText }),
         }
@@ -172,7 +196,7 @@ local function renderInline(data, chatIndex, stackItem)
             -- generated and has data in the stack: can regenerate
             inStack and h.button['lb-xnai-toolbar-btn'] {
               popovertarget = fullsizePop and popID or nil,
-              risu_btn = t_concat({ 'lb-xnai-gen/', chatIndex, '_', slot }),
+              risu_btn = createGenerationCode(chatIndex, operationID, slot),
               title = '재생성',
               type = 'button',
               h.lb_xnai_play_icon { closed = true },
@@ -236,7 +260,7 @@ local function renderInline(data, chatIndex, stackItem)
 
       if inlay == '' and inStack then
         local placeholder = h.button['lb-xnai-placeholder'] {
-          risu_btn = t_concat({ 'lb-xnai-gen/', chatIndex, '_-1' }),
+          risu_btn = createGenerationCode(chatIndex, operationID, '-1'),
           type = 'button',
           '✦ 키 비주얼 생성',
         }
@@ -254,7 +278,7 @@ local function renderInline(data, chatIndex, stackItem)
           return {
             inStack and h.button['lb-xnai-toolbar-btn'] {
               popovertarget = fullsizePop and popID or nil,
-              risu_btn = t_concat({ 'lb-xnai-gen/', chatIndex, '_-1' }),
+              risu_btn = createGenerationCode(chatIndex, operationID, '-1'),
               title = '재생성',
               type = 'button',
               h.lb_xnai_play_icon { closed = true },
@@ -340,7 +364,7 @@ local function renderInline(data, chatIndex, stackItem)
       local lazyNode = lazyNodes[nodeIndex]
       out = t_concat({
         out:sub(1, lazyNode.rangeStart - 1),
-        tostring(createModuleMenu(chatIndex)),
+        tostring(createModuleMenu(chatIndex, stackItem.operationID)),
         out:sub(lazyNode.rangeEnd + 1),
       })
     end
@@ -360,7 +384,7 @@ listenEdit(
 
     local chatLength = getChatLength(triggerId)
     local position = meta.index - chatLength
-    if position < -5 then
+    if position < -7 then
       return data
     end
 
@@ -369,8 +393,10 @@ listenEdit(
 
     ---@type XNAIStackItem?
     local stackItem = nil
+    local imageNodes = prelude.queryNodes('lb-xnai', data)
+    local operationID = imageNodes[1] and imageNodes[1].attributes.operation
     for _, item in ipairs(fullState) do
-      if item.chatIndex == meta.index then
+      if (operationID and item.operationID == operationID) or (not operationID and item.chatIndex == meta.index) then
         stackItem = item
         break
       end
@@ -400,6 +426,7 @@ local regenHandler = require('./xnai_regenHandler')
 
 onButtonClick = async(function(tid, code)
   setTriggerId(tid)
+  verbose('Button clicked. code=' .. tostring(code))
 
   local interactionChatIndex, interactionSlot = code:match(
     '^lb%-interaction__lb%-xnai__.-#RegenerateScene/ChatIndex:(%-?%d+)/Slot:(%d+)$'
@@ -445,12 +472,19 @@ onButtonClick = async(function(tid, code)
     return deleteHandler.deleteScene(tid, chatIndex, slot)
   end
 
-  -- lb-xnai-gen/{chatIndex}_{slot?}
+  -- lb-xnai-gen/{chatIndex}_{slot?}#{operationID?}
   local genPrefix = 'lb%-xnai%-gen/'
   local _, genPrefixEnd = string.find(code, genPrefix)
 
   if genPrefixEnd then
     local body = code:sub(genPrefixEnd + 1)
+    local hashIndex = body:find('#', 1, true)
+    local operationID = nil
+    if hashIndex then
+      operationID = body:sub(hashIndex + 1)
+      body = body:sub(1, hashIndex - 1)
+    end
+
     local parts = prelude.split(body, '_')
     local chatIndex = tonumber(parts[1])
     local slot = parts[2]
@@ -459,7 +493,7 @@ onButtonClick = async(function(tid, code)
       return
     end
 
-    return regenHandler.regenerate(tid, chatIndex, slot)
+    return regenHandler.regenerate(tid, chatIndex, operationID, slot)
   end
 
   -- lb-xnai-edit/{chatIndex}_{slot}
@@ -494,6 +528,7 @@ onStart = function(tid)
 
   local chatIndex = tonumber(promptNode[1].attributes.chatIndex)
   local slot = promptNode[1].attributes.slot
+  info('Applying prompt edit. chatIndex=' .. tostring(chatIndex) .. ', slot=' .. tostring(slot))
 
   if not chatIndex or not slot or slot == '' then
     return

@@ -3,6 +3,21 @@
 The standard library is then available through the global `prelude` table.
 
 ```lua
+---@param triggerId string
+---@param scope string?
+---@param ... any
+function prelude.info(triggerId, scope, ...) end
+
+---@param triggerId string
+---@param level 'VERBOSE'|'INFO'
+---@return boolean
+function prelude.logEnabled(triggerId, level) end
+
+---@param triggerId string
+---@param scope string?
+---@param ... any
+function prelude.verbose(triggerId, scope, ...) end
+
 ---@param str string
 ---@return string
 function prelude.trim(str) end
@@ -46,7 +61,11 @@ function prelude.getPriorityLoreBook(triggerId, name) end
 function prelude.split(str, sep) end
 ```
 
+`prelude.verbose()` and `prelude.info()` follow the backend `lightboard.logLevel` toggle. Its levels are `VERBOSE`, `INFO`, and `NONE`, with `VERBOSE` as the default. Use `prelude.logEnabled()` before constructing an expensive log value. Errors are not controlled by this diagnostic log level.
+
 For example, `prelude.split('a,b,c', ',')` returns `{ 'a', 'b', 'c' }`.
+
+`prelude.toon.decode()` accepts `⇥` at the start of a line as one indentation level. Use visible indentation markers in prompt examples when the request transport does not preserve leading spaces. Keep standard spaces in generated TOON when the transport preserves them.
 
 ## Rendering HTML example with h()
 

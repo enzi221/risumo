@@ -120,19 +120,21 @@ ADD NOTHING ELSE OR YOU WILL BE PUNISHED.
 
 # Example
 
+Each leading `⇥` represents one TOON indentation level of exactly two spaces. Do not output `⇥`; use two ASCII spaces for each indentation level.
+
 ```
 <lb-stage{{#when::{{getglobalvar::toggle_lb-stage.sampling}}::is::1}} prob="0.00"{{/when}}>
 objective:
-  title: Renewal of the Heart
-  content: A burnt-out pastry chef rediscovers what they truly value in life and reconciles with their past
-  completion: 8%
+⇥title: Renewal of the Heart
+⇥content: A burnt-out pastry chef rediscovers what they truly value in life and reconciles with their past
+⇥completion: 8%
 phase:
-  title: The Coffeehouse at the End of Spring
-  content: The dilapidated cafe forces concrete choices about whether to invest time and resources into restoration
-  stage: main
+⇥title: The Coffeehouse at the End of Spring
+⇥content: The dilapidated cafe forces concrete choices about whether to invest time and resources into restoration
+⇥stage: main
 episodes[2|]{content|stage|state|title}:
-  Protagonist arrives at the cafe, reflecting on past decisions|introduction|done|Falling Leaves
-  The cafe's current state and its place in the community become apparent|rise|ongoing|First Impressions
+⇥Protagonist arrives at the cafe, reflecting on past decisions|introduction|done|Falling Leaves
+⇥The cafe's current state and its place in the community become apparent|rise|ongoing|First Impressions
 divergence: medium
 comment: Ongoing E1 for 2 turns.
 history: Protagonist discovered inherited property.

@@ -2,6 +2,17 @@ local lbdata = require('./lbdata')
 
 local M = {}
 
+---@param triggerId string
+---@param index number
+---@param expected string
+---@param label string
+local function verifyChatWrite(triggerId, index, expected, label)
+  local written = getChat(triggerId, index)
+  if not written or written.data ~= expected then
+    error(label .. ' 저장 검증에 실패했습니다. chatIndex=' .. tostring(index))
+  end
+end
+
 --- Runs sideEffect onOutput with proper signature.
 --- @param triggerId string
 --- @param man Manifest
@@ -22,6 +33,9 @@ local function runSideEffectOnOutput(triggerId, man, pipelineResult, chatContent
     chatContent,
     chatIndex)
   if success and modifiedOutput and prelude.trim(modifiedOutput) ~= '' then
+    prelude.verbose(triggerId, man.identifier,
+      'SideEffect callback returned. modifiedLength=' .. tostring(#modifiedOutput) ..
+      ', lbdataLength=' .. tostring(type(lbdataOutput) == 'string' and #lbdataOutput or 0))
     return modifiedOutput, lbdataOutput
   end
 
@@ -54,6 +68,10 @@ function M.handleSideEffectResult(triggerId, params)
   local originalContent = resolved.targetContent or ''
   local lbdataIdx = resolved.lbdataIdx or targetIdx
   local lbdataChatContent = resolved.lbdataContent or originalContent
+
+  prelude.verbose(triggerId, params.identifier,
+    'SideEffect target resolved. action=' .. params.action .. ', targetIndex=' .. tostring(targetIdx) ..
+    ', lbdataIndex=' .. tostring(lbdataIdx))
 
   ---@cast targetIdx number
   ---@cast lbdataIdx number
@@ -102,11 +120,18 @@ end
 function M.applyResult(triggerId, params)
   local finalChat = params.modifiedContent
 
+  prelude.verbose(triggerId, params.man.identifier,
+    'SideEffect commit started. action=' .. params.action .. ', targetIndex=' .. tostring(params.targetIdx) ..
+    ', lbdataIndex=' .. tostring(params.lbdataIdx))
+
   if params.lbdataIdx == params.targetIdx then
     finalChat = lbdata.appendLBDATA(finalChat, params.lbdataContent)
   else
     local mergedLBDATA = lbdata.appendLBDATA(params.lbdataChatContent or '', params.lbdataContent)
     setChat(triggerId, params.lbdataIdx, mergedLBDATA)
+    verifyChatWrite(triggerId, params.lbdataIdx, mergedLBDATA, 'SideEffect LBDATA')
+    prelude.verbose(triggerId, params.man.identifier,
+      'SideEffect LBDATA written. chatIndex=' .. tostring(params.lbdataIdx))
   end
 
   if params.man.onMutation then
@@ -114,6 +139,9 @@ function M.applyResult(triggerId, params)
   end
 
   setChat(triggerId, params.targetIdx, finalChat)
+  verifyChatWrite(triggerId, params.targetIdx, finalChat, 'SideEffect 대상 채팅')
+  prelude.info(triggerId, params.man.identifier,
+    'SideEffect commit completed. action=' .. params.action .. ', targetIndex=' .. tostring(params.targetIdx))
 end
 
 --- @class ApplySideEffectsParams
@@ -158,6 +186,10 @@ function M.applySideEffects(triggerId, params)
   local lbdataIdx = resolved.lbdataIdx or targetIdx
   local lbdataChatContent = resolved.lbdataContent or currentChatContent
 
+  prelude.verbose(triggerId, 'sideEffect',
+    'SideEffect batch target resolved. targetIndex=' .. tostring(targetIdx) ..
+    ', lbdataIndex=' .. tostring(lbdataIdx))
+
   ---@cast targetIdx number
   ---@cast lbdataIdx number
 
@@ -179,6 +211,7 @@ function M.applySideEffects(triggerId, params)
           targetIdx)
         if success and result then
           currentChatContent = result
+          prelude.verbose(triggerId, man.identifier, 'SideEffect callback applied to batch.')
           if lbdataResult and prelude.trim(lbdataResult) ~= '' then
             table.insert(lbdataContents, lbdataResult)
           end
@@ -205,9 +238,16 @@ function M.applySideEffects(triggerId, params)
   end
 
   setChat(triggerId, targetIdx, currentChatContent)
+  verifyChatWrite(triggerId, targetIdx, currentChatContent, 'SideEffect 배치 대상 채팅')
   if lbdataIdx ~= targetIdx then
     setChat(triggerId, lbdataIdx, lbdataChatContent)
+    verifyChatWrite(triggerId, lbdataIdx, lbdataChatContent, 'SideEffect 배치 LBDATA')
   end
+
+
+  prelude.info(triggerId, 'sideEffect',
+    'SideEffect batch commit completed. targetIndex=' .. tostring(targetIdx) ..
+    ', lbdataIndex=' .. tostring(lbdataIdx))
 end
 
 return M

@@ -6,6 +6,8 @@ local DEFAULT_CONFIG = {
   indent = 2
 }
 
+local INDENT_MARKER = "⇥"
+
 local function mergeConfig(options)
   local cfg = {}
   for k, v in pairs(DEFAULT_CONFIG) do
@@ -186,7 +188,16 @@ local function parseLines(text, config)
   local parsed = {}
   for lineno, line in ipairs(lines) do
     if line ~= "" then
-      local indent = #line:match("^( *)")
+      local contentStart = 1
+      local markerDepth = 0
+
+      while line:sub(contentStart, contentStart + #INDENT_MARKER - 1) == INDENT_MARKER do
+        contentStart = contentStart + #INDENT_MARKER
+        markerDepth = markerDepth + 1
+      end
+
+      local spaces = #(line:sub(contentStart):match("^( *)") or "")
+      local indent = spaces + (markerDepth * config.indent)
       local remainder = indent % config.indent
       if remainder ~= 0 then
         error(string.format('Line %d: Indentation must be exact multiple of %d, but found %d spaces.', lineno,
@@ -194,7 +205,7 @@ local function parseLines(text, config)
       end
 
       local depth = math.floor(indent / config.indent)
-      local content = line:sub(indent + 1)
+      local content = line:sub(contentStart + spaces)
 
       table.insert(parsed, {
         depth = depth,

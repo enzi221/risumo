@@ -204,26 +204,28 @@ Map every featured person in `description` to exactly one `characters` entry. Id
 
 # Example
 
+Each leading `⇥` represents one TOON indentation level of exactly two spaces. Do not output `⇥`; use two ASCII spaces for each indentation level.
+
 ```
 <lb-news datetime="2026-03-17 06:00" name="데일리 라이프"{{#when::{{getglobalvar::toggle_lb-news.sampling}}::is::1}} prob="0.00"{{/when}}>
 posts[3|]{title|category|time|content}:
-  [단독] 이원석 대표, 차기 대선 출마 포기 선언... 당내 파장|정치|2시간 전|이원석 대표가 오늘 오전 긴급 기자회견을 열고 차기 대선 불출마를 선언했습니다. 이 대표는 "당의 화합과 미래를 위해 백의종군하겠다"고 밝혔으며, 갑작스러운 선언에 당내 계파 갈등이 격화될 조짐을 보이고 있습니다. (...)
-  한국 야구, 팬들 책임은 없나|스포츠|1시간 전|이번 WBC에서 우리 야구 대표팀의 수준 차이를 절감할 수 있었다. 그건 단지 선수 기량만이 아니었다. 팬들 태도도 (...)
-  '이것' 하나로 허리 통증 싹 사라져... 구매 문의 쇄도|건강|3시간 전|미국 NASA에서 개발한 신소재 '퀀텀-나노'를 활용한 허리 보호대가 출시되어 화제다. 사용자들은 "10년 앓던 디스크가 거짓말처럼 나았다"며 (...)
+⇥[단독] 이원석 대표, 차기 대선 출마 포기 선언... 당내 파장|정치|2시간 전|이원석 대표가 오늘 오전 긴급 기자회견을 열고 차기 대선 불출마를 선언했습니다. 이 대표는 "당의 화합과 미래를 위해 백의종군하겠다"고 밝혔으며, 갑작스러운 선언에 당내 계파 갈등이 격화될 조짐을 보이고 있습니다. (...)
+⇥한국 야구, 팬들 책임은 없나|스포츠|1시간 전|이번 WBC에서 우리 야구 대표팀의 수준 차이를 절감할 수 있었다. 그건 단지 선수 기량만이 아니었다. 팬들 태도도 (...)
+⇥'이것' 하나로 허리 통증 싹 사라져... 구매 문의 쇄도|건강|3시간 전|미국 NASA에서 개발한 신소재 '퀀텀-나노'를 활용한 허리 보호대가 출시되어 화제다. 사용자들은 "10년 앓던 디스크가 거짓말처럼 나았다"며 (...)
 {{#when::toggle::lb-news.image}}headlineImage:
-  camera: straight-on, upper body
-  cast: 1boy
-  characters[1|]{positive|negative}:
-    boy, male, short black hair, swept bangs, brown eyes, light skin, average build, navy wool suit, white dress shirt, serious expression, center, middle ground|
-  description: Camera operators and blurred microphones occupy the foreground of a crowded conference room, while the man in the navy suit stands at the center behind a wooden lectern in the middle ground and party officials watch beneath cool ceiling lights along the rear wall.
-  scene: interior, press photography, conference room, morning, cool fluorescent lighting, crowd, black cameras, wooden lectern{{/when}}
+⇥camera: straight-on, upper body
+⇥cast: 1boy
+⇥characters[1|]{positive|negative}:
+⇥⇥boy, male, short black hair, swept bangs, brown eyes, light skin, average build, navy wool suit, white dress shirt, serious expression, center, middle ground|
+⇥description: Camera operators and blurred microphones occupy the foreground of a crowded conference room, while the man in the navy suit stands at the center behind a wooden lectern in the middle ground and party officials watch beneath cool ceiling lights along the rear wall.
+⇥scene: interior, press photography, conference room, morning, cool fluorescent lighting, crowd, black cameras, wooden lectern{{/when}}
 topAds[2|]{content|boxStyle|textStyle}:
-  세상을 연결하는 창\n더 나은 내일을 위한 뉴스, 데일리 라이프|background:#E0F7FA;padding:4px 4px 4px 12px|color:#004D40;text-align:left
-  취업률 1위\n경북대학교\n미래를 향한 한 걸음|background:#032A97;border:4px solid #333333|color:#FF0603;text-align:center
+⇥세상을 연결하는 창\n더 나은 내일을 위한 뉴스, 데일리 라이프|background:#E0F7FA;padding:4px 4px 4px 12px|color:#004D40;text-align:left
+⇥취업률 1위\n경북대학교\n미래를 향한 한 걸음|background:#032A97;border:4px solid #333333|color:#FF0603;text-align:center
 bottomAd:
-  boxStyle:background:linear-gradient(90deg, #FFD54F, #FF8A65);border:4px solid #BF360C;padding:8px 12px
-  content: KASPAR The Essential\n필요한 모든 것을 한 곳에\nDAEHYUN AUTOMOTIVE GROUP
-  textStyle:color:#FFFFFF;text-align:right
+⇥boxStyle:background:linear-gradient(90deg, #FFD54F, #FF8A65);border:4px solid #BF360C;padding:8px 12px
+⇥content: KASPAR The Essential\n필요한 모든 것을 한 곳에\nDAEHYUN AUTOMOTIVE GROUP
+⇥textStyle:color:#FFFFFF;text-align:right
 </lb-news>
 ```
 

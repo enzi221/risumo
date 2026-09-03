@@ -45,6 +45,8 @@ end
 function M.runPipeline(triggerId, man, fullChat, options)
   local modeType = options.type
 
+  prelude.info(triggerId, man.identifier, 'Pipeline started. type=' .. tostring(modeType))
+
   if modeType ~= 'interaction' and options.lazy then
     return '\n<lb-lazy id="' .. man.identifier .. '" />'
   end
@@ -61,7 +63,7 @@ function M.runPipeline(triggerId, man, fullChat, options)
     return '\n<lb-lazy id="' .. man.identifier .. '" />'
   end
   local prom = promptResult
-  print('[Lightboard Backend][VERBOSE] Prompt created.')
+  prelude.verbose(triggerId, man.identifier, 'Prompt created.')
 
   local maxRetries = tonumber(getGlobalVar(triggerId, C.CONFIG.MAX_RETRIES)) or 0
   local retryMode = getGlobalVar(triggerId, C.CONFIG.RETRY_MODE) or '0'
@@ -69,7 +71,7 @@ function M.runPipeline(triggerId, man, fullChat, options)
   local attempts = 0
 
   while true do
-    print('[Lightboard Backend][VERBOSE] Prompt submitted. Try #' .. attempts)
+    prelude.verbose(triggerId, man.identifier, 'Prompt submitted. try=' .. attempts)
 
     --- @type '1'|'2'|nil
     --- @diagnostic disable-next-line: assign-type-mismatch
@@ -79,18 +81,18 @@ function M.runPipeline(triggerId, man, fullChat, options)
     if not llmSuccess then
       error('응답을 받지 못했습니다. ' .. tostring(llmResponse))
     end
-    print('[Lightboard Backend][VERBOSE] Received response.')
+    prelude.verbose(triggerId, man.identifier, 'Received response.')
 
     local processSuccess, processResult = pcall(cleanLLMResult, man, llmResponse)
     if not processSuccess then
       error('응답을 처리하지 못했습니다. ' .. tostring(processResult))
     end
-    print('[Lightboard Backend][VERBOSE] Response cleaned.')
+    prelude.verbose(triggerId, man.identifier, 'Response cleaned.')
 
     -- Reiteration: self-review loop before validation (skip on retries)
     if attempts == 0 then
       for ri = 1, man.reiteration or 0 do
-        print('[Lightboard Backend][VERBOSE] Reiteration ' .. ri .. '/' .. man.reiteration)
+        prelude.verbose(triggerId, man.identifier, 'Reiteration ' .. ri .. '/' .. man.reiteration)
 
         table.insert(prom, {
           content = processResult,
@@ -128,7 +130,7 @@ Carefully think, then if it is OK, output %s node without any changes. If it nee
     local valid = true
     local validationError = nil
 
-    print('[Lightboard Backend][VERBOSE] Response validating.')
+    prelude.verbose(triggerId, man.identifier, 'Response validating.')
 
     if not processResult or processResult == '' or processResult == null then
       valid = false
@@ -150,7 +152,7 @@ Carefully think, then if it is OK, output %s node without any changes. If it nee
 
     if valid or attempts >= maxRetries then
       if valid then
-        print('[Lightboard Backend][VERBOSE] Validation complete.')
+        prelude.verbose(triggerId, man.identifier, 'Validation complete.')
       else
         print('[Lightboard] Validation failed for ' ..
           man.identifier .. ' but max retries reached: ' .. tostring(validationError))
@@ -169,6 +171,7 @@ Carefully think, then if it is OK, output %s node without any changes. If it nee
         end
       end
 
+      prelude.info(triggerId, man.identifier, 'Pipeline completed. attempts=' .. attempts)
       return processResult
     end
 

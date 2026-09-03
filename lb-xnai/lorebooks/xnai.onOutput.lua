@@ -1,3 +1,11 @@
+local function info(tid, ...)
+  prelude.info(tid, 'lb-xnai.onOutput', ...)
+end
+
+local function verbose(tid, ...)
+  prelude.verbose(tid, 'lb-xnai.onOutput', ...)
+end
+
 ---Strips all XML nodes from text, returning stripped text and a restore function.
 ---@param text string
 ---@return string stripped
@@ -143,6 +151,7 @@ end
 local function applyInteraction(tid, response, fullChatContent, index, gen)
   local scene = response.scenes and response.scenes[1]
   if not scene then
+    verbose(tid, 'Interaction ignored because no scene was returned.')
     return nil, '<lb-lazy id="lb-xnai" />'
   end
 
@@ -152,6 +161,7 @@ local function applyInteraction(tid, response, fullChatContent, index, gen)
   end
 
   local slot = interactionTarget and interactionTarget.slot or tostring(scene.slot)
+  info(tid, 'Applying interaction. chatIndex=' .. tostring(index) .. ', slot=' .. tostring(slot))
   scene.slot = tonumber(slot)
   local xnaiState = getState(tid, 'lb-xnai-stack') or {}
   if type(xnaiState) ~= 'table' then
@@ -169,6 +179,7 @@ local function applyInteraction(tid, response, fullChatContent, index, gen)
     return nil, '<lb-lazy id="lb-xnai" />'
   end
 
+  local operationID = stackItem.operationID or tid
   stackItem.data.scenes[slot] = scene
   gen.persistStateAndHistory(tid, xnaiState)
 
@@ -177,18 +188,22 @@ local function applyInteraction(tid, response, fullChatContent, index, gen)
     local success, generated = pcall(gen.generate, tid, scene)
     if success then
       inlay = generated
+    else
+      info(tid, 'Interaction image generation failed. error=' .. tostring(generated))
     end
   end
 
   local replacement
   if inlay then
     replacement = table.concat({
-      '<lb-xnai id="scene-', slot, '" scene="', slot, '">',
+      '<lb-xnai id="scene-', slot, '" operation="', operationID, '" scene="', slot, '">',
       inlay,
       '</lb-xnai>',
     })
   else
-    replacement = table.concat({ '<lb-xnai id="scene-', slot, '" scene="', slot, '" />' })
+    replacement = table.concat({
+      '<lb-xnai id="scene-', slot, '" operation="', operationID, '" scene="', slot, '" />',
+    })
   end
 
   setState(tid, 'lb-xnai-interaction-target', nil)
@@ -201,8 +216,10 @@ end
 ---@param index number
 local function main(tid, output, fullChatContent, index)
   local forcedInsertion = getGlobalVar(tid, 'toggle_lb-xnai.forcedinsertion') == '1'
+  verbose(tid, 'Processing output. chatIndex=' .. tostring(index) .. ', forcedInsertion=' .. tostring(forcedInsertion))
   if forcedInsertion then
-    output = output:gsub('@', '')
+    output = output:gsub('%%', '')
+    output = output:gsub('wfsn', 'nsfw')
   end
 
   if not string.find(output, '<lb%-xnai') then
@@ -218,6 +235,7 @@ local function main(tid, output, fullChatContent, index)
   end
 
   local nodes = prelude.queryNodes('lb-xnai', output)
+  verbose(tid, 'Output nodes found. count=' .. tostring(#nodes))
 
   ---@type XNAIGen
   local gen = prelude.import(tid, 'lb-xnai.gen')
@@ -229,6 +247,8 @@ local function main(tid, output, fullChatContent, index)
   if success then
     ---@type XNAIResponse
     local response = xnaiData
+    info(tid, 'Output decoded. keyvis=' .. tostring(response.keyvis ~= nil) ..
+      ', scenes=' .. tostring(#(response.scenes or {})))
     if response.interaction == true then
       return applyInteraction(tid, response, fullChatContent, index, gen)
     end
@@ -253,10 +273,12 @@ local function main(tid, output, fullChatContent, index)
       data = {
         keyvis = response.keyvis,
         scenes = {},
-      }
+      },
+      operationID = tid,
     }
 
     local shouldGenerateNow = getGlobalVar(tid, 'toggle_lb-xnai.generation') == '0'
+    verbose(tid, 'Automatic image generation=' .. tostring(shouldGenerateNow))
 
     ---@type table<string, string>
     local inlays = {}
@@ -266,6 +288,8 @@ local function main(tid, output, fullChatContent, index)
         local ok, inlay = pcall(gen.generate, tid, response.keyvis)
         if ok and inlay then
           inlays['-1'] = inlay
+        elseif not ok then
+          info(tid, 'Key visual generation failed. error=' .. tostring(inlay))
         end
       end
     end
@@ -277,6 +301,8 @@ local function main(tid, output, fullChatContent, index)
         local ok, inlay = pcall(gen.generate, tid, scene)
         if ok and inlay then
           inlays[slot] = inlay
+        elseif not ok then
+          info(tid, 'Scene generation failed. slot=' .. slot .. ', error=' .. tostring(inlay))
         end
       end
     end
@@ -291,10 +317,11 @@ local function main(tid, output, fullChatContent, index)
       local slot = tostring(scene.slot)
       if inlays[slot] then
         slotted = slotted:gsub('%[Slot%s+' .. slot .. '%]',
-          '<lb-xnai id="scene-' .. slot .. '" scene="' .. slot .. '">' .. inlays[slot] .. '</lb-xnai>')
+          '<lb-xnai id="scene-' .. slot .. '" operation="' .. tid .. '" scene="' .. slot .. '">' ..
+          inlays[slot] .. '</lb-xnai>')
       else
         slotted = slotted:gsub('%[Slot%s+' .. slot .. '%]',
-          '<lb-xnai id="scene-' .. slot .. '" scene="' .. slot .. '" />')
+          '<lb-xnai id="scene-' .. slot .. '" operation="' .. tid .. '" scene="' .. slot .. '" />')
       end
     end
 
@@ -302,13 +329,19 @@ local function main(tid, output, fullChatContent, index)
     slotted = slotted:gsub('\n%[Slot%s+%d+%]\n', '')
     slotted = restoreNodes(slotted)
 
+    local finalOutput
     if inlays['-1'] then
-      return slotted .. '\n\n<lb-xnai id="keyvis" kv>' .. inlays['-1'] .. '</lb-xnai>',
-          '<lb-lazy id="lb-xnai" />'
+      finalOutput = slotted .. '\n\n<lb-xnai id="keyvis" kv operation="' .. tid .. '">' ..
+          inlays['-1'] .. '</lb-xnai>'
+    else
+      finalOutput = slotted .. '\n\n<lb-xnai id="keyvis" kv operation="' .. tid .. '" />'
     end
 
-    return slotted .. '\n\n<lb-xnai id="keyvis" kv />', '<lb-lazy id="lb-xnai" />'
+    verbose(tid, 'Output composition completed. length=' .. tostring(#finalOutput))
+    return finalOutput, '<lb-lazy id="lb-xnai" />'
   end
+
+  verbose(tid, 'Output decoding failed. error=' .. tostring(xnaiData))
 
   return nil, '<lb-lazy id="lb-xnai" />'
 end

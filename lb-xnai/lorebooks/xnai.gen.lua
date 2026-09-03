@@ -102,17 +102,19 @@ local function joinNonempty(values)
 end
 
 ---@param desc XNAIDescriptor
+---@param comicPrompt boolean
 ---@return { characters: XNAIPromptSet[], comic: boolean, description: string, setup: string }
-local function compileDescriptor(desc)
+local function compileDescriptor(desc, comicPrompt)
   local characters = {}
   local comic = type(desc.panels) == 'table' and #desc.panels > 0
 
   if comic then
     local panelPrompts = {}
-    local setup = COMIC_PROMPT
+    local setup = comicPrompt and COMIC_PROMPT or ''
+    local cast = trimText(desc.cast)
 
-    if trimText(desc.cast) ~= '' then
-      setup = setup .. '\n\n' .. trimText(desc.cast)
+    if cast ~= '' then
+      setup = setup ~= '' and setup .. '\n\n' .. cast or cast
     end
 
     for panelIndex, panel in ipairs(desc.panels) do
@@ -144,10 +146,12 @@ local function compileDescriptor(desc)
   }
 end
 
+---@param triggerId string
 ---@param desc XNAIDescriptor
 ---@return XNAIPromptSet
-local function buildRawPrompt(desc)
-  local compiled = compileDescriptor(desc)
+local function buildRawPrompt(triggerId, desc)
+  local comicPrompt = getGlobalVar(triggerId, 'toggle_lb-xnai.scene.comic') == '1'
+  local compiled = compileDescriptor(desc, comicPrompt)
   local positiveParts = {}
   local charsPositive = {}
   local charsNegative = {}
@@ -182,11 +186,14 @@ end
 ---@param desc XNAIDescriptor
 ---@return ImagePromptSet?
 local function buildPresetPrompt(triggerId, desc)
-  local compiled = compileDescriptor(desc)
+  local comicPrompt = getGlobalVar(triggerId, 'toggle_lb-xnai.scene.comic') == '1'
+  local compiled = compileDescriptor(desc, comicPrompt)
   local preset = getGlobalVar(triggerId, 'toggle_lb-xnai.preset')
   if not preset or preset == '' or preset == 'null' then
     preset = '1'
   end
+
+  prelude.verbose(triggerId, 'lb-xnai.gen', 'Building prompt. preset=' .. tostring(preset))
 
   local comfy = getGlobalVar(triggerId, 'toggle_lb-xnai.compat.comfy') == '1'
   local positiveNote = getGlobalVar(triggerId, 'toggle_lb-xnai.positive') or ''
@@ -220,6 +227,8 @@ end
 ---@param desc XNAIDescriptor
 ---@return string?
 local function generate(triggerId, desc)
+  prelude.info(triggerId, 'lb-xnai.gen', 'Image generation started.')
+
   local prompts = buildPresetPrompt(triggerId, desc)
   if not prompts then
     return error('이미지 프롬프트를 생성할 수 없습니다. 삽화 모듈 프리셋이 있나요?')
@@ -227,10 +236,14 @@ local function generate(triggerId, desc)
 
   ---@type LightboardImage
   local image = prelude.import(triggerId, 'lightboard.image')
-  return image.generateImageFromPrompts(triggerId, prompts, {
+  local inlay = image.generateImageFromPrompts(triggerId, prompts, {
     emptyPositive = '삽화 모듈 프리셋에 긍정 프롬프트가 없습니다.',
     requestFailed = 'API 호출 실패. 삽화 모듈의 저수준 접근을 꺼버렸나요?',
   })
+
+  prelude.info(triggerId, 'lb-xnai.gen', 'Image generation completed. result=' .. tostring(inlay ~= nil))
+
+  return inlay
 end
 
 ---@param fullChat Chat[]
@@ -424,11 +437,14 @@ local function persistStateAndHistory(triggerId, xnaiState)
   setState(triggerId, 'lb-xnai-stack', safeState)
   setChatVar(triggerId, 'lb-xnai-history', history)
 
+  prelude.verbose(triggerId, 'lb-xnai.gen',
+    'State persisted. entries=' .. tostring(#safeState) .. ', historyLength=' .. tostring(#history))
+
   return safeState, history
 end
 
 ---@class XNAIGen
----@field buildRawPrompt fun (desc: XNAIDescriptor): XNAIPromptSet
+---@field buildRawPrompt fun (triggerId: string, desc: XNAIDescriptor): XNAIPromptSet
 ---@field cleanDescriptionBlocks fun (text: string): string
 ---@field generate fun (triggerId: string, desc: XNAIDescriptor): string?
 ---@field insertSlots fun (text: string): string

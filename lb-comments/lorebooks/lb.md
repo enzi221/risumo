@@ -79,25 +79,27 @@ The board data you are generating MUST ONLY for the current chapter, after the l
 
 # Example
 
+Each leading `⇥` represents one TOON indentation level of exactly two spaces. Do not output `⇥`; use two ASCII spaces for each indentation level.
+
 ```
 <lb-comments{{#when::{{getglobalvar::toggle_lb-comments.sampling}}::is::1}} prob="0.00"{{/when}}>
 [2|]:
-  - author: Gold:퇴근언제함
-    time: 3시간 전
-    upvotes: 112
-    downvotes: 51
-    content: 하늘아 사랑해 ㅜㅜㅜ 너 없으면 나도 없어 작가님 아시죠???
-    comments[1|]{content|time|author}:
-      뭐야 씨발 주접 떨지 마라|30분 전|Bronze:배당금재투자
-  - author: 틀딱아님
-    time: 2시간 전
-    upvotes: 83
-    downvotes: 65
-    content: 송하늘 그만 좀 쳐나와라 씨발아 개연성 어디감? 작가 진짜 죽고싶냐?
-    comments[3|]{content|time|author}:
-      왜... 하늘이 좋지 않음??|1시간 전|Gold:퇴근언제함
-      팩트는 하늘이 없으면 주인공 친구가 없다는 거임|1시간 전|라이트만봄
-      과몰입 존나 웃기네ㅋㅋㅋ 팝콘이나 가져와라|30분 전|aaaa
+⇥- author: Gold:퇴근언제함
+⇥⇥time: 3시간 전
+⇥⇥upvotes: 112
+⇥⇥downvotes: 51
+⇥⇥content: 하늘아 사랑해 ㅜㅜㅜ 너 없으면 나도 없어 작가님 아시죠???
+⇥⇥comments[1|]{content|time|author}:
+⇥⇥⇥뭐야 씨발 주접 떨지 마라|30분 전|Bronze:배당금재투자
+⇥- author: 틀딱아님
+⇥⇥time: 2시간 전
+⇥⇥upvotes: 83
+⇥⇥downvotes: 65
+⇥⇥content: 송하늘 그만 좀 쳐나와라 씨발아 개연성 어디감? 작가 진짜 죽고싶냐?
+⇥⇥comments[3|]{content|time|author}:
+⇥⇥⇥왜... 하늘이 좋지 않음??|1시간 전|Gold:퇴근언제함
+⇥⇥⇥팩트는 하늘이 없으면 주인공 친구가 없다는 거임|1시간 전|라이트만봄
+⇥⇥⇥과몰입 존나 웃기네ㅋㅋㅋ 팝콘이나 가져와라|30분 전|aaaa
 </lb-comments>
 ```
 

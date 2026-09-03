@@ -135,30 +135,32 @@ Major character (not protagonist) can't post/comment when preoccupied engaging P
 
 # Example
 
+Each leading `⇥` represents one TOON indentation level of exactly two spaces. Do not output `⇥`; use two ASCII spaces for each indentation level.
+
 ```
 <lb-hn name="헌터넷 자유게시판" currenttime="2025-05-15 09:15:23"{{#when::{{getglobalvar::toggle_lb-hn.sampling}}::is::1}} prob="0.00"{{/when}}>
 [2|]:
-  - author: 비틱하러가입함(175.223)
-    id: 105234
-    title: 아니 C급 게이트 보스 드랍 실화냐? (인증샷)
-    time: 09:15
-    views: 852
-    upvotes: 45
-    content: (레어 등급 스킬북 이미지 설명) 오늘 C급 돌다가 먹음 ㅋㅋ 이걸로 D급 탈출한다 ㅅㄱ
-    comments[3|]{author|content}:
-      F:마석광부:D|주작아님? C급에서 저게 왜뜸?
-      S:마석광부:C|부럽네... 난 오늘도 잡템만 먹었는데
-      지나가던E급(59.10)|ㅊㅊ
-  - author: F:랭커구경꾼:C
-    id: 105232
-    title: 백X성 그새끼 요즘 왜케 안보임?
-    time: 09:10
-    views: 670
-    upvotes: 21
-    content: 뭔 일 있냐? 맨날 게이트 터지면 제일 먼저 보이던 놈인데. 잠수탐?
-    comments[2|]{author|content}:
-      S:헌티비:B|비밀 임무 수행중이라는 썰 있음
-      ㅇㅇ(118.235)|ㄴㄴ 걍 지 꼴리는대로 하는거 아님? 원래 성격 이상하잖아
+⇥- author: 비틱하러가입함(175.223)
+⇥⇥id: 105234
+⇥⇥title: 아니 C급 게이트 보스 드랍 실화냐? (인증샷)
+⇥⇥time: 09:15
+⇥⇥views: 852
+⇥⇥upvotes: 45
+⇥⇥content: (레어 등급 스킬북 이미지 설명) 오늘 C급 돌다가 먹음 ㅋㅋ 이걸로 D급 탈출한다 ㅅㄱ
+⇥⇥comments[3|]{author|content}:
+⇥⇥⇥F:마석광부:D|주작아님? C급에서 저게 왜뜸?
+⇥⇥⇥S:마석광부:C|부럽네... 난 오늘도 잡템만 먹었는데
+⇥⇥⇥지나가던E급(59.10)|ㅊㅊ
+⇥- author: F:랭커구경꾼:C
+⇥⇥id: 105232
+⇥⇥title: 백X성 그새끼 요즘 왜케 안보임?
+⇥⇥time: 09:10
+⇥⇥views: 670
+⇥⇥upvotes: 21
+⇥⇥content: 뭔 일 있냐? 맨날 게이트 터지면 제일 먼저 보이던 놈인데. 잠수탐?
+⇥⇥comments[2|]{author|content}:
+⇥⇥⇥S:헌티비:B|비밀 임무 수행중이라는 썰 있음
+⇥⇥⇥ㅇㅇ(118.235)|ㄴㄴ 걍 지 꼴리는대로 하는거 아님? 원래 성격 이상하잖아
 </lb-hn>
 ```
 

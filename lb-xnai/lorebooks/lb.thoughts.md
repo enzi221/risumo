@@ -2,7 +2,10 @@
 Think step-by-step for final data, but keep minimal draft per step.
 
 Follow this template exactly. Fill every active field. A missing active field invalidates the draft.
-{{/when}}
+{{/reason-verbal}}
+{{#when::lb-xnai.thoughts::tis::1}}
+The following template is your internal guide. Reason through it. Do not include the reasoning or the completed template in your response.
+{{/reason-internal}}
 
 1. Last Log Entry: `[Log, Slot Range]`
 2. Scene Count: `[Raw Input, Resolved Minimum, Resolved Maximum, Selected Count]`
@@ -10,13 +13,13 @@ Follow this template exactly. Fill every active field. A missing active field in
 4. Eligible Event Moments: `[Event, Eligible Visual Cast, Omitted Ineligible Participants, Immediately Following Insertion Marker][]`
 5. Selected Scenes:
 {{#when::keep::lb-xnai.scene.comic::tis::0}}   - For each Scene: `[Scene Number, Distinct Event Moment, Exact Following Insertion Marker, Featured Cast, Cast, Anonymous Background, Focal Information]`
-{{/when}}{{#when::keep::lb-xnai.scene.comic::tis::1}}   - For each Scene: `[Scene Number, Distinct Event Moment, Exact Following Insertion Marker, Distinct Featured Cast Across All Panels, Scene-Wide Cast, Anonymous Background, Focal Information]`
+{{/when}}{{#when::keep::lb-xnai.scene.comic::tisnot::0}}   - For each Scene: `[Scene Number, Distinct Event Moment, Exact Following Insertion Marker, Distinct Featured Cast Across All Panels, Scene-Wide Cast, Anonymous Background, Focal Information]`
 {{/when}}
 {{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.characters}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.characters}} != null }}}}}}{{#when::keep::lb-xnai.scene.comic::tis::0}}   - Limit each Scene to {{getglobalvar::toggle_lb-xnai.characters}} completely visible featured characters.
 {{/when}}{{/when}}
-{{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.characters}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.characters}} != null }}}}}}{{#when::keep::lb-xnai.scene.comic::tis::1}}   - Limit each Scene to {{getglobalvar::toggle_lb-xnai.characters}} distinct completely visible featured characters across all panels, not separately per panel.
+{{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.characters}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.characters}} != null }}}}}}{{#when::keep::lb-xnai.scene.comic::tisnot::0}}   - Limit each Scene to {{getglobalvar::toggle_lb-xnai.characters}} distinct completely visible featured characters across all panels, not separately per panel.
 {{/when}}{{/when}}
-{{#when::lb-xnai.scene.comic::tis::1}}   - Panels for each Scene: `[Panel Number, Event Beat, Composition, Environment, Character Depictions, Required Appearance Groups, Character Descriptions][]`, with two to four panels in reading order.
+{{#when::lb-xnai.scene.comic::tisnot::0}}   - Panels for each Scene: `[Panel Number, Event Beat, Composition, Environment, Character Depictions, Required Appearance Groups, Character Descriptions][]`, with two to four panels in reading order.
    - Derive the Scene-wide `cast` from the union of featured character identities across all panels. Count a recurring character once.
 {{/when}}{{#when::lb-xnai.scene.comic::tis::0}}   - Camera and Composition for each Scene: `[Perspective, Framing, Character Blocking, Depth Planes, Focal Placement]`
    - Environment for each Scene: `[Location, Layout, Foreground, Middle Ground, Background, Props, Lighting]`
@@ -27,13 +30,13 @@ Follow this template exactly. Fill every active field. A missing active field in
 {{/when}}   - Client Instruction: `[pass or corrected]`
    - Scene Count, Distinct Event Moments, Following Insertion Markers, and Marker Separation: `[pass or corrected]`
 {{#when::keep::lb-xnai.scene.comic::tis::0}}   - Scene Cast Field and Character Array: `[pass or corrected]`
-{{/when}}{{#when::keep::lb-xnai.scene.comic::tis::1}}   - Scene-Wide Cast Union and Panel Character Arrays: `[pass or corrected]`
+{{/when}}{{#when::keep::lb-xnai.scene.comic::tisnot::0}}   - Scene-Wide Cast Union and Panel Character Arrays: `[pass or corrected]`
 {{/when}}
 {{#when::lb-xnai.kv.off::tis::0}}   - Key Visual Character Limit, Cast Field, and Character Array: `[pass or corrected]`
 {{/when}}
    - Featured Character Eligibility and Appearance Handling: `[pass or corrected]`
    - Appearance Groups, Character Descriptions, Posture, Action, and Visibility: `[pass or corrected]`
-{{#when::lb-xnai.scene.comic::tis::1}}   - Panel Objects and Panel-Scoped Depiction Entries: `[pass or corrected]`
-{{/when}}   - TOON Structure: `[pass or corrected]`
+{{#when::lb-xnai.scene.comic::tisnot::0}}   - Panel Objects and Panel-Scoped Depiction Entries: `[pass or corrected]`
+{{/when}}
 
 Fix every failed check before producing the final data.
