@@ -164,8 +164,8 @@ Carefully think, then if it is OK, output %s node without any changes. If it nee
           print("[LightBoard Backend] Failed processing (onOutput) for " ..
             man.identifier .. ": " .. tostring(modifiedOutput))
 
-          local reason = success and 'nil 반환' or tostring(modifiedOutput)
-          error('출력 처리 실패(onOutput). ' .. reason .. '\n\n출력:\n' .. processResult:gsub('\n', '\\n'))
+          local reason = success and '응답이 비어있습니다. 검열? 리퀘스트 로그를 확인하세요.' or tostring(modifiedOutput)
+          error('일반 출력 처리 실패(onOutput). ' .. reason .. '\n\n출력:\n' .. processResult:gsub('\n', '\\n'))
         end
       end
 

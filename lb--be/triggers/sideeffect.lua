@@ -25,8 +25,8 @@ local function runSideEffectOnOutput(triggerId, man, pipelineResult, chatContent
     return modifiedOutput, lbdataOutput
   end
 
-  local reason = success and 'nil 또는 빈 문자열 반환' or tostring(modifiedOutput)
-  error('sideEffect 출력 처리 실패(onOutput). ' .. reason)
+  local reason = success and '응답이 비어있습니다. 검열? 리퀘스트 로그를 확인하세요.' or tostring(modifiedOutput)
+  error('사이드이펙트 출력 처리 실패(onOutput). ' .. reason)
 end
 
 --- @class HandleSideEffectParams
