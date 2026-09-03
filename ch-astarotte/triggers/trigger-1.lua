@@ -26,10 +26,28 @@ local function sanitizeThoughts(data)
   return data
 end
 
+local function sanitizeInlineTarotSpreadTags(data)
+  return data:gsub(
+    "(`+)<([^<>\r\n]+)>(`+)",
+    function(openTicks, tag, closeTicks)
+      local tarotSpreadTag = tag == 'tarot-spread' or
+          tag == '/tarot-spread' or
+          tag:match('^tarot%-spread%s+') ~= nil
+
+      if #openTicks ~= #closeTicks or not tarotSpreadTag then
+        return openTicks .. '<' .. tag .. '>' .. closeTicks
+      end
+
+      return openTicks .. tag .. closeTicks
+    end
+  )
+end
+
 listenEdit(
   'editOutput',
   function(tid, data)
     setTriggerId(tid)
+    data = sanitizeInlineTarotSpreadTags(data)
     return sanitizeThoughts(data)
   end
 )
