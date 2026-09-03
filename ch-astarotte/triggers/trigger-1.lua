@@ -7,7 +7,7 @@ local function setTriggerId(tid)
   end
   local source = getLoreBooks(triggerId, 'lightboard-prelude')
   if not source or #source == 0 then
-    error('Failed to load lightboard-prelude.')
+    error('라이트보드 백엔드를 찾지 못했습니다.')
   end
   load(source[1].content, '@prelude', 't')()
 end
@@ -134,6 +134,13 @@ local function printDeck()
   local shuffledDeck = shuffleDeck(deck)
 
   local spread = json.decode(spreadCommand[1].content)
+  if type(spread) ~= 'table' then
+    error('Tarot spread must be a JSON array.')
+  end
+
+  if #spread < 1 then
+    error('Tarot spread must contain at least 1 position.')
+  end
 
   addChat(triggerId, 'user',
     '<tarot-spread-cache>' ..
@@ -318,10 +325,16 @@ local function renderSelection(spreadData, selectionData)
   return tostring(html)
 end
 
-local function displayMain(data)
+local function displayMain(tid, data)
   if not data or data == '' then
     return ''
   end
+
+  if not data:find('<tarot-', 1, true) then
+    return data
+  end
+
+  setTriggerId(tid)
 
   local deckData = prelude.queryNodes('tarot-deck', data)
   if deckData and #deckData > 0 then
@@ -368,22 +381,20 @@ end
 listenEdit(
   "editDisplay",
   function(tid, data, meta)
-    setTriggerId(tid)
-
     if meta and meta.index ~= nil then
-      local position = meta.index - getChatLength(triggerId)
+      local position = meta.index - getChatLength(tid)
       if position < -10 then
         return data
       end
     end
 
-    local success, result = pcall(displayMain, data)
+    local success, result = pcall(displayMain, tid, data)
     if success then
       return result
-    else
-      print("[Astarotte] Rendering failed:", tostring(result))
-      return data
     end
+
+    print("[Astarotte] Rendering failed:", tostring(result))
+    return data .. '\n\n[Astarotte] 타로 화면을 표시하지 못했어요. ' .. tostring(result)
   end
 )
 
@@ -471,7 +482,12 @@ onStart = function(tid)
 end
 
 onButtonClick = function(tid, code)
-  setTriggerId(tid)
+  local success, result = pcall(setTriggerId, tid)
+  if not success then
+    print('[Astarotte] Initialization failed:', tostring(result))
+    alertNormal(tid, '아스타로테를 불러오지 못했어요.\n\n' .. tostring(result))
+    return
+  end
 
   if code == 'tarot__retry' then
     local spreadCommand = prelude.queryNodes('tarot-spread', getChat(triggerId, -1).data)
@@ -480,7 +496,11 @@ onButtonClick = function(tid, code)
       return
     end
 
-    printDeck()
+    local deckSuccess, deckResult = pcall(printDeck)
+    if not deckSuccess then
+      print('[Astarotte] Deck creation failed:', tostring(deckResult))
+      alertNormal(triggerId, '타로 덱을 만드는 중 오류가 발생했어요.\n\n' .. tostring(deckResult))
+    end
     return
   end
 
