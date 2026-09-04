@@ -9,7 +9,6 @@ lb-xnai.jb=┗탈옥 (프레이야)
 lb-xnai.forcedinsertion=┗태그 칼질
 =출력 필터 격파 시도. 무거움, 검열에 당한 게 아니라면 체크 해제=caption
 =⚠️반드시 생각 보조를 "생각만"으로 변경 후 사용할 것=caption
-=⚠️변경 시 삽화 메뉴에서 "캐릭터 태그 기록 삭제"할 것=caption
 lb-xnai.japanese=┗일본어 출력
 =출력 필터 완화=caption
 =———————📒스타일=divider
@@ -54,7 +53,7 @@ lb-xnai.positive=긍정　프롬=textarea
 lb-xnai.negative=부정　프롬=textarea
 =항상 맨 뒤에 추가=caption
 ==divider
-=라이트보드 삽화 4.2.0—amonamona=caption
+=라이트보드 삽화 4.2.1—amonamona=caption
 ==groupEnd
 
 =🌠삽화 (고급)=group
@@ -87,5 +86,5 @@ lb-xnai.compat.weight=가　중　치=select=제거,Comfy
 =NAI 가중치를 제거하거나 변환=caption
 =ComfyUI 체크해야 적용=caption
 ==divider
-=라이트보드 삽화 4.2.0—amonamona=caption
+=라이트보드 삽화 4.2.1—amonamona=caption
 ==groupEnd

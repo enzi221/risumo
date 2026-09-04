@@ -277,8 +277,8 @@ end
 local function insertSlots(text)
   local slotIndex = 0
   local trimmed = text:match('^%s*(.-)%s*$') or text
-  trimmed = trimmed:gsub('\n\n+', function()
-    local out = '\n\n[Slot ' .. slotIndex .. ']\n\n'
+  trimmed = trimmed:gsub('(\n+)', function(lineBreaks)
+    local out = lineBreaks .. '[Slot ' .. slotIndex .. ']\n'
     slotIndex = slotIndex + 1
     return out
   end)

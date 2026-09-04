@@ -58,7 +58,7 @@ local function stripXMLNodes(text)
   end
 
   -- Absorb surrounding newlines into saved content so that the placeholder
-  -- does not inflate the \n\n boundary count. This keeps slot numbering
+  -- does not inflate the newline boundary count. This keeps slot numbering
   -- consistent between the onInput path (removeAllNodes) and onOutput path
   -- (stripXMLNodes).
   --
@@ -122,6 +122,8 @@ end
 ---@param replacement string
 ---@param gen XNAIGen
 ---@return string
+---@return boolean replaced
+---@return number availableSlots
 local function replaceSceneNode(text, slot, replacement, gen)
   local nodes = prelude.queryNodes('lb-xnai', text, { scene = slot })
   if #nodes > 0 then
@@ -130,16 +132,18 @@ local function replaceSceneNode(text, slot, replacement, gen)
       text:sub(1, node.rangeStart - 1),
       replacement,
       text:sub(node.rangeEnd + 1),
-    })
+    }), true, 0
   end
 
   local stripped, restoreNodes = stripXMLNodes(text)
   local slotted = gen.insertSlots(stripped)
-  slotted = slotted:gsub('%[Slot%s+' .. slot .. '%]', function()
+  local _, availableSlots = slotted:gsub('%[Slot%s+%d+%]', '')
+  local replacementCount
+  slotted, replacementCount = slotted:gsub('%[Slot%s+' .. slot .. '%]', function()
     return replacement
   end, 1)
-  slotted = slotted:gsub('\n%[Slot%s+%d+%]\n', '')
-  return restoreNodes(slotted)
+  slotted = slotted:gsub('\n%[Slot%s+%d+%]\n', '\n')
+  return restoreNodes(slotted), replacementCount > 0, availableSlots
 end
 
 ---@param tid string
@@ -207,7 +211,12 @@ local function applyInteraction(tid, response, fullChatContent, index, gen)
   end
 
   setState(tid, 'lb-xnai-interaction-target', nil)
-  return replaceSceneNode(fullChatContent, slot, replacement, gen), nil
+  local replacedText, replaced, availableSlots = replaceSceneNode(fullChatContent, slot, replacement, gen)
+  if not replaced then
+    info(tid, 'Interaction scene insertion failed. slot=' .. tostring(slot) ..
+      ', availableSlots=' .. tostring(availableSlots))
+  end
+  return replacedText, nil
 end
 
 ---@param tid string
@@ -312,21 +321,32 @@ local function main(tid, output, fullChatContent, index)
 
     local stripped, restoreNodes = stripXMLNodes(fullChatContent)
     local slotted = gen.insertSlots(stripped)
+    local _, availableSlots = slotted:gsub('%[Slot%s+%d+%]', '')
+    verbose(tid, 'Slot map built. availableSlots=' .. tostring(availableSlots))
 
     for _, scene in ipairs(response.scenes or {}) do
       local slot = tostring(scene.slot)
+      local replacement
       if inlays[slot] then
-        slotted = slotted:gsub('%[Slot%s+' .. slot .. '%]',
-          '<lb-xnai id="scene-' .. slot .. '" operation="' .. tid .. '" scene="' .. slot .. '">' ..
-          inlays[slot] .. '</lb-xnai>')
+        replacement = '<lb-xnai id="scene-' .. slot .. '" operation="' .. tid .. '" scene="' .. slot .. '">' ..
+            inlays[slot] .. '</lb-xnai>'
       else
-        slotted = slotted:gsub('%[Slot%s+' .. slot .. '%]',
-          '<lb-xnai id="scene-' .. slot .. '" operation="' .. tid .. '" scene="' .. slot .. '" />')
+        replacement = '<lb-xnai id="scene-' .. slot .. '" operation="' .. tid .. '" scene="' .. slot .. '" />'
+      end
+
+      local replacementCount
+      slotted, replacementCount = slotted:gsub('%[Slot%s+' .. slot .. '%]', function()
+        return replacement
+      end, 1)
+      if replacementCount == 0 then
+        info(tid, 'Scene insertion failed. slot=' .. slot .. ', availableSlots=' .. tostring(availableSlots))
+      else
+        verbose(tid, 'Scene inserted. slot=' .. slot)
       end
     end
 
     -- remove unreplaced [Slot #] tags
-    slotted = slotted:gsub('\n%[Slot%s+%d+%]\n', '')
+    slotted = slotted:gsub('\n%[Slot%s+%d+%]\n', '\n')
     slotted = restoreNodes(slotted)
 
     local finalOutput

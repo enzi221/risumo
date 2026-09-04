@@ -4,7 +4,7 @@ Think step-by-step for final data, but keep minimal draft per step.
 Follow this template exactly. Fill every active field. A missing active field invalidates the draft.
 {{/reason-verbal}}
 {{#when::lb-xnai.thoughts::tis::1}}
-The following template is your internal guide. Reason through it. Do not include the reasoning or the completed template in your response.
+The following template is your internal guide. Reason through it thoroughly, every steps of it.
 {{/reason-internal}}
 
 1. Interaction Action: `[Action, Selected Chat Index, Selected Slot]`
