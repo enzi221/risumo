@@ -27,7 +27,6 @@ DCInside style - informal, casual, slang, memes, anon focus, sometimes crude/cri
 ### Nicknames
 
 Users aim for anonymity. Real IDs unknown unless linked to known online persona.
-Nicks/content hinting at real-life roles (e.g., 협회노예, rank/class struggles) OK.
 
 Guest nick format: Nick(xxx.yyy)
 Assigned nick format: (F/S):Nick:(Rank)
@@ -38,11 +37,13 @@ Assigned nicks: 고정닉 `F:`, 반고정닉 `S:` prefix. Assigned nicks MUST ha
 
 Rank distribution: E/D very common; C frequent; B/A rare; S-ranks are few and busy, appear for big events only. Users see assigned nicks' ranks; comments like "E급 주제에 깝치지 마라" or "A급이 왜 여기서 이러고 있어?" common. Guests have no rank visible. Mocked as E-rank by high ranks.
 
-Generate random community nicknames of diverse user identities with varied length. Treat each newly invented nickname as a pre-existing identity chosen without knowledge of the current situation or the contribution it labels. Make each nickname equally plausible when attached to any other contribution in the same output. Draw from broad community styles such as pop culture, memes, slang, random garble, self-deprecation, or put-downs. Exclude names that identify, summarize, interpret, or react to the current situation, its people, events, dialogue, themes, or the labeled contribution.
+Generate nicknames as if unrelated users had already been using them across real Korean anonymous communities before arriving in the same comment section. Choose each nickname independently of the current post's topic, title, characters, mood, and the contribution it labels. Do not deliberately adapt words, proper nouns, or puns from the post. Avoid mechanically combining two meaningful words. Vary forms and lengths irregularly among single words, ordinary account names, abbreviations, names with digits, meaningless strings, and short sentence fragments. Do not make every nickname witty or give it a character concept. Keep the set stylistically incoherent, as if different people happened to gather in one comment section. A nickname may overlap with the post's subject by chance, but do not create that overlap intentionally.
 
 Reuse previously established nicknames from previous data when appropriate. Keep their speaking tone when reusing them.
 
 Protagonist/Major characters: Use established nick or create new plausible one (based on appearance, occupation, characteristics etc).
+
+Users will call others with the nickname body (or IP), without assignment/rank prefix/suffix.
 
 ### Topics
 
@@ -99,6 +100,7 @@ These are allowed ONLY IF protagonist (or engaging partners) is already known, h
 
 - Public or semi-public sightings (street, cafe, lobby) FROM DISTANCE (no details included)
 - Status rumors ("not seen lately," "heard injured?")
+- Established public reputation and gossip that does not reveal unwitnessed current activities
 
 Protagonist and their partners' activities in private or remote spaces (home, safehouses, anywhere without witnesses) are not to be discussed. Discuss the activity's aftermath ONLY IF the action was very impactful enough to leave such aftermath. Discussion should be mild rumor ONLY ('someone did something') unless narrative allows.
 
@@ -146,7 +148,7 @@ Each leading `⇥` represents one TOON indentation level of exactly two spaces. 
 ⇥⇥time: 09:15
 ⇥⇥views: 852
 ⇥⇥upvotes: 45
-⇥⇥content: (레어 등급 스킬북 이미지 설명) 오늘 C급 돌다가 먹음 ㅋㅋ 이걸로 D급 탈출한다 ㅅㄱ
+⇥⇥content: "(레어 등급 스킬북 이미지 설명)\n오늘 C급 돌다가 먹음 ㅋㅋ\n이걸로 D급 탈출한다 ㅅㄱ"
 ⇥⇥comments[3|]{author|content}:
 ⇥⇥⇥F:마석광부:D|주작아님? C급에서 저게 왜뜸?
 ⇥⇥⇥S:마석광부:C|부럽네... 난 오늘도 잡템만 먹었는데
@@ -170,7 +172,7 @@ Key syntax:
 - Output in TOON format (2-space indent, array show length, separate fields by `|`).
 - Root elements are the posts.
 - id: integer index of posts. Start from random big number over 100,000, larger then previous data if any.
-- content: For posts, may contain line breaks with only literal `\n`. For comments, no line breaks. Avoid lengthy contents. Actively employ omissions (beginning, middle, end) to maintain length.
+- content: For posts, may contain line breaks with only **literal** `\n`. For comments, no line breaks. Avoid lengthy contents. Actively employ omissions (beginning, middle, end) to maintain length.
 - time: HH:MM.
 - views/upvotes: integers without obvious patterns (not multiples of 5, 10).
 - Close `</lb-hn>`

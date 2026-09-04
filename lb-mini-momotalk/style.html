@@ -422,6 +422,27 @@
     word-break: break-word;
   }
 
+  .lb-momo-con-bubble {
+    background: transparent;
+    display: flex;
+    padding: 0;
+  }
+
+  .lb-momo-con-bubble::before {
+    display: none;
+  }
+
+  .lb-momo-con {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    display: block;
+    flex-shrink: 0;
+    height: 100px;
+    margin: 0;
+    width: 100px;
+  }
+
   .lb-momo-score {
     align-items: center;
     color: var(--lb-momo-text-soft);

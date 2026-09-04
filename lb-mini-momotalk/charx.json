@@ -1,6 +1,6 @@
 {
   "CSS": "style.html",
-  "description": "♦️미니보드, 모모톡, for 미니보드 4.1.1+",
+  "description": "♦️미니보드, 모모톡, for 미니보드 4.3.0+",
   "hideIcon": false,
   "lorebook": [
     {
@@ -17,7 +17,7 @@
     }
   ],
   "lowLevelAccess": false,
-  "name": "♦️미니보드 렌더러 · 모모톡 1.0.0",
+  "name": "♦️미니보드 렌더러 · 모모톡 1.1.0",
   "namespace": "lb-mini-momotalk",
   "regex": [
     "regex/display-change-board-icon.md",
@@ -27,5 +27,5 @@
     "regex/display-thumbs-up-icon.md",
     "regex/display-write-icon.md"
   ],
-  "version": "1.0.0"
+  "version": "1.1.0"
 }

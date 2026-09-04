@@ -27,5 +27,5 @@ lightboard.retryMode=시도　모델=select=모듈별 설정,메인 강제,보�
 lightboard.logLevel=로그　수준=select=VERBOSE,INFO,NONE
 =브라우저 콘솔 로그=caption
 ==divider
-=라이트보드 백엔드 4.2.0—amonamona=caption
+=라이트보드 백엔드 4.3.0—amonamona=caption
 ==groupEnd

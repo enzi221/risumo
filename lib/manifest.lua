@@ -1,5 +1,13 @@
 --- @meta
 
+--- @class LightboardInstructionMeta
+--- @field type 'generation'|'interaction'|'reroll'
+
+--- @class LightboardInstructions
+--- @field format string
+--- @field guideline string
+--- @field thoughts string?
+
 --- @class Manifest
 --- @field authorsNote boolean
 --- @field charDesc boolean
@@ -18,6 +26,7 @@
 --- @field sideEffect boolean
 --- @field thoughts '0'|'1'|'2' write down, in reasoning, none
 --- @field onInput (fun (triggerId: string, input: string, index: number): string)?
+--- @field onInstructions (fun (triggerId: string, instructions: LightboardInstructions, meta: LightboardInstructionMeta): LightboardInstructions)?
 --- @field onOutput (fun (triggerId: string, output: string, fullChatContent: string?, chatIndex: number?): string)?
 --- @field onMutation (fun (triggerId: string, action: string, output: string): string)?
 --- @field onValidate (fun (triggerId: string, output: string): boolean)?

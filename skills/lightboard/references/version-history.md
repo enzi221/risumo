@@ -1,5 +1,9 @@
 # Version History
 
+## 4.3.0
+
+- Added the optional `onInstructions` callback for preprocessing a module's format, guideline, and thoughts instructions once per request.
+
 ## 4.2.0
 
 - Added configurable `VERBOSE`, `INFO`, and `NONE` diagnostic logging through the Lightboard Prelude.

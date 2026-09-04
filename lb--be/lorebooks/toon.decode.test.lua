@@ -1,7 +1,9 @@
 _ENV.prelude = {}
 
-local test = require("test")
-local toon = require("toon.decode")
+local sourcePath = debug.getinfo(1, 'S').source:sub(2)
+local lorebookDirectory = sourcePath:match('^(.*[/\\])') or ''
+local test = assert(loadfile(lorebookDirectory .. '../../test.lua'))()
+local toon = assert(loadfile(lorebookDirectory .. 'toon.decode.lua'))()
 
 local assertEquals = test.assertEquals
 local describe = test.describe
@@ -315,6 +317,15 @@ keyvis:
         status = "active"
       } }
     }, "parse nested tabular in list")
+  end)
+
+  it("rejects list markers in nested tabular rows", function()
+    local toon_str = "items[1]:\n  - name: test\n    comments[1|]{author|time|content}:\n      - user|now|text"
+    local success, result = pcall(toon.decode, toon_str)
+
+    assertEquals(success, false, "reject list marker in nested tabular row")
+    assertEquals(tostring(result):find('Tabular rows must not start with "- ".', 1, true) ~= nil, true,
+      "report invalid tabular row marker")
   end)
 
   it("parses objects containing arrays (including empty arrays) in list format", function()

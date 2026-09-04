@@ -14,6 +14,22 @@ local function getInitial(name)
 end
 
 local function renderComment(comment, chatIndex, postIndex, commentIndex)
+  local bubbleClass = 'lb-momo-post-bubble'
+  local commentContent
+  if comment.cons then
+    bubbleClass = bubbleClass .. ' lb-momo-con-bubble'
+    commentContent = {}
+    for _, identifier in ipairs(comment.cons) do
+      table.insert(commentContent, h.div['lb-momo-con'] {
+        style = 'background-image: url("{{raw::' .. identifier .. '}}");',
+      })
+    end
+  else
+    commentContent = h.p {
+      comment.content,
+    }
+  end
+
   return h.div['lb-momo-comment'] {
     h.div['lb-momo-avatar'] {
       getInitial(comment.author),
@@ -23,10 +39,8 @@ local function renderComment(comment, chatIndex, postIndex, commentIndex)
         comment.author,
       },
       h.div['lb-momo-comment-row'] {
-        h.div['lb-momo-post-bubble'] {
-          h.p {
-            comment.content,
-          },
+        h.div[bubbleClass] {
+          commentContent,
         },
         h.div['lb-momo-comment-meta'] {
           h.span {

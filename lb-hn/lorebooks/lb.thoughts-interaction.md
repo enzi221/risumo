@@ -1,6 +1,11 @@
 {{#when::lb-hn.thoughts::tis::0}}
 Think step-by-step for final data, but keep minimal draft per step.
-{{/when}}
+
+Follow the templates.
+{{/reason-verbal}}
+{{#when::lb-hn.thoughts::tis::1}}
+The following templates are your internal guide. Reason through one thoroughly, every steps of it.
+{{/reason-internal}}
 
 Suggestion for AddComment/AddPost:
 
@@ -18,6 +23,7 @@ To add new posts for engagement simulation, take these steps:
 {{#when {{? {{getglobalvar::toggle_lb-hn.privacy}} > 0}}}}
 {{#when {{? {{getglobalvar::toggle_lb-hn.privacy}} < 4}}}}0. IMPORTANT/MANDATORY STEP: Preliminary Protagonist AND Partners Privacy Check. Identify them. Are they IMPORTANT figures? IF NOT -> UNACCEPTABLE as topics, NOT EVEN REMOTELY RELATED. DO NOT VIOLATE PRIVACY RULES. Were they in PUBLIC places? Assess carefully - they might have been in PRIVATE blind spots within public places. IF PRIVATE -> UNACCEPTABLE as topics. DO NOT VIOLATE PRIVACY RULES!
 {{/when}}{{/when}}
+
 1. Narrative Context - Time & World
 2. Current Status - Situation & Location
 3. Recent Notable Event List In Narrative, Paired With Relative Time

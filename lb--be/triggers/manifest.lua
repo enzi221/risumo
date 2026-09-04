@@ -81,6 +81,7 @@ local function getManifests(triggerId, includeInactive)
           tbl.sideEffect                        = resolveConfig(triggerId, tbl.sideEffect, id, "sideEffect", false)
 
           tbl.onInput                           = loadCallback(triggerId, id, 'onInput')
+          tbl.onInstructions                    = loadCallback(triggerId, id, 'onInstructions')
           tbl.onOutput                          = loadCallback(triggerId, id, 'onOutput')
           tbl.onMutation                        = loadCallback(triggerId, id, 'onMutation')
           tbl.onValidate                        = loadCallback(triggerId, id, 'onValidate')

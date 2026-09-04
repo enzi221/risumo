@@ -21,6 +21,24 @@ local function render(triggerId, data, options)
     for pi, post in ipairs(posts) do
       local comment_es = {}
       for ci, comment in ipairs(post.comments) do
+        local commentContent
+        if comment.cons then
+          local con_es = {}
+          for _, identifier in ipairs(comment.cons) do
+            table.insert(con_es, h.div['lb-mini-con'] {
+              style = 'background-image: url("{{raw::' .. identifier .. '}}");',
+            })
+          end
+
+          commentContent = h.div['lb-mini-comment-content lb-mini-con-content'] {
+            con_es,
+          }
+        else
+          commentContent = h.p['lb-mini-comment-content'] {
+            comment.content
+          }
+        end
+
         local comment_e = h.div['lb-mini-comment'] {
           h.div['lb-mini-meta'] {
             h.span['lb-mini-author'] {
@@ -36,9 +54,7 @@ local function render(triggerId, data, options)
               h.lb_trash_icon { closed = true },
             },
           },
-          h.p['lb-mini-comment-content'] {
-            comment.content
-          }
+          commentContent,
         }
 
         table.insert(comment_es, comment_e)

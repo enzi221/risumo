@@ -1,8 +1,9 @@
 {{#when::lb-hn.thoughts::tis::0}}
 Think step-by-step for final data, but keep minimal draft per step.
-{{/when}}
-
-Follow this template:
+{{/reason-verbal}}
+{{#when::lb-hn.thoughts::tis::1}}
+The following template is your internal guide. Reason through it thoroughly, every steps of it.
+{{/reason-internal}}
 
 {{#when {{? {{getglobalvar::toggle_lb-hn.privacy}} > 0}}}}
 {{#when {{? {{getglobalvar::toggle_lb-hn.privacy}} < 4}}}}0. IMPORTANT/MANDATORY STEP: Preliminary Protagonist AND Partners Privacy Check. Identify them. Are they IMPORTANT figures? IF NOT -> UNACCEPTABLE as topics, NOT EVEN REMOTELY RELATED. DO NOT VIOLATE PRIVACY RULES. Were they in PUBLIC places? Assess carefully - they might have been in PRIVATE blind spots within public places. IF PRIVATE -> UNACCEPTABLE as topics. DO NOT VIOLATE PRIVACY RULES!

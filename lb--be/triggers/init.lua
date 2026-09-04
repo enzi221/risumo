@@ -9,6 +9,7 @@ local triggerId = ''
 local function setTriggerId(tid)
   triggerId = tid
   if type(prelude) ~= 'nil' then
+    prelude.import(tid, 'toon.encode')
     prelude.import(tid, 'toon.decode')
     return
   end
@@ -17,6 +18,7 @@ local function setTriggerId(tid)
     error('Failed to load lightboard-prelude.')
   end
   load(source[1].content, '@prelude', 't')()
+  prelude.import(tid, 'toon.encode')
   prelude.import(tid, 'toon.decode')
 end
 

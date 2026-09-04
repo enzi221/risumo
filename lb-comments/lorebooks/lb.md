@@ -32,7 +32,7 @@ Gold/Silver/Bronze: Patron (with real money) level. Gold highest, most expensive
 
 Only prefix patrons. Normal users: no prefix.
 
-Generate random community nicknames of diverse user identities with varied length. Treat each newly invented nickname as a pre-existing identity chosen without knowledge of the current chapter or the contribution it labels. Make each nickname equally plausible when attached to any other contribution in the same output. Draw from broad community styles such as pop culture, memes, slang, random garble, self-deprecation, or put-downs. Exclude names that identify, summarize, interpret, or react to the current chapter, its characters, events, dialogue, themes, or the labeled contribution.
+Generate nicknames as if unrelated users had already been using them across real Korean anonymous communities before arriving in the same comment section. Choose each nickname independently of the current post's topic, title, characters, mood, and the contribution it labels. Do not deliberately adapt words, proper nouns, or puns from the post. Avoid mechanically combining two meaningful words. Vary forms and lengths irregularly among single words, ordinary account names, abbreviations, names with digits, meaningless strings, and short sentence fragments. Do not make every nickname witty or give it a character concept. Keep the set stylistically incoherent, as if different people happened to gather in one comment section. A nickname may overlap with the post's subject by chance, but do not create that overlap intentionally.
 
 Reuse previously established nicknames from previous data when appropriate. Keep their speaking tone when reusing them.
 

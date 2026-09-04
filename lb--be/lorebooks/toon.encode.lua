@@ -13,6 +13,31 @@ local function isPrimitive(value)
   return t == "string" or t == "number" or t == "boolean" or value == nil
 end
 
+local function objectKeys(value)
+  local keys = {}
+  local seen = {}
+  local metatable = getmetatable(value)
+  local preservedKeys = type(metatable) == "table" and metatable.__toonKeyOrder or nil
+
+  if type(preservedKeys) == "table" then
+    for _, key in ipairs(preservedKeys) do
+      if rawget(value, key) ~= nil and not seen[key] then
+        table.insert(keys, key)
+        seen[key] = true
+      end
+    end
+  end
+
+  for key in pairs(value) do
+    if not seen[key] then
+      table.insert(keys, key)
+      seen[key] = true
+    end
+  end
+
+  return keys
+end
+
 local function escapeString(str)
   return str:gsub("\\", "\\\\")
       :gsub("\"", "\\\"")
@@ -114,7 +139,8 @@ local function isTabularArray(arr)
     return false, nil
   end
 
-  for k, v in pairs(arr[1]) do
+  for _, k in ipairs(objectKeys(arr[1])) do
+    local v = arr[1][k]
     if not isPrimitive(v) then
       return false, nil
     end
@@ -203,10 +229,7 @@ local function encodeValue(value, depth, config, lines, key)
             elseif isArray(item) then
               encodeValue(item, depth + 1, config, lines, "- ")
             else
-              local objKeys = {}
-              for k in pairs(item) do
-                table.insert(objKeys, k)
-              end
+              local objKeys = objectKeys(item)
 
               if #objKeys == 0 then
                 table.insert(lines, itemIndent .. "-")
@@ -218,13 +241,12 @@ local function encodeValue(value, depth, config, lines, key)
                   table.insert(lines,
                     itemIndent .. "- " .. encodeKey(firstKey) .. ": " .. encodePrimitive(firstValue, config.delimiter))
                 else
-                  table.insert(lines, itemIndent .. "- " .. encodeKey(firstKey) .. ":")
-                  encodeValue(firstValue, depth + 2, config, lines, nil)
+                  encodeValue(firstValue, depth + 1, config, lines, "- " .. encodeKey(firstKey))
                 end
 
                 for j = 2, #objKeys do
                   local k = objKeys[j]
-                  encodeValue(item[k], depth + 1, config, lines, encodeKey(k))
+                  encodeValue(item[k], depth + 2, config, lines, encodeKey(k))
                 end
               end
             end
@@ -232,10 +254,7 @@ local function encodeValue(value, depth, config, lines, key)
         end
       end
     else
-      local keys = {}
-      for k in pairs(value) do
-        table.insert(keys, k)
-      end
+      local keys = objectKeys(value)
 
       if key then
         table.insert(lines, indent .. key .. ":")

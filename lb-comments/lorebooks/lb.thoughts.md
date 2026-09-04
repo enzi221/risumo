@@ -1,8 +1,12 @@
 {{#when::lb-comments.thoughts::tis::0}}
 Think step-by-step for final data, but keep minimal draft per step.
-{{/when}}
+{{/reason-verbal}}
+{{#when::lb-comments.thoughts::tis::1}}
+The following template is your internal guide. Reason through it thoroughly, every steps of it.
+{{/reason-internal}}
 
 Suggestion:
+
 1. Last Discussion Topics: ...
 2. Narrative Assessment: ...
 3. Scene Assessment: ...

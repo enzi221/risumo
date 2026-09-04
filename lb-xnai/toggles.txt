@@ -53,7 +53,7 @@ lb-xnai.positive=긍정　프롬=textarea
 lb-xnai.negative=부정　프롬=textarea
 =항상 맨 뒤에 추가=caption
 ==divider
-=라이트보드 삽화 4.2.1—amonamona=caption
+=라이트보드 삽화 4.2.2—amonamona=caption
 ==groupEnd
 
 =🌠삽화 (고급)=group

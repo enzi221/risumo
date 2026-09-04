@@ -1,6 +1,6 @@
 # Miniboard Renderer
 
-Create a standalone CharX module that supplies one visual renderer for Miniboard. Target the self-contained renderer contract in this reference for Miniboard 4.1.1+.
+Create a standalone CharX module that supplies one visual renderer for Miniboard. Target the self-contained renderer contract in this reference for Miniboard 4.3.0+.
 
 ## Deliverable
 
@@ -47,7 +47,14 @@ The renderer receives:
 - `options.color`: Resolved accent color as a CSS color string
 - `options.darkness`: Either `light` or `dark`
 
-Each post contains `author`, `comments`, `content`, `downvotes`, `time`, `title`, and `upvotes`. Each comment contains `author`, `content`, and `time`. These are all strings.
+Each post contains `author`, `comments`, `content`, `downvotes`, `time`, `title`, and `upvotes`. These are all strings except `comments`, which is a list.
+
+Each comment contains `author`, `time`, and exactly one of these fields:
+
+- `content`: Comment text.
+- `con`: A validated asset identifier from a `[con:asset-identifier]` comment reference.
+
+Render `con` with a local asset expression such as `<img src="{{raw::asset-identifier}}">`. The Miniboard trigger parses the stored reference before calling the renderer. Keep this data distinction in custom renderers instead of parsing the stored reference syntax.
 
 Read the optional board name from `data.attributes.name`.
 

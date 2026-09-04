@@ -1,6 +1,11 @@
 {{#when::lb-comments.thoughts::tis::0}}
 Think step-by-step for final data, but keep minimal draft per step.
-{{/when}}
+
+Follow the templates.
+{{/reason-verbal}}
+{{#when::lb-comments.thoughts::tis::1}}
+The following templates are your internal guide. Reason through one thoroughly, every steps of it.
+{{/reason-internal}}
 
 Suggestion:
 

@@ -8,6 +8,24 @@ local DEFAULT_CONFIG = {
 
 local INDENT_MARKER = "⇥"
 
+local function newObject()
+  local keyOrder = {}
+  local recorded = {}
+  local object = {}
+
+  return setmetatable(object, {
+    __newindex = function(target, key, value)
+      if not recorded[key] then
+        table.insert(keyOrder, key)
+        recorded[key] = true
+      end
+
+      rawset(target, key, value)
+    end,
+    __toonKeyOrder = keyOrder,
+  })
+end
+
 local function mergeConfig(options)
   local cfg = {}
   for k, v in pairs(DEFAULT_CONFIG) do
@@ -236,7 +254,7 @@ local function parseTabularRows(lines, startIdx, targetDepth, headerInfo, config
 
     if actualDepth == targetDepth then
       if rowContent:sub(1, 2) == "- " then
-        break
+        error('Tabular rows must not start with "- ".')
       end
 
       local delimPos = findUnquotedChar(rowContent, headerInfo.delimiter)
@@ -248,7 +266,7 @@ local function parseTabularRows(lines, startIdx, targetDepth, headerInfo, config
     end
 
     local tokens = splitValues(rowContent, headerInfo.delimiter)
-    local obj = {}
+    local obj = newObject()
     for i, field in ipairs(headerInfo.fields) do
       obj[field] = parseValue(tokens[i] or "")
     end
@@ -284,7 +302,7 @@ local function collectSiblings(obj, lines, startIdx, targetDepth, delimiter, con
         if nextLine and nextLine.depth > targetDepth then
           local child
           child, idx = decodeValue(lines, idx + 1, targetDepth + 1, config, delimiter)
-          obj[sibParsedKey] = child or {}
+          obj[sibParsedKey] = child or newObject()
         else
           obj[sibParsedKey] = ""
           idx = idx + 1
@@ -304,7 +322,7 @@ local function decodeListItem(lines, startIdx, targetDepth, config, parentDelimi
   local itemContent = lines[startIdx].content:sub(3)
 
   if itemContent == "" then
-    return {}, startIdx + 1
+    return newObject(), startIdx + 1
   end
 
   local headerInfo = parseHeader(itemContent)
@@ -338,7 +356,7 @@ local function decodeListItem(lines, startIdx, targetDepth, config, parentDelimi
   end
 
   local value = itemContent:sub(colonPos + 1):match("^%s*(.-)%s*$")
-  local obj = {}
+  local obj = newObject()
   local parsedKey = assertKeyNotNil(parseValue(itemContent:sub(1, colonPos - 1)))
   local idx = startIdx
 
@@ -373,7 +391,7 @@ local function decodeListItem(lines, startIdx, targetDepth, config, parentDelimi
     local nextLine = lines[startIdx + 1]
     if nextLine and nextLine.depth > targetDepth + 1 then
       obj[parsedKey], idx = decodeValue(lines, startIdx + 1, targetDepth + 2, config, delimiter)
-      obj[parsedKey] = obj[parsedKey] or {}
+      obj[parsedKey] = obj[parsedKey] or newObject()
     else
       obj[parsedKey] = ""
       idx = startIdx + 1
@@ -427,7 +445,7 @@ function decodeValue(lines, startIdx, targetDepth, config, parentDelimiter, expe
   local headerInfo = parseHeader(content)
   if headerInfo then
     if headerInfo.key and not expectValue then
-      local obj = {}
+      local obj = newObject()
       local nextIdx = collectSiblings(obj, lines, startIdx, targetDepth, delimiter, config)
       return obj, nextIdx
     end
@@ -486,7 +504,7 @@ function decodeValue(lines, startIdx, targetDepth, config, parentDelimiter, expe
   end
 
   local value = content:sub(colonPos + 1):match("^%s*(.-)%s*$")
-  local obj = {}
+  local obj = newObject()
   local parsedKey = assertKeyNotNil(parseValue(content:sub(1, colonPos - 1)))
 
   if value == "" then
@@ -495,7 +513,7 @@ function decodeValue(lines, startIdx, targetDepth, config, parentDelimiter, expe
       obj[parsedKey], startIdx = parseListArray(lines, startIdx + 1, targetDepth + 1, config, delimiter)
     elseif nextLine and nextLine.depth > targetDepth then
       obj[parsedKey], startIdx = decodeValue(lines, startIdx + 1, targetDepth + 1, config, delimiter)
-      obj[parsedKey] = obj[parsedKey] or {}
+      obj[parsedKey] = obj[parsedKey] or newObject()
     else
       obj[parsedKey] = ""
       startIdx = startIdx + 1
@@ -516,13 +534,13 @@ local function decode(text, options)
   local config = mergeConfig(options)
 
   if text == "" or text:match("^%s*$") then
-    return {}
+    return newObject()
   end
 
   local lines = parseLines(text, config)
 
   if #lines == 0 then
-    return {}
+    return newObject()
   end
 
   if lines[1].depth == 0 then
@@ -541,12 +559,14 @@ local function decode(text, options)
       end
       local value = content:sub(colonPos + 1):match("^%s*(.-)%s*$")
       if value == "" then
-        return { [parseValue(content:sub(1, colonPos - 1))] = {} }
+        local object = newObject()
+        object[parseValue(content:sub(1, colonPos - 1))] = newObject()
+        return object
       end
     end
   end
 
-  local obj = {}
+  local obj = newObject()
   local idx = 1
 
   while idx <= #lines and lines[idx].depth == 0 do
@@ -572,7 +592,7 @@ local function decode(text, options)
             obj[parsedKey], idx = parseListArray(lines, idx + 1, 1, config, ",")
           elseif nextLine and nextLine.depth >= 1 then
             obj[parsedKey], idx = decodeValue(lines, idx + 1, 1, config, ",")
-            obj[parsedKey] = obj[parsedKey] or {}
+            obj[parsedKey] = obj[parsedKey] or newObject()
           else
             obj[parsedKey] = ""
             idx = idx + 1

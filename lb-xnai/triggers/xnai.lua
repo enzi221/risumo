@@ -251,6 +251,7 @@ local function renderInline(data, chatIndex, stackItem)
               h.div['lb-xnai-inlay-actions'] { table.unpack(createToolbar()) }, inlineImage, fullsizePop
             }
           }),
+          '\n',
           out:sub(imageNode.rangeEnd + 1),
         })
       end

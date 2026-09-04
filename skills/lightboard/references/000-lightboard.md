@@ -250,6 +250,7 @@ Use the `{identifier}.lb.interaction` and `{identifier}.lb.thoughts-interaction`
 The backend provides callback support:
 
 - Input preprocessing: `{identifier}.lb.onInput`
+- Instruction preprocessing: `{identifier}.lb.onInstructions`
 - Validation: `{identifier}.lb.onValidate`
 - Output post-processing: `{identifier}.lb.onOutput`
 - Reroll and interaction mutation: `{identifier}.lb.onMutation`
@@ -276,6 +277,17 @@ Note the `return main`. It must return the callback function.
 Receives `(triggerId, chat text)`. The backend calls it for every chat block being sent. Return the modified chat text.
 
 Use this callback to strip data unnecessary for the module and to retrieve or add required chat data.
+
+#### Before instructions
+
+Receives `(triggerId, instructions, meta)` once per request after selecting the module's instruction lorebooks and before assembling the output instruction. Return the complete instruction table.
+
+- `instructions.format`: Content selected from `{identifier}.lb.format`.
+- `instructions.guideline`: Content selected from `{identifier}.lb`.
+- `instructions.thoughts`: Content selected from `{identifier}.lb.thoughts` or `{identifier}.lb.thoughts-interaction`, or `nil`.
+- `meta.type`: `generation`, `interaction`, or `reroll`.
+
+Use this callback to derive or replace instruction content from runtime data. Return strings for `format` and `guideline`. Return a string or `nil` for `thoughts`.
 
 #### Validation and autofix
 

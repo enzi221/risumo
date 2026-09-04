@@ -40,7 +40,7 @@
     }
   ],
   "lowLevelAccess": true,
-  "name": "🔦라이트보드 - 4.2.0",
+  "name": "🔦라이트보드 - 4.3.0",
   "namespace": "lightboard",
   "regex": [
     "regex/remove-main-output.md",
@@ -72,5 +72,5 @@
       "type": "start"
     }
   ],
-  "version": "4.2.0"
+  "version": "4.3.0"
 }

@@ -216,11 +216,11 @@ Treat every featured character appearance in every panel as a separate depiction
 
 #### Slots
 
-`[Slot N]` is an insertion marker between content blocks. Treat the markers immediately before the first narrative prose block and immediately after the last narrative prose block as the first and last markers of the narrative prose content. {{#when::toggle::lb-xnai.scene.quantityexact}}Select a suitable marker within this range after the final narrative paragraph that establishes the complete depicted moment.{{:else}}Select the first suitable marker within this range after the final narrative paragraph that establishes the complete depicted moment.{{/when}} Use each slot for at most one Scene.
+`[Slot N]` marks the exact insertion position after the content above it and before the content below it. Depict only events established above the selected marker. {{#when::toggle::lb-xnai.scene.quantityexact}}Select a suitable marker after the complete depicted moment.{{:else}}Select the first suitable marker after the complete depicted moment.{{/when}}
 
-Keep every depicted action, interaction, and reaction before the selected slot. Do not place a Scene before or within the prose that establishes its depicted moment.
+Treat the markers immediately before the first narrative prose block and immediately after the last narrative prose block as the narrative boundaries. {{#when::toggle::lb-xnai.scene.quantityexact}}{{:else}}Keep both boundary markers unused. {{/when}}Use each slot for at most one Scene.
 
-{{#when::toggle::lb-xnai.scene.quantityexact}}Distribute Scenes across different portions of the log when doing so preserves the required Scene count.{{:else}}Choose a distinct event moment for each Scene. Distribute Scenes across different portions of the log when suitable moments exist. Do not use the first or last marker of the narrative prose content, they are reserved.{{/when}}
+{{#when::toggle::lb-xnai.scene.quantityexact}}Distribute Scenes across different portions of the log when doing so preserves the required Scene count.{{:else}}Choose a distinct event moment for each Scene. Distribute Scenes across different portions of the log when suitable moments exist.{{/when}}
 
 {{#when::keep::toggle::lb-xnai.context}}{{#when::keep::lb-xnai-history::visnot::null}}{{#when::keep::{{? {{length::{{trim::{{getvar::lb-xnai-history}}}}}} > 0}}}}
 

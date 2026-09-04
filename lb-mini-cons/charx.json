@@ -1,0 +1,108 @@
+{
+  "assets": [
+    {
+      "extension": "webp",
+      "file": "assets/mini-angry.webp",
+      "name": "mini-angry"
+    },
+    {
+      "extension": "webp",
+      "file": "assets/mini-crying.webp",
+      "name": "mini-crying"
+    },
+    {
+      "extension": "webp",
+      "file": "assets/mini-disgusted.webp",
+      "name": "mini-disgusted"
+    },
+    {
+      "extension": "webp",
+      "file": "assets/mini-goodnight.webp",
+      "name": "mini-goodnight"
+    },
+    {
+      "extension": "webp",
+      "file": "assets/mini-no.webp",
+      "name": "mini-no"
+    },
+    {
+      "extension": "webp",
+      "file": "assets/mini-praise.webp",
+      "name": "mini-praise"
+    },
+    {
+      "extension": "webp",
+      "file": "assets/mini-punched.webp",
+      "name": "mini-punched"
+    },
+    {
+      "extension": "webp",
+      "file": "assets/mini-scared.webp",
+      "name": "mini-scared"
+    },
+    {
+      "extension": "webp",
+      "file": "assets/mini-shrug.webp",
+      "name": "mini-shrug"
+    },
+    {
+      "extension": "webp",
+      "file": "assets/mini-smug.webp",
+      "name": "mini-smug"
+    },
+    {
+      "extension": "webp",
+      "file": "assets/mini-standing-lower.webp",
+      "name": "mini-standing-lower"
+    },
+    {
+      "extension": "webp",
+      "file": "assets/mini-standing-upper.webp",
+      "name": "mini-standing-upper"
+    },
+    {
+      "extension": "webp",
+      "file": "assets/mini-star.webp",
+      "name": "mini-star"
+    },
+    {
+      "extension": "webp",
+      "file": "assets/mini-surprised.webp",
+      "name": "mini-surprised"
+    },
+    {
+      "extension": "webp",
+      "file": "assets/mini-teasing-lower.webp",
+      "name": "mini-teasing-lower"
+    },
+    {
+      "extension": "webp",
+      "file": "assets/mini-teasing-upper.webp",
+      "name": "mini-teasing-upper"
+    },
+    {
+      "extension": "webp",
+      "file": "assets/mini-thumbs-up.webp",
+      "name": "mini-thumbs-up"
+    },
+    {
+      "extension": "webp",
+      "file": "assets/mini-yes.webp",
+      "name": "mini-yes"
+    }
+  ],
+  "description": "♦️미니보드 미니 미니콘 for 미니보드 4.3.0+",
+  "hideIcon": false,
+  "lorebook": [
+    {
+      "alwaysActive": false,
+      "comment": "lb-mini.cons",
+      "file": "lorebooks/cons.md",
+      "insertOrder": 200
+    }
+  ],
+  "lowLevelAccess": false,
+  "name": "♦️미니보드 미니 미니콘 1.0.0",
+  "namespace": "lb-mini-cons",
+  "version": "1.0.0"
+}

@@ -1,7 +1,10 @@
 _ENV.prelude = {}
 
-local test = require("test")
-local toon = require("toon.encode")
+local sourcePath = debug.getinfo(1, 'S').source:sub(2)
+local lorebookDirectory = sourcePath:match('^(.*[/\\])') or ''
+local test = assert(loadfile(lorebookDirectory .. '../../test.lua'))()
+local toon = assert(loadfile(lorebookDirectory .. 'toon.encode.lua'))()
+local toonDecoder = assert(loadfile(lorebookDirectory .. 'toon.decode.lua'))()
 
 local assertEquals = test.assertEquals
 local describe = test.describe
@@ -272,6 +275,94 @@ describe("root arrays", function()
     print("✓ encodes arrays of similar objects in tabular format")
     stats.total = stats.total + 1
     stats.passed = stats.passed + 1
+  end)
+
+  it("indents every field in non-tabular object items beneath the array item", function()
+    local arr = {
+      {
+        author = "user",
+        comments = {
+          { author = "reply", content = "hello", time = "now" }
+        },
+        title = "title"
+      }
+    }
+    local result = toon.encode(arr, { delimiter = "|" })
+    local normalized = result:gsub("\n  %- ", "\n    ", 1)
+
+    assertEquals(normalized:find("\n    author: user", 1, true) ~= nil, true,
+      "indent root object array author field")
+    assertEquals(normalized:find("\n    comments[1|]", 1, true) ~= nil, true,
+      "indent root object array nested field")
+    assertEquals(normalized:find("\n    title: title", 1, true) ~= nil, true,
+      "indent root object array title field")
+  end)
+
+  it("round trips non-tabular object items", function()
+    local arr = {
+      {
+        author = "user",
+        comments = {
+          { author = "reply", content = "hello", time = "now" }
+        },
+        title = "title"
+      }
+    }
+    local decoded = toonDecoder.decode(toon.encode(arr, { delimiter = "|" }))
+
+    assertEquals(decoded[1].author, "user", "round trip root object array author")
+    assertEquals(decoded[1].title, "title", "round trip root object array title")
+    assertEquals(decoded[1].comments[1].content, "hello", "round trip root object array nested content")
+  end)
+
+  it("preserves decoded Miniboard field order", function()
+    local source = [[ [1|]:
+  - author: user
+    title: title
+    time: now
+    upvotes: 7
+    downvotes: 0
+    content: body
+    comments[2|]{author|time|content}:
+      reply1|1분 전|first
+      reply2|2분 전|second]]
+    source = source:sub(2)
+
+    local encoded = toon.encode(toonDecoder.decode(source), { delimiter = "|" })
+
+    assertEquals(encoded, source, "preserve decoded Miniboard field order")
+  end)
+
+  it("round trips non-tabular object items when a nested field is first", function()
+    local item = {
+      author = "user",
+      comments = {
+        { author = "reply", content = "hello", time = "now" }
+      },
+      title = "title"
+    }
+    local keys = { "comments", "author", "title" }
+    setmetatable(item, {
+      __pairs = function(value)
+        local index = 0
+        return function()
+          index = index + 1
+          local key = keys[index]
+          if key then
+            return key, value[key]
+          end
+        end
+      end
+    })
+
+    local encoded = toon.encode({ item }, { delimiter = "|" })
+    local decoded = toonDecoder.decode(encoded)
+
+    assertEquals(encoded:find("\n  - comments[1|]", 1, true) ~= nil, true,
+      "attach a first nested field header to the list marker")
+    assertEquals(decoded[1].author, "user", "round trip nested-first object array author")
+    assertEquals(decoded[1].title, "title", "round trip nested-first object array title")
+    assertEquals(decoded[1].comments[1].content, "hello", "round trip nested-first object array content")
   end)
 
   it("encodes empty arrays at root level", function()

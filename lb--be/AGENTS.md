@@ -65,7 +65,7 @@ Manifests are stored as lorebooks keyed `manifest.lb`. Each manifest is a key=va
 | `sideEffect`  | If true, output is processed by `onOutput` callback to mutate chat directly.         |
 | `insertOrder` | Controls ordering among manifests. Higher = earlier.                                 |
 
-Optional callbacks loaded from lorebooks (`<id>.lb.<name>`): `onInput`, `onOutput`, `onValidate`, `onMutation`.
+Optional callbacks loaded from lorebooks (`<id>.lb.<name>`): `onInput`, `onInstructions`, `onOutput`, `onValidate`, `onMutation`.
 
 ## Pipeline
 

@@ -114,8 +114,8 @@ end
 
 --- @param triggerId string
 --- @param man Manifest
---- @param type 'generation'|'interaction'|'reroll'
-local function makeOutro(triggerId, man, type)
+--- @param requestType 'generation'|'interaction'|'reroll'
+local function makeOutro(triggerId, man, requestType)
   local identifier = man.identifier
 
   -- What to generate
@@ -130,13 +130,33 @@ local function makeOutro(triggerId, man, type)
   local thoughtsFormatExternal = nil
   local thoughtsFlag = man.thoughts or '0'
   if thoughtsFlag ~= '2' then
-    if type == 'generation' or type == 'reroll' then
+    if requestType == 'generation' or requestType == 'reroll' then
       thoughtsFormatExternal = prelude.getPriorityLoreBook(triggerId, identifier .. ".lb.thoughts")
-    elseif type == 'interaction' then
+    elseif requestType == 'interaction' then
       thoughtsFormatExternal = prelude.getPriorityLoreBook(triggerId, identifier .. ".lb.thoughts-interaction")
     end
   end
   local thoughtsFormat = (thoughtsFormatExternal and thoughtsFormatExternal.content) or nil
+
+  if man.onInstructions then
+    local instructions = {
+      format = dataFormat,
+      guideline = guideline,
+      thoughts = thoughtsFormat,
+    }
+    local success, modified = pcall(man.onInstructions, triggerId, instructions, { type = requestType })
+    if success
+        and type(modified) == 'table'
+        and type(modified.format) == 'string'
+        and type(modified.guideline) == 'string'
+        and (modified.thoughts == nil or type(modified.thoughts) == 'string') then
+      dataFormat = modified.format
+      guideline = modified.guideline
+      thoughtsFormat = modified.thoughts
+    else
+      print('[Lightboard Backend] Error in onInstructions for ' .. identifier .. ': ' .. tostring(modified))
+    end
+  end
 
   local outputGuideline = ''
   if thoughtsFormat and thoughtsFlag == '1' then

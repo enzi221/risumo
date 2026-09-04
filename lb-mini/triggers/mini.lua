@@ -42,7 +42,8 @@ local THEME_COLORS = {
 
 ---@class MiniboardCommentData
 ---@field author string
----@field content string
+---@field cons string[]? Asset identifiers when content is absent.
+---@field content string? Comment text when cons is absent.
 ---@field time string
 
 ---@class MiniboardPostData
@@ -113,6 +114,51 @@ local function getRenderOptions(chatIndex)
   }
 end
 
+---@param content any
+---@return string[]?
+local function parseConReferences(content)
+  if type(content) ~= 'string' then
+    return nil
+  end
+
+  local value = content:match('^%s*%[con:([^%]]+)%]%s*$')
+  if not value then
+    return nil
+  end
+
+  local identifiers = {}
+  for identifier in value:gmatch('[^,]+') do
+    if not identifier:match('^[%w._/%-]+$') then
+      return nil
+    end
+    table.insert(identifiers, identifier)
+  end
+
+  if #identifiers < 1 or table.concat(identifiers, ',') ~= value then
+    return nil
+  end
+
+  return identifiers
+end
+
+---@param content string
+---@return MiniboardPostData[]
+local function decodePosts(content)
+  local posts = prelude.toon.decode(content)
+
+  for _, post in ipairs(posts) do
+    for _, comment in ipairs(post.comments or {}) do
+      local cons = parseConReferences(comment.content)
+      if cons then
+        comment.cons = cons
+        comment.content = nil
+      end
+    end
+  end
+
+  return posts
+end
+
 local function main(data, chatIndex)
   if not data or data == '' then
     return ''
@@ -130,7 +176,7 @@ local function main(data, chatIndex)
   end
 
   local renderer = resolveRenderer()
-  local posts = prelude.toon.decode(lastResult.content)
+  local posts = decodePosts(lastResult.content)
   local renderData = {
     attributes = lastResult.attributes,
     posts = posts,
@@ -197,7 +243,8 @@ local function encodePosts(posts)
     table.insert(lines, "    content: " .. escape(post.content))
     table.insert(lines, "    comments[" .. #post.comments .. "|]{author|time|content}:")
     for _, comment in ipairs(post.comments) do
-      table.insert(lines, "      " .. comment.author .. "|" .. comment.time .. "|" .. escape(comment.content))
+      local content = comment.cons and ('[con:' .. table.concat(comment.cons, ',') .. ']') or comment.content
+      table.insert(lines, "      " .. comment.author .. "|" .. comment.time .. "|" .. escape(content))
     end
   end
 
@@ -256,7 +303,7 @@ onButtonClick = async(function(tid, code)
   end
 
   local node = nodes[#nodes]
-  local posts = prelude.toon.decode(node.content)
+  local posts = decodePosts(node.content)
 
   if postIndex < 1 or postIndex > #posts then
     alertNormal(tid, deathMessage)

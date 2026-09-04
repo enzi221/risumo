@@ -38,6 +38,11 @@
       "insertOrder": 1
     },
     {
+      "comment": "lb-mini.lb.onInstructions",
+      "file": "lorebooks/mini.onInstructions.lua",
+      "insertOrder": 1
+    },
+    {
       "comment": "lb-mini.lb.onValidate",
       "file": "lorebooks/mini.onValidate.lua",
       "insertOrder": 1
@@ -55,7 +60,7 @@
     }
   ],
   "lowLevelAccess": false,
-  "name": "🔦라이트보드 ♦️미니보드 4.1.2",
+  "name": "🔦라이트보드 ♦️미니보드 4.3.0",
   "namespace": "lb-mini",
   "regex": [
     "regex/filter-response.md",
@@ -73,5 +78,5 @@
       "type": "start"
     }
   ],
-  "version": "4.1.2"
+  "version": "4.3.0"
 }
