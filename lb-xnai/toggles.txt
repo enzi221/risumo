@@ -58,6 +58,8 @@ lb-xnai.negative=부정　프롬=textarea
 
 =🌠삽화 (고급)=group
 =———————⚙️시스템=divider
+lb-xnai.showOld=오래된 삽화 표시하기
+=클릭 시 확대는 불가, 크게 보려면 새 탭에서 열 것=caption
 lb-xnai.context=컨텍스트 유지
 =이전 태그 기록을 다음 요청에 전달?=caption
 lb-xnai.thoughts=생각　보조=select=적고 제거,생각만,안하기
@@ -86,5 +88,5 @@ lb-xnai.compat.weight=가　중　치=select=제거,Comfy
 =NAI 가중치를 제거하거나 변환=caption
 =ComfyUI 체크해야 적용=caption
 ==divider
-=라이트보드 삽화 4.2.1—amonamona=caption
+=라이트보드 삽화 4.2.2—amonamona=caption
 ==groupEnd
