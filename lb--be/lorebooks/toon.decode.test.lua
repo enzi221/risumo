@@ -320,13 +320,40 @@ keyvis:
     }, "parse nested tabular in list")
   end)
 
-  it("rejects list markers in nested tabular rows", function()
+  it("accepts list markers in nested tabular rows", function()
     local toon_str = "items[1]:\n  - name: test\n    comments[1|]{author|time|content}:\n      - user|now|text"
-    local success, result = pcall(toon.decode, toon_str)
+    assertDeepEquals(toon.decode(toon_str), {
+      items = { {
+        comments = { { author = "user", content = "text", time = "now" } },
+        name = "test"
+      } }
+    }, "accept list marker in nested tabular row")
+  end)
 
-    assertEquals(success, false, "reject list marker in nested tabular row")
-    assertEquals(tostring(result):find('Tabular rows must not start with "- ".', 1, true) ~= nil, true,
-      "report invalid tabular row marker")
+  it("normalizes mixed tabular row markers on round trip", function()
+    local encoder = assert(loadfile(lorebookDirectory .. 'toon.encode.lua'))()
+    local value = toon.decode("items[2]{name,count}:\n  - apple,3\n  banana,2")
+    local canonical = "items[2]{name,count}:\n  apple,3\n  banana,2"
+    assertEquals(encoder.encode(value), canonical, "encode without row markers")
+    assertDeepEquals(toon.decode(encoder.encode(value)), value, "preserve decoded values")
+  end)
+
+  it("preserves quoted prefixes and negative numbers in root tabular rows", function()
+    assertDeepEquals(toon.decode('[3]{value}:\n  "- apple"\n  -3\n  - -4'), {
+      { value = "- apple" }, { value = -3 }, { value = -4 }
+    }, "preserve literal prefixes and negative numbers")
+  end)
+
+  it("removes only one marker at the expected row depth", function()
+    assertDeepEquals(toon.decode('items[2]{value}:\n  - - apple\n    - banana'), {
+      items = { { value = "- apple" }, { value = "  - banana" } }
+    }, "preserve second marker and excess indentation")
+  end)
+
+  it("ends marked nested rows before sibling fields", function()
+    assertDeepEquals(toon.decode('items[1]:\n  - rows[1]{name,count}:\n    - apple,3\n    status: active'), {
+      items = { { rows = { { count = 3, name = "apple" } }, status = "active" } }
+    }, "preserve sibling field boundary")
   end)
 
   it("parses objects containing arrays (including empty arrays) in list format", function()

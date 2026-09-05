@@ -79,10 +79,9 @@ local function unescapeString(str)
   return table.concat(result)
 end
 
--- Tokenize while respecting quotes/escapes; optionally capture first target char position
-local function tokenize(line, delimiter, targetChar)
+local function tokenize(line, delimiter)
   local tokens, current = {}, {}
-  local inQuotes, firstTarget = false, nil
+  local inQuotes = false
   local i = 1
 
   local function push()
@@ -110,16 +109,13 @@ local function tokenize(line, delimiter, targetChar)
       push()
       i = i + 1
     else
-      if not inQuotes and targetChar and not firstTarget and c == targetChar then
-        firstTarget = i
-      end
       table.insert(current, c)
       i = i + 1
     end
   end
 
   push()
-  return tokens, firstTarget
+  return tokens
 end
 
 local LITERALS = { ["true"] = true, ["false"] = false }
@@ -152,8 +148,27 @@ local function splitValues(line, delimiter)
 end
 
 local function findUnquotedChar(str, char)
-  local _, pos = tokenize(str, nil, char)
-  return pos
+  local inQuotes = false
+  local i = 1
+
+  while i <= #str do
+    local c = str:sub(i, i)
+    if c == "\\" and i < #str then
+      local nextC = str:sub(i + 1, i + 1)
+      if inQuotes or nextC == "\"" or nextC == "\\" then
+        i = i + 2
+      else
+        i = i + 1
+      end
+    elseif c == "\"" then
+      inQuotes = not inQuotes
+      i = i + 1
+    elseif not inQuotes and c == char then
+      return i
+    else
+      i = i + 1
+    end
+  end
 end
 
 local function parseHeader(headerStr)
@@ -175,9 +190,6 @@ local function parseHeader(headerStr)
 
   local delimiter = ","
   local delimStart = #lengthStr + 1
-  if bracketContent:sub(1, 1) == "#" then
-    delimStart = delimStart + 1
-  end
 
   if delimStart <= #bracketContent then
     local delimChar = bracketContent:sub(delimStart, delimStart)
@@ -223,10 +235,6 @@ local function parseLines(text, config)
   local lines = {}
   for line in text:gmatch("[^\n]*") do
     table.insert(lines, line)
-  end
-
-  if #lines > 0 and lines[#lines] == "" then
-    table.remove(lines)
   end
 
   local parsed = {}
@@ -280,7 +288,7 @@ local function parseTabularRows(lines, startIdx, targetDepth, headerInfo, config
 
     if actualDepth == targetDepth then
       if rowContent:sub(1, 2) == "- " then
-        error('Tabular rows must not start with "- ".')
+        rowContent = rowContent:sub(3)
       end
 
       local delimPos = findUnquotedChar(rowContent, headerInfo.delimiter)
@@ -444,7 +452,7 @@ local function parseListArray(lines, startIdx, targetDepth, config, delimiter)
   return arr, idx
 end
 
-function decodeValue(lines, startIdx, targetDepth, config, parentDelimiter, expectValue, isArrayElement)
+function decodeValue(lines, startIdx, targetDepth, config, parentDelimiter, expectValue)
   local delimiter = parentDelimiter or ","
 
   if startIdx > #lines then
@@ -461,11 +469,6 @@ function decodeValue(lines, startIdx, targetDepth, config, parentDelimiter, expe
 
   if content:sub(1, 2) == "- " then
     return decodeListItem(lines, startIdx, targetDepth, config, delimiter)
-  end
-
-  -- If we're parsing an array element (not a list item), treat entire line as value
-  if isArrayElement then
-    return parseValue(content), startIdx + 1
   end
 
   local headerInfo = parseHeader(content)

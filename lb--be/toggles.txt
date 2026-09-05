@@ -15,6 +15,9 @@ lightboard.noUser=유저메시지=select=포함,제외
 lightboard.concurrent=동시요청수=text
 =최소 1, 기본 1, 최대 5=caption
 =——————🧩호　　환=divider
+lightboard.preserveXML=XML 태그 보존
+=⛔이상징후가 있을 때만 활성화=caption
+=로어북을 못 읽는 것 같거나, 삽화가 본문 사이에 들어가질 않는 등=caption
 lightboard.position=출력　위치=select=아래,위,분리
 =번역 또는 봇과 충돌 시 분리 권장=caption
 =——————🔧자동수정=divider
