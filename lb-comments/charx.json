@@ -54,7 +54,7 @@
     }
   ],
   "lowLevelAccess": false,
-  "name": "🔦라이트보드 댓글창 4.0.1",
+  "name": "🔦라이트보드 댓글창 4.3.0",
   "namespace": "lb-comments",
   "regex": [
     "regex/filter-response.md",
@@ -72,5 +72,5 @@
       "type": "start"
     }
   ],
-  "version": "4.0.1"
+  "version": "4.3.0"
 }

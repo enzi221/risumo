@@ -50,7 +50,7 @@
     }
   ],
   "lowLevelAccess": false,
-  "name": "🔦라이트보드 💠헌터넷 4.0.1",
+  "name": "🔦라이트보드 💠헌터넷 4.3.0",
   "namespace": "lb-hn",
   "regex": [
     "regex/filter-response.md",
@@ -68,5 +68,5 @@
       "type": "start"
     }
   ],
-  "version": "4.0.1"
+  "version": "4.3.0"
 }
