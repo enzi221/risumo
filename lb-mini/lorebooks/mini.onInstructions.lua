@@ -1,6 +1,14 @@
 local CONS_EXAMPLE_MARKER = '<!-- lb-mini-cons-example -->'
 local CONS_GUIDELINE_MARKER = '<!-- lb-mini-cons-guideline -->'
 
+local INTERACTION_FORMAT = [[<lb-mini-patch>
+[
+  {"op":"replace","path":"/posts/0/upvotes","value":1},
+  {"op":"remove","path":"/posts/1"},
+  {"op":"add","path":"/posts/0","value":{"author":"...","title":"...","time":"...","upvotes":0,"downvotes":0,"content":"...","comments":[]}}
+]
+</lb-mini-patch>]]
+
 local function replaceMarker(text, marker, replacement)
   return text:gsub(prelude.escMatch(marker), function()
     return replacement
@@ -26,8 +34,9 @@ local function collectCons(triggerId)
 end
 
 ---@param triggerId string
----@return string
-local function main(triggerId, instructions)
+---@param meta LightboardInstructionMeta
+---@return LightboardInstructions
+local function main(triggerId, instructions, meta)
   local cons = collectCons(triggerId)
   local example = ''
   local guideline = ''
@@ -55,6 +64,10 @@ comments[1|]{author|time|content}:
 
   instructions.guideline = replaceMarker(instructions.guideline, CONS_GUIDELINE_MARKER, guideline)
   instructions.guideline = replaceMarker(instructions.guideline, CONS_EXAMPLE_MARKER, example)
+
+  if meta and meta.type == 'interaction' then
+    instructions.format = INTERACTION_FORMAT
+  end
 
   return instructions
 end

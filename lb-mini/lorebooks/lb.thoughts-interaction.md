@@ -30,8 +30,6 @@ To add new posts for engagement simulation or ChangeBoard action, take these ste
 6. Plausible New Invented Events (generate surplus events and pick from the pool)
 7. Character Posting Feasibility - Narrative characters (personality, busy)
 
-(For #4, it is likely that narrative won't provide exact relative times. Estimate based on the context.)
-
 ---
 
 In both interactions, if there is "Extra Universe Settings" given, reiterate them.

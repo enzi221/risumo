@@ -7,6 +7,7 @@ local M = {}
 --- @param tagName string
 --- @param attrs table<string, string>?
 --- @return string modifiedText, number? removedPosition, number? removedLength
+--- @return Node? removedNode
 function M.removeNode(text, tagName, attrs)
   if not text then return '', nil end
 
@@ -38,7 +39,7 @@ function M.removeNode(text, tagName, attrs)
   local suffix = text:sub(targetNode.rangeEnd + 1):gsub("^\n?", "")
 
   local result = prefix .. '\n' .. suffix
-  return result, #prefix + 2, #text - #result
+  return result, #prefix + 2, #text - #result, targetNode
 end
 
 --- Removes all instances of a matching node from text.

@@ -220,11 +220,11 @@ posts[3|]{title|category|time|content}:
 ⇥description: Camera operators and blurred microphones occupy the foreground of a crowded conference room, while the man in the navy suit stands at the center behind a wooden lectern in the middle ground and party officials watch beneath cool ceiling lights along the rear wall.
 ⇥scene: interior, press photography, conference room, morning, cool fluorescent lighting, crowd, black cameras, wooden lectern{{/when}}
 topAds[2|]{content|boxStyle|textStyle}:
-⇥세상을 연결하는 창\n더 나은 내일을 위한 뉴스, 데일리 라이프|background:#E0F7FA;padding:4px 4px 4px 12px|color:#004D40;text-align:left
-⇥취업률 1위\n경북대학교\n미래를 향한 한 걸음|background:#032A97;border:4px solid #333333|color:#FF0603;text-align:center
+⇥세상을 연결하는 창\u000A더 나은 내일을 위한 뉴스, 데일리 라이프|background:#E0F7FA;padding:4px 4px 4px 12px|color:#004D40;text-align:left
+⇥취업률 1위\u000A경북대학교\u000A미래를 향한 한 걸음|background:#032A97;border:4px solid #333333|color:#FF0603;text-align:center
 bottomAd:
 ⇥boxStyle:background:linear-gradient(90deg, #FFD54F, #FF8A65);border:4px solid #BF360C;padding:8px 12px
-⇥content: KASPAR The Essential\n필요한 모든 것을 한 곳에\nDAEHYUN AUTOMOTIVE GROUP
+⇥content: KASPAR The Essential\u000A필요한 모든 것을 한 곳에\u000ADAEHYUN AUTOMOTIVE GROUP
 ⇥textStyle:color:#FFFFFF;text-align:right
 </lb-news>
 ```
@@ -234,6 +234,7 @@ Key syntax:
 - Use `<lb-news datetime="(YYYY-MM-DD HH:MM)" name="(newspaper name)"{{#when::{{getglobalvar::toggle_lb-news.sampling}}::is::1}} prob="0.00"{{/when}}>`.
   - datetime: narrative date and time the news is being viewed. 24-hour format.
 - Output in TOON format (2-space indent, array show length, separate fields by `|`).
+- Encode every line break in a TOON field value as `\u000A`. Do not use `\n` or a literal line break within a field value.
 - time: approx relative past time. Use minutes (<1hr) or hours (>=1hr). No minutes for >=1hr. No fractional numbers.{{#when::toggle::lb-news.image}}
 - headlineImage: The image-generation prompt derived from the first item of `posts[]`.{{/when}}
 - topAds: small ads at the top, must be 2. Keep text short.
@@ -254,7 +255,7 @@ Key syntax:
 Generate exactly two possible responses as two separate, complete `<lb-news>` elements and nothing else. Sample both at random from the tails of the distribution so that each response has a probability lower than 0.10. Put that numeric probability in its `prob` attribute. Make the responses meaningfully different and order them by probability in descending order.
 {{/when}}
 
-First article is the headline, and will display the whole contents. Headline title may not contain line breaks. Headline content may contain line breaks with only literal `\n`. Divide each paragraph with two line breaks(`\n\n`). Keep it to 3-5 paragraphs.
+First article is the headline and displays the whole content. The headline title may not contain line breaks. The headline content may contain line breaks. Separate paragraphs with `\u000A\u000A`. Keep the headline content to 3-5 paragraphs.
 
 Other articles are small. So keep their contents much shorter, and without line breaks. Generate 5-7 articles total.
 

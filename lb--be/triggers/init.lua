@@ -119,8 +119,9 @@ end
 --- @param content string
 --- @param man Manifest
 --- @param action string
-local function writeResult(jsIdx, content, man, action)
-  local final = man.onMutation and man.onMutation(triggerId, action, content) or content
+--- @param mutation MutationContext?
+local function writeResult(jsIdx, content, man, action, mutation)
+  local final = man.onMutation and man.onMutation(triggerId, action, content, mutation) or content
   setChat(triggerId, jsIdx, final)
 end
 
@@ -387,6 +388,33 @@ end
 --- @field immediate boolean
 --- @field preserve boolean
 
+---@class MutationNode
+---@field attributes table<string, string>
+---@field content string
+---@field raw string
+
+---@class MutationContext
+---@field blockID string?
+---@field chatIndex number
+---@field identifier string
+---@field output string
+---@field previousNode MutationNode?
+
+---@param node Node?
+---@param source string
+---@return MutationNode?
+local function createMutationNode(node, source)
+  if not node then
+    return nil
+  end
+
+  return {
+    attributes = node.attributes,
+    content = node.content,
+    raw = source:sub(node.rangeStart, node.rangeEnd),
+  }
+end
+
 --- @param action string
 --- @return InteractionMod
 local function parseInteractionModifiers(action)
@@ -502,6 +530,7 @@ Action: `%s`
   local isSeparated = lbdataJsIdx ~= nil and lbdataJsIdx ~= jsIndex
   local workContent = isSeparated and fullChat[lbdataJsIdx + 1].data or originalContent
   local workJsIdx = isSeparated and lbdataJsIdx or jsIndex
+  local previousNode = nil
 
   if modifiers.preserve then
     local existingNodes = prelude.queryNodes(identifier, workContent)
@@ -519,19 +548,27 @@ Action: `%s`
     end
 
     if targetNode then
+      previousNode = createMutationNode(targetNode, workContent)
       finalChat = workContent:sub(1, targetNode.rangeEnd) ..
           '\n' .. result .. workContent:sub(targetNode.rangeEnd + 1)
     else
       finalChat = lbdata.fallbackInsert(workContent, result)
     end
   else
-    local baseContent, targetPosition = lbdata.removeNode(workContent, identifier,
+    local baseContent, targetPosition, _, removedNode = lbdata.removeNode(workContent, identifier,
       modifiers.blockID and { id = modifiers.blockID } or nil)
 
+    previousNode = createMutationNode(removedNode, workContent)
     finalChat = insertResult(baseContent, targetPosition, result)
   end
 
-  writeResult(workJsIdx, finalChat, man, 'interaction')
+  writeResult(workJsIdx, finalChat, man, 'interaction', {
+    blockID = modifiers.blockID,
+    chatIndex = workJsIdx,
+    identifier = identifier,
+    output = result,
+    previousNode = previousNode,
+  })
 end
 
 onButtonClick = async(function(tid, code)

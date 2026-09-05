@@ -70,6 +70,11 @@ local function preserveKeyFigures(triggerId, output)
 end
 
 local function main(triggerId, output)
+  local patchNodes = prelude.queryNodes('lb-mini-patch', output)
+  if #patchNodes > 0 then
+    return output:sub(patchNodes[#patchNodes].rangeStart, patchNodes[#patchNodes].rangeEnd)
+  end
+
   if not string.find(output, '<lb%-mini[%s>/]') then
     return nil
   end

@@ -41,7 +41,7 @@ end
 local function escapeString(str)
   return str:gsub("\\", "\\\\")
       :gsub("\"", "\\\"")
-      :gsub("\n", "\\n")
+      :gsub("\n", "\\u000A")
       :gsub("\r", "\\r")
       :gsub("\t", "\\t")
 end

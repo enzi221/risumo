@@ -326,7 +326,17 @@ return main
 
 #### Reroll and interaction mutation
 
-The `{identifier}.lb.onMutation` callback receives `(triggerId, action, full chat text)` immediately before a reroll or interaction writes the final chat text. The `action` value is either `reroll` or `interaction`.
+The `{identifier}.lb.onMutation` callback receives `(triggerId, action, full chat text, mutation)` immediately before a reroll or interaction writes the final chat text. The `action` value is either `reroll` or `interaction`.
+
+During an interaction, `mutation` contains:
+
+- `blockID`: Target block ID from the interaction modifier, or `nil`.
+- `chatIndex`: Zero-based index of the chat that will receive the mutation.
+- `identifier`: Interacted module identifier.
+- `output`: Module output returned by the interaction pipeline before insertion.
+- `previousNode`: Replaced module node, or `nil` when no matching node exists. The node contains `attributes`, inner `content`, and complete `raw` markup.
+
+During a reroll, `mutation` is `nil`. Keep the fourth parameter optional for callbacks that handle both actions. Existing three-parameter callbacks remain compatible.
 
 Return the complete chat text to write. Use this callback only for edits that must run after the generated data has been inserted into the target chat.
 

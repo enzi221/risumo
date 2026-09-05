@@ -43,6 +43,11 @@
       "insertOrder": 1
     },
     {
+      "comment": "lb-mini.lb.onMutation",
+      "file": "lorebooks/mini.onMutation.lua",
+      "insertOrder": 1
+    },
+    {
       "comment": "lb-mini.lb.onValidate",
       "file": "lorebooks/mini.onValidate.lua",
       "insertOrder": 1

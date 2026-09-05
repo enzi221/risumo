@@ -42,15 +42,41 @@ local function mergeConfig(options)
 end
 
 local function unescapeString(str)
-  local result = str:gsub("\\(.)", function(char)
-    if char == "\\" then return "\\" end
-    if char == "\"" then return "\"" end
-    if char == "n" then return "\n" end
-    if char == "r" then return "\r" end
-    if char == "t" then return "\t" end
-    error("Invalid escape sequence: \\" .. char)
-  end)
-  return result
+  local result = {}
+  local index = 1
+
+  while index <= #str do
+    local char = str:sub(index, index)
+    if char ~= "\\" or index == #str then
+      table.insert(result, char)
+      index = index + 1
+    else
+      local escaped = str:sub(index + 1, index + 1)
+      if escaped == "\\" then
+        table.insert(result, "\\")
+        index = index + 2
+      elseif escaped == "\"" then
+        table.insert(result, "\"")
+        index = index + 2
+      elseif escaped == "n" then
+        table.insert(result, "\n")
+        index = index + 2
+      elseif escaped == "r" then
+        table.insert(result, "\r")
+        index = index + 2
+      elseif escaped == "t" then
+        table.insert(result, "\t")
+        index = index + 2
+      elseif escaped == "u" and str:sub(index + 2, index + 5):lower() == "000a" then
+        table.insert(result, "\n")
+        index = index + 6
+      else
+        error("Invalid escape sequence: \\" .. escaped)
+      end
+    end
+  end
+
+  return table.concat(result)
 end
 
 -- Tokenize while respecting quotes/escapes; optionally capture first target char position

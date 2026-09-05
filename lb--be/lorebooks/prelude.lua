@@ -18,6 +18,7 @@ end
 ]]
 
 local t_insert = table.insert
+local applyJSONPatch = require('./json-patch')
 
 local moduleCache = {}
 
@@ -545,6 +546,7 @@ local function parseBlock(block, tagToEnd)
 end
 
 _ENV.prelude = {
+  applyJSONPatch = applyJSONPatch,
   escEntities = escEntities,
   escMatch = escMatch,
   extractTagName = extractTagName,

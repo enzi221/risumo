@@ -105,8 +105,9 @@ Each leading `⇥` represents one TOON indentation level of exactly two spaces. 
 
 - Use `<lb-comments{{#when::{{getglobalvar::toggle_lb-comments.sampling}}::is::1}} prob="0.00"{{/when}}>`.
 - Output in TOON format (2-space indent, array show length, separate fields by `|`).
+- Encode every line break in a TOON field value as `\u000A`. Do not use `\n` or a literal line break within a field value.
 - Root elements are the posts.
-- content: For posts, may contain line breaks with only literal `\n`. For comments, no line breaks. Avoid lengthy contents. Actively employ omissions (beginning, middle, end) to maintain length.
+- content: Posts may contain line breaks. Comments may not contain line breaks. Avoid lengthy contents. Actively employ omissions (beginning, middle, end) to maintain length.
 - time: approx relative past time. Comments MUST be more recent than posts. Use minutes (<1hr) or hours (>=1hr). No minutes for >=1hr. No fractional numbers.
 - upvotes/downvotes: integers without obvious patterns (not multiples of 5, 10).
 - Close `</lb-comments>`.

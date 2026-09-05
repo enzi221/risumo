@@ -247,19 +247,19 @@ Each leading `⇥` represents one TOON indentation level of exactly two spaces. 
 [2|]:
 ⇥- author: ㅇㅇ
 ⇥⇥title: 시발 국대 실화냐?
-⇥⇥time: 1시간 전
+⇥⇥time: 방금
 ⇥⇥upvotes: 257
 ⇥⇥downvotes: 13
 ⇥⇥content: 야 이 ㅅㄲ들 개씹노잼이네ㅋㅋㅋ 아오 발암 걸릴 뻔ㅋㅋㅋㅋ 토토한 새기들 한강물 온도 재러 가자 ㅋㅋㅋ
 ⇥⇥comments[2|]{author|time|content}:
-⇥⇥⇥ㅇㅇ|50분 전|진짜 개노답ㅋㅋ 내가 이걸 보려고 야근하고 왔나 자괴감 든다 시발
-⇥⇥⇥축붕이|47분 전|후반에 수비 라인 다 내려앉은 순간부터 질 줄 알았음
+⇥⇥⇥ㅇㅇ|방금|진짜 개노답ㅋㅋ 내가 이걸 보려고 야근하고 왔나 자괴감 든다 시발
+⇥⇥⇥축붕이|방금|후반에 수비 라인 다 내려앉은 순간부터 질 줄 알았음
 ⇥- author: 늘보아빠
 ⇥⇥title: 이번에 새로 나온 그 폰 써보신 분 계신가요?
-⇥⇥time: 1시간 전
+⇥⇥time: 얼마 전
 ⇥⇥upvotes: 7
 ⇥⇥downvotes: 0
-⇥⇥content: "며칠째 고민 중인데, 실사용 후기가 궁금하네요.\n카메라 성능이랑 배터리가 특히 어떤지 말씀해주시면 감사하겠습니다."
+⇥⇥content: "며칠째 고민 중인데, 실사용 후기가 궁금하네요.\u000A카메라 성능이랑 배터리가 특히 어떤지 말씀해주시면 감사하겠습니다."
 ⇥⇥comments[0|]:
 </lb-mini>
 {{#when::{{getglobalvar::toggle_lb-mini.keyfigures}}::is::1}}
@@ -276,10 +276,11 @@ Each leading `⇥` represents one TOON indentation level of exactly two spaces. 
 
 - Use `<lb-mini name="(board name)"{{#when::{{getglobalvar::toggle_lb-mini.sampling}}::is::1}} prob="0.00"{{/when}}>`.
 - Output in TOON format (2-space indent, array show length, separate fields by `|`).
+- Encode every line break in a TOON field value as `\u000A`. Do not use `\n` or a literal line break within a field value.
 - Root elements are the posts.
-- Prefix only root post entries with `- `. Write comment table rows directly as `author|time|content`; a leading `- ` ends tabular parsing.
-- content: For posts, may contain line breaks with only **literal** `\n`. For comments, no line breaks. Avoid lengthy contents. Actively employ omissions (beginning, middle, end) to maintain length.
-- time: approx relative past time. Comments MUST be more recent than posts. Use minutes (<1hr) or hours (>=1hr). No minutes for >=1hr. No fractional numbers.
+- The `time` field is immutable. Use only `오래전`, `얼마 전`, or `방금`. Reserve `신규` for later interactions and do not use it in this output.
+- Write comment table rows directly as `author|time|content` without a leading `- `.
+- content: Posts may contain line breaks. Comments may not contain line breaks. Avoid lengthy contents. Actively employ omissions (beginning, middle, end) to maintain length.
 - upvotes/downvotes: integers without obvious patterns (not multiples of 5, 10).
 - Close `</lb-mini>`.
 
@@ -287,9 +288,9 @@ Each leading `⇥` represents one TOON indentation level of exactly two spaces. 
 Generate exactly two possible responses as two separate, complete `<lb-mini>` elements and nothing else. Sample both at random from the tails of the distribution so that each response has a probability lower than 0.10. Put that numeric probability in its `prob` attribute. Make the responses meaningfully different and order them by probability in descending order.
 {{/when}}
 
-Write {{dictelement::{"0":"2-5","1":"4-7","2":"5-8"}::{{getglobalvar::toggle_lb-mini.quantity}}}} posts. Order posts by time, recent first. 0-8 comments per post. Hot (both good and bad) posts, more comments. Mundane posts not much comments or votes.
+Write {{dictelement::{"0":"2-5","1":"4-7","2":"5-8"}::{{getglobalvar::toggle_lb-mini.quantity}}}} posts. Order posts by current relevance and activity. 0-8 comments per post. Hot (both good and bad) posts, more comments. Mundane posts not much comments or votes.
 
-Be cautious with time. The board should be written like a real time data, not retrospective view of past. What happened in the last scene may span only a few minutes.
+Be cautious with information propagation. The board should be written like real-time data, not a retrospective view of the past. What happened in the last scene may span only a few minutes.
 
 All data visible to board users.
 
@@ -299,13 +300,13 @@ NO REPEAT PREVIOUS BOARD DATA.
 
 ### Preserved key figures
 
-After the `<lb-mini>` node, output one `<lb-mini-keyfigures>` node for preserving nickname continuity. Update the preserved state from the Miniboard you just wrote. Include only nicknames that need continuity because they belong to a major character or have a narrative of their own. Do not infer private identities unavailable to board users.
+After the `<lb-mini>` node, output one `<lb-mini-keyfigures>` node for preserving nickname continuity. Update the preserved state from the Miniboard you just wrote. Include only nicknames belonging to characters provided in the universe settings. Do not infer private identities unavailable to board users.
 
 Write the node as a TOON array of objects with these fields:
 
 - `nickname`: Exact board nickname.
-- `keyFigure`: Major character name or public identity, or `none` when the author is not a known major character.
-- `note`: Concise continuity details such as distinctive speech, recurring behavior, or an ongoing personal narrative, or `none` if the author is a known major character.
+- `keyFigure`: Character name or identity from the universe settings.
+- `note`: Concise characteristics the character displays on the board, such as speaking style, recurring behavior, or posting habits.
 
 Preserve still-valid entries, update changed entries, and remove obsolete entries. Output `[0|]:` when there are no entries.
 

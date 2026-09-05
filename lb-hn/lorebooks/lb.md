@@ -148,7 +148,7 @@ Each leading `⇥` represents one TOON indentation level of exactly two spaces. 
 ⇥⇥time: 09:15
 ⇥⇥views: 852
 ⇥⇥upvotes: 45
-⇥⇥content: "(레어 등급 스킬북 이미지 설명)\n오늘 C급 돌다가 먹음 ㅋㅋ\n이걸로 D급 탈출한다 ㅅㄱ"
+⇥⇥content: "(레어 등급 스킬북 이미지 설명)\u000A오늘 C급 돌다가 먹음 ㅋㅋ\u000A이걸로 D급 탈출한다 ㅅㄱ"
 ⇥⇥comments[3|]{author|content}:
 ⇥⇥⇥F:마석광부:D|주작아님? C급에서 저게 왜뜸?
 ⇥⇥⇥S:마석광부:C|부럽네... 난 오늘도 잡템만 먹었는데
@@ -170,9 +170,10 @@ Key syntax:
 
 - Use `<lb-hn name="(board name)" currenttime="(narrative YYYY-MM-DD HH:MM:SS)"{{#when::{{getglobalvar::toggle_lb-hn.sampling}}::is::1}} prob="0.00"{{/when}}>`.
 - Output in TOON format (2-space indent, array show length, separate fields by `|`).
+- Encode every line break in a TOON field value as `\u000A`. Do not use `\n` or a literal line break within a field value.
 - Root elements are the posts.
 - id: integer index of posts. Start from random big number over 100,000, larger then previous data if any.
-- content: For posts, may contain line breaks with only **literal** `\n`. For comments, no line breaks. Avoid lengthy contents. Actively employ omissions (beginning, middle, end) to maintain length.
+- content: Posts may contain line breaks. Comments may not contain line breaks. Avoid lengthy contents. Actively employ omissions (beginning, middle, end) to maintain length.
 - time: HH:MM.
 - views/upvotes: integers without obvious patterns (not multiples of 5, 10).
 - Close `</lb-hn>`

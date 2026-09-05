@@ -3,6 +3,11 @@
 The standard library is then available through the global `prelude` table.
 
 ```lua
+---@param document any
+---@param patch table
+---@return any
+function prelude.applyJSONPatch(document, patch) end
+
 ---@param triggerId string
 ---@param scope string?
 ---@param ... any
@@ -61,11 +66,15 @@ function prelude.getPriorityLoreBook(triggerId, name) end
 function prelude.split(str, sep) end
 ```
 
+`prelude.applyJSONPatch()` returns a patched copy without modifying `document`. It supports the JSON Patch `add`, `remove`, and `replace` operations. Paths use JSON Pointer syntax, including `~0`, `~1`, zero-based array indexes, `-` for array appends, and an empty path for root replacement. Operations apply sequentially against the current patched state.
+
 `prelude.verbose()` and `prelude.info()` follow the backend `lightboard.logLevel` toggle. Its levels are `VERBOSE`, `INFO`, and `NONE`, with `VERBOSE` as the default. Use `prelude.logEnabled()` before constructing an expensive log value. Errors are not controlled by this diagnostic log level.
 
 For example, `prelude.split('a,b,c', ',')` returns `{ 'a', 'b', 'c' }`.
 
 `prelude.toon.decode()` accepts `⇥` at the start of a line as one indentation level. Use visible indentation markers in prompt examples when the request transport does not preserve leading spaces. Keep standard spaces in generated TOON when the transport preserves them.
+
+`prelude.toon.encode()` writes line feeds as `\u000A`. `prelude.toon.decode()` reads `\u000A` as a line feed and continues to accept `\n` for compatibility.
 
 ## Rendering HTML example with h()
 

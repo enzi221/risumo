@@ -39,6 +39,51 @@ local function validateCons(posts)
   end
 end
 
+local function validatePatch(patch)
+  if type(patch) ~= 'table' then
+    error('InvalidOutput: <lb-mini-patch> must contain a JSON array.')
+  end
+
+  local operationCount = 0
+  for key in pairs(patch) do
+    if type(key) ~= 'number' or key < 1 or key % 1 ~= 0 then
+      error('InvalidOutput: <lb-mini-patch> must contain a JSON array.')
+    end
+    operationCount = operationCount + 1
+  end
+
+  if operationCount ~= #patch then
+    error('InvalidOutput: JSON Patch array must not contain gaps.')
+  end
+  if operationCount == 0 then
+    error('InvalidOutput: JSON Patch array must contain at least one operation.')
+  end
+
+  for _, operation in ipairs(patch) do
+    if type(operation) ~= 'table' then
+      error('InvalidOutput: Each JSON Patch operation must be an object.')
+    end
+    if operation.op ~= 'add' and operation.op ~= 'remove' and operation.op ~= 'replace' then
+      error('InvalidOutput: JSON Patch op must be add, remove, or replace.')
+    end
+    if type(operation.path) ~= 'string' then
+      error('InvalidOutput: Each JSON Patch operation requires a string path.')
+    end
+    if operation.path ~= '' and operation.path:sub(1, 1) ~= '/' then
+      error('InvalidOutput: JSON Patch paths must be empty or begin with /.')
+    end
+    if operation.path:find('~[^01]') or operation.path:sub(-1) == '~' then
+      error('InvalidOutput: JSON Patch path contains an invalid escape.')
+    end
+    if operation.op == 'remove' and operation.path == '' then
+      error('InvalidOutput: Removing the board root is not supported.')
+    end
+    if operation.op ~= 'remove' and rawget(operation, 'value') == nil then
+      error('InvalidOutput: JSON Patch add and replace operations require value.')
+    end
+  end
+end
+
 ---@param triggerId string
 ---@param output string
 local function validateKeyFigures(triggerId, output)
@@ -72,6 +117,17 @@ local function validateKeyFigures(triggerId, output)
 end
 
 local function main(triggerId, output)
+  local patchNodes = prelude.queryNodes('lb-mini-patch', output)
+  if #patchNodes > 0 then
+    local success, patch = pcall(json.decode, prelude.trim(patchNodes[#patchNodes].content))
+    if not success then
+      error('InvalidOutput: Invalid JSON Patch. ' .. tostring(patch))
+    end
+
+    validatePatch(patch)
+    return
+  end
+
   local nodes = prelude.queryNodes('lb-mini', output)
   if #nodes == 0 then
     error('InvalidOutput: Missing <lb-mini> node.')
