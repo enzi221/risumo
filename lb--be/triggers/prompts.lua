@@ -68,6 +68,7 @@ local JOB_INSTRUCTION =
 "Your job is to produce data blocks as instructed. You will be given creative materials including universe settings and narrative chat log. Utilize materials, output in structured format."
 
 local function cleanInput(triggerId, text, identifier)
+  text = text:gsub('<lb%-update%s[^>]*>.-</lb%-update>', '')
   if getGlobalVar(triggerId, "toggle_lightboard.preserveXML") == "1" then
     return text
   end

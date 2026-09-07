@@ -33,3 +33,8 @@ function getPersonaDescription(triggerId) end
 --- @param triggerId string
 --- @return string
 function getPersonaName(triggerId) end
+
+--- @param triggerId string
+--- @param url string
+--- @return Promise<string|nil> JSON string containing integer `status` and string `data`; errors use status 400, 413, or 429.
+function request(triggerId, url) end

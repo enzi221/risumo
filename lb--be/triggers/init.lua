@@ -29,6 +29,7 @@ local manifest = require('./manifest')
 local moduleopener = require('./moduleopener')
 local pipeline = require('./pipeline')
 local sideeffect = require('./sideeffect')
+local update = require('./update')
 
 --- Finds the last chat index with `char` role within a range.
 --- @param fullChat Chat[]
@@ -129,7 +130,8 @@ end
 --- @param chatContext Chat[]
 --- @param chatOffset number
 --- @param fullContext boolean
-local main = async(function(manifests, chatContext, chatOffset, fullContext)
+--- @param updateNotice string
+local main = async(function(manifests, chatContext, chatOffset, fullContext, updateNotice)
   local batchResults = pipeline.runGenerationBatch(triggerId, manifests, chatContext, chatOffset)
   local normalManifestCount = 0
   local sideEffectBatchResults = {}
@@ -178,6 +180,9 @@ local main = async(function(manifests, chatContext, chatOffset, fullContext)
   local lastCharChatJsIdx = lastCharChatIdx and (latestChatOffset + lastCharChatIdx - 1) or -1
 
   if #allProcessedResults > 0 then
+    if updateNotice ~= '' and getChatVar(triggerId, 'lightboard.updateDismissed') ~= '1' then
+      table.insert(allProcessedResults, 1, updateNotice)
+    end
     local contents = table.concat(allProcessedResults, '\n\n')
     local updated = lbdata.replaceLBDATA(lastCharChat, contents)
 
@@ -214,12 +219,13 @@ local main = async(function(manifests, chatContext, chatOffset, fullContext)
   end
 end)
 
---- Inserts an empty LBDATA block at the configured output position.
+--- Inserts an LBDATA placeholder at the configured output position.
 --- @param tid string
 --- @param chatContext Chat[]
-local function insertGenerationPlaceholder(tid, chatContext)
+--- @param updateNotice string
+local function insertGenerationPlaceholder(tid, chatContext, updateNotice)
   local lastChat = chatContext[#chatContext]
-  local insertedContent, addedAsChat = lbdata.insertLBDATA(tid, -1, lastChat.data)
+  local insertedContent, addedAsChat = lbdata.insertLBDATA(tid, -1, lastChat.data, updateNotice)
 
   -- context sync
   if addedAsChat then
@@ -250,10 +256,11 @@ local function runGeneration(tid)
     return false
   end
 
-  insertGenerationPlaceholder(tid, chatContext)
+  local updateNotice = update.check(tid)
+  insertGenerationPlaceholder(tid, chatContext, updateNotice)
 
   local success, result = pcall(function()
-    local mainPromise = main(manifests, chatContext, chatOffset, fullContext)
+    local mainPromise = main(manifests, chatContext, chatOffset, fullContext, updateNotice)
     return mainPromise:await()
   end)
 
@@ -573,6 +580,11 @@ end
 
 onButtonClick = async(function(tid, code)
   setTriggerId(tid)
+
+  if code == 'lb-update-dismiss' then
+    update.dismiss(tid)
+    return
+  end
 
   if moduleopener.handleButton(tid, code) then
     return
