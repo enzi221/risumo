@@ -1,9 +1,6 @@
 {
   "CSS": "style.html",
   "description": "장거리 스토리 어시스턴트",
-  "folders": [
-    "안지워져"
-  ],
   "hideIcon": false,
   "lorebook": [
     {
@@ -37,6 +34,14 @@
       "file": "lorebooks/lb.thoughts-interaction.md"
     },
     {
+      "comment": "lb-stage.state",
+      "file": "lorebooks/stage.state.lua"
+    },
+    {
+      "comment": "lb-stage.lb.onInstructions",
+      "file": "lorebooks/stage.onInstructions.lua"
+    },
+    {
       "comment": "lb-stage.lb.onInput",
       "file": "lorebooks/stage.onInput.lua"
     },
@@ -58,7 +63,7 @@
     }
   ],
   "lowLevelAccess": true,
-  "name": "🔦라이트보드 ⚡스테이지매니저 4.0.1",
+  "name": "🔦라이트보드 ⚡스테이지매니저 4.3.1",
   "namespace": "lb-stage",
   "regex": [
     "regex/filter-response.md",
@@ -80,5 +85,5 @@
       "type": "start"
     }
   ],
-  "version": "4.0.1"
+  "version": "4.3.1"
 }

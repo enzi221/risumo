@@ -84,6 +84,24 @@ local function render(node)
       })
   end
 
+  local driveRows = {}
+  if type(content.drive) == 'table' then
+    for _, field in ipairs({
+      { key = 'desire', label = '욕구' },
+      { key = 'resistance', label = '저항' },
+      { key = 'belief_gap', label = '믿음과 사실의 차이' },
+      { key = 'attempt', label = '최근 시도와 결과' },
+    }) do
+      local value = content.drive[field.key]
+      if type(value) == 'string' and value ~= '' and value ~= 'none' then
+        table.insert(driveRows, h.div['lb-stage-drive-row'] {
+          h.dt['lb-stage-drive-label'] { field.label },
+          h.dd['lb-stage-drive-value'] { value },
+        })
+      end
+    end
+  end
+
   local id = 'lb-stage-' .. math.random()
 
   local playing = phase.title .. (nextEpisode and ' - ' .. nextEpisode.title or '')
@@ -153,6 +171,10 @@ local function render(node)
         },
       },
       h.div['lb-stage-dialog-body'] {
+        #driveRows > 0 and h.details['lb-stage-drive'] {
+          h.summary['lb-stage-drive-title'] { '페이즈 드라이브' },
+          h.dl['lb-stage-drive-fields'] { driveRows },
+        } or '',
         h.div['lb-stage-tracklist-header'] {
           h.span { 'TRACKLIST' },
           h.span['lb-stage-tracklist-count'] { #episodes .. ' episodes' },
@@ -187,7 +209,6 @@ local function render(node)
         h.div['lb-stage-debug-content'] {
           h.div { 'Objective: ' .. (objective.content or '') },
           h.div { 'Completion: ' .. (objective.completion or '') },
-          h.div { 'Divergence: ' .. (content.divergence or '') },
           h.div { 'Comment: ' .. (comment or '') },
           h.div { 'History: ' .. (history or '') },
         },
@@ -286,6 +307,20 @@ listenEdit(
         table.insert(parts, title .. " (" .. stage .. ")")
         if latestContent.phase.content then
           table.insert(parts, latestContent.phase.content)
+        end
+      end
+
+      if type(latestContent.drive) == 'table' then
+        local driveParts = {}
+        for _, field in ipairs({ 'desire', 'resistance', 'belief_gap', 'attempt' }) do
+          local value = latestContent.drive[field]
+          if type(value) == 'string' and value ~= '' and value ~= 'none' then
+            table.insert(driveParts, field .. ': ' .. value)
+          end
+        end
+        if #driveParts > 0 then
+          table.insert(parts, "\n#### Phase Drive")
+          table.insert(parts, table.concat(driveParts, "\n"))
         end
       end
 

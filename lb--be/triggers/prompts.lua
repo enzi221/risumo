@@ -361,13 +361,13 @@ local function makePrompt(triggerId, man, fullChat, type, extras, chatOffset)
   if not language or language == "" or not man.multilingual then
     language = ""
   elseif language == "0" then
-    language = "각 필드의 값은 한국어로 출력하세요."
+    language = "언어를 따로 정의하지 않은 필드는 한국어로 출력하세요."
   elseif language == "1" then
-    language = "Output each field value in English."
+    language = "Output fields without a separately specified language in English."
   elseif language == "2" then
-    language = "各フィールドの値を日本語で出力してください。"
+    language = "言語が個別に指定されていないフィールドは、日本語で出力してください。"
   elseif language == "3" then
-    language = "Output each field value in the dominant language of the chat log."
+    language = "Output fields without a separately specified language in the dominant language of the chat log."
   end
   table.insert(prompt, {
     content = OUTRO_CLOSING:format(language),

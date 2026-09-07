@@ -25,29 +25,12 @@ local function xor(str)
   return base64Encode(bytes)
 end
 
-local function main(_, output)
-  if not string.find(output, '</lb%-stage>') then
-    output = output .. '\n</lb-stage>'
-  end
-
-  local allBlocks = prelude.queryNodes('lb-stage', output)
-  local body = nil
-  if #allBlocks >= 1 then
-    body = allBlocks[#allBlocks]
-  end
-
-  if not body then
-    print('[Lightboard] No <lb-stage> block found')
-    return ''
-  end
-
-  local data = prelude.toon.decode(body.content)
-  if not data or not data.objective or not data.phase or not data.episodes then
-    print('[Lightboard] Stage content invalid')
-    return '<lb-lazy id="lb-stage" />'
-  end
-
-  return '<lb-stage>' .. xor(body.content) .. '</lb-stage>'
+local function main(triggerId, output)
+  local resolve = prelude.import(triggerId, 'lb-stage.state')
+  local data = resolve(triggerId, output)
+  prelude.import(triggerId, 'toon.encode')
+  local content = prelude.toon.encode(data, { delimiter = '|' })
+  return '<lb-stage>' .. xor(content) .. '</lb-stage>'
 end
 
 return main

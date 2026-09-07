@@ -10,7 +10,8 @@ lb-stage.tags-likes=좋아　태그=text
 lb-stage.tags-dislikes=싫어　태그=text
 lb-stage.direction=┗장르제시=select=❌,⭕
 =메인 모델에게 느낌/태그 전달 여부. 프롬 장르 태그와 동시 사용 금지=caption
-lb-stage.intervention=개입　수준=select=최소,텐션관리
+lb-stage.intervention=페이싱 보정=select=끄기,켜기
+=진행을 막는 반복·정체 보정. 동기·지식·결과의 일관성 교정은 항상 적용=caption
 =———————⚙️시스템=divider
 lb-stage.sampling=다양성 강화
 =비용 증가=caption
@@ -18,5 +19,5 @@ lb-stage.thoughts=생각　보조=select=적고 제거,생각만,안하기
 lb-stage.maxLogs=포함채팅수=text
 =↑ 분석력 향상, 비용 증가=caption
 =최소 1, 기본 5=caption
-=라이트보드 스테이지매니저 4.0.1—amonamona=caption
+=라이트보드 스테이지매니저 4.3.1—amonamona=caption
 ==groupEnd

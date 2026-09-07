@@ -15,6 +15,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 0.5rem;
+      margin-top: 8px;
     }
 
     /*#region new opener style */
@@ -23,6 +24,10 @@
       display: inline-flex;
       gap: 0.15em;
       order: -2;
+    }
+
+    .x-risu-lb-module-opener-root[data-split='true'] {
+      gap: 0;
     }
 
     .x-risu-lb-module-opener {
@@ -65,6 +70,33 @@
       height: 1em;
       margin-left: 0.5em;
       width: 1em;
+    }
+
+    .x-risu-lb-module-opener-root[data-split='true'] > .x-risu-lb-module-opener {
+      border-radius: 0;
+    }
+
+    .x-risu-lb-module-opener-root[data-split='true'] > .x-risu-lb-module-opener:first-child {
+      border-radius: 0.4em 0 0 0.4em;
+    }
+
+    .x-risu-lb-module-opener-root[data-split='true'] > .x-risu-lb-module-opener:last-child {
+      border-left: 0;
+      border-radius: 0 0.4em 0.4em 0;
+    }
+
+    .x-risu-lb-module-opener-root[data-split='true'] > .x-risu-lb-module-opener:focus-visible {
+      position: relative;
+      z-index: 1;
+    }
+
+    .x-risu-lb-module-opener-root[data-split='true'] > .x-risu-lb-module-opener-icon {
+      justify-content: center;
+      padding-inline: 0.7em;
+    }
+
+    .x-risu-lb-module-opener-root[data-split='true'] > .x-risu-lb-module-opener-icon svg {
+      margin-left: 0;
     }
 
     .x-risu-lb-module-adder {

@@ -28,13 +28,12 @@ local function xordecrypt(str)
 end
 
 local function main(_, input)
-  local node = prelude.queryNodes('lb-stage', input)[1]
-  if not node then
-    return input
+  local nodes = prelude.queryNodes('lb-stage', input)
+  for index = #nodes, 1, -1 do
+    local node = nodes[index]
+    input = input:sub(1, node.rangeStart - 1) ..
+        '<lb-stage>' .. xordecrypt(node.content) .. '</lb-stage>' .. input:sub(node.rangeEnd + 1)
   end
-
-  input = input:sub(1, node.rangeStart - 1) ..
-      '<lb-stage>' .. xordecrypt(node.content) .. '</lb-stage>' .. input:sub(node.rangeEnd + 1)
 
   input = input:gsub('<lb%-stage%-marker keepalive>', '<lb-stage-marker>')
 
