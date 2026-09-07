@@ -71,6 +71,7 @@ Respecting `options.color` and `options.darkness` is not a requirement. It shoul
 All icons are 15x15 `<svg>`.
 
 - `<lb-comment-icon>`: A speech bubble.
+- `<lb-play-icon>`: A right-pointing triangle.
 - `<lb-reroll-icon>`: A turning arrow.
 - `<lb-trash-icon>`: A diagonal cross.
 - `<lb-pin-icon>`: A pin icon. Set `pinned="true"` fills it.

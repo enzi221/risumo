@@ -199,7 +199,7 @@ local function renderInline(data, chatIndex, stackItem)
               risu_btn = createGenerationCode(chatIndex, operationID, slot),
               title = '재생성',
               type = 'button',
-              h.lb_xnai_play_icon { closed = true },
+              h.lb_play_icon { closed = true },
             } or nil,
             h.button['lb-xnai-toolbar-btn'] {
               popovertarget = fullsizePop and popID or nil,
@@ -282,7 +282,7 @@ local function renderInline(data, chatIndex, stackItem)
               risu_btn = createGenerationCode(chatIndex, operationID, '-1'),
               title = '재생성',
               type = 'button',
-              h.lb_xnai_play_icon { closed = true },
+              h.lb_play_icon { closed = true },
             } or nil,
             fullsizePop and inStack and h.label['lb-xnai-toolbar-btn'] {
               htmlFor = promptID,

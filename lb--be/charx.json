@@ -53,6 +53,7 @@
     "regex/display-interaction-hints.md",
     "regex/display-pin-icon.md",
     "regex/display-platform-area.md",
+    "regex/display-play-icon.md",
     "regex/display-reroll-icon.md",
     "regex/display-update.md",
     "regex/ignore-update.md",

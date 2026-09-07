@@ -166,12 +166,12 @@ local function escapeAttribute(value)
   return value:gsub('&', '&amp;'):gsub('"', '&quot;'):gsub('<', '&lt;'):gsub('>', '&gt;')
 end
 
----@param previousNode MutationNode
+---@param previousNode MutationNode?
 ---@param name string
 ---@return string
 local function createOpenTag(previousNode, name)
-  local openTag = previousNode.raw:match('^(<lb%-mini[^>]*>)') or '<lb-mini>'
-  if name == previousNode.attributes.name then
+  local openTag = previousNode and previousNode.raw:match('^(<lb%-mini[^>]*>)') or '<lb-mini>'
+  if previousNode and name == previousNode.attributes.name then
     return openTag
   end
 
@@ -222,20 +222,21 @@ local function main(_, action, fullChat, mutation)
   if action ~= 'interaction' then
     return fullChat
   end
-  if not mutation or not mutation.previousNode then
-    error('Missing previous miniboard node for interaction.')
+  if not mutation then
+    return fullChat
   end
 
   local patchNodes = prelude.queryNodes('lb-mini-patch', mutation.output)
   local patchNode = patchNodes[#patchNodes]
   if not patchNode then
-    error('Missing <lb-mini-patch> interaction output.')
+    return fullChat
   end
 
   local patch = json.decode(prelude.trim(patchNode.content))
-  local posts = prelude.toon.decode(mutation.previousNode.content)
+  local previousNode = mutation.previousNode
+  local posts = previousNode and prelude.toon.decode(previousNode.content) or {}
   local board = {
-    name = mutation.previousNode.attributes.name or '미니보드',
+    name = previousNode and previousNode.attributes.name or '미니보드',
     posts = posts,
   }
   local patched = prelude.applyJSONPatch(board, patch)
@@ -245,7 +246,7 @@ local function main(_, action, fullChat, mutation)
   validateCons(patched.posts)
 
   local content = prelude.toon.encode(patched.posts, { delimiter = '|' })
-  local replacement = createOpenTag(mutation.previousNode, patched.name) .. '\n'
+  local replacement = createOpenTag(previousNode, patched.name) .. '\n'
       .. content
       .. '\n</lb-mini>'
   return replacePatchNode(fullChat, replacement)

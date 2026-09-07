@@ -537,10 +537,11 @@ Action: `%s`
   local isSeparated = lbdataJsIdx ~= nil and lbdataJsIdx ~= jsIndex
   local workContent = isSeparated and fullChat[lbdataJsIdx + 1].data or originalContent
   local workJsIdx = isSeparated and lbdataJsIdx or jsIndex
+  local cleanedWorkContent, lazyPosition = lbdata.removeNode(workContent, 'lb-lazy', { id = identifier })
   local previousNode = nil
 
   if modifiers.preserve then
-    local existingNodes = prelude.queryNodes(identifier, workContent)
+    local existingNodes = prelude.queryNodes(identifier, cleanedWorkContent)
     local targetNode = nil
 
     if modifiers.blockID and #existingNodes > 0 then
@@ -555,18 +556,18 @@ Action: `%s`
     end
 
     if targetNode then
-      previousNode = createMutationNode(targetNode, workContent)
-      finalChat = workContent:sub(1, targetNode.rangeEnd) ..
-          '\n' .. result .. workContent:sub(targetNode.rangeEnd + 1)
+      previousNode = createMutationNode(targetNode, cleanedWorkContent)
+      finalChat = cleanedWorkContent:sub(1, targetNode.rangeEnd) ..
+          '\n' .. result .. cleanedWorkContent:sub(targetNode.rangeEnd + 1)
     else
-      finalChat = lbdata.fallbackInsert(workContent, result)
+      finalChat = insertResult(cleanedWorkContent, lazyPosition, result)
     end
   else
-    local baseContent, targetPosition, _, removedNode = lbdata.removeNode(workContent, identifier,
+    local baseContent, targetPosition, _, removedNode = lbdata.removeNode(cleanedWorkContent, identifier,
       modifiers.blockID and { id = modifiers.blockID } or nil)
 
-    previousNode = createMutationNode(removedNode, workContent)
-    finalChat = insertResult(baseContent, targetPosition, result)
+    previousNode = createMutationNode(removedNode, cleanedWorkContent)
+    finalChat = insertResult(baseContent, targetPosition or lazyPosition, result)
   end
 
   writeResult(workJsIdx, finalChat, man, 'interaction', {

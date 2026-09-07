@@ -385,6 +385,7 @@ Read [Lightboard Prelude](000-prelude.md) for more.
 All icons are 15x15 `<svg>`.
 
 - `<lb-comment-icon>`: A speech bubble.
+- `<lb-play-icon>`: A right-pointing triangle.
 - `<lb-reroll-icon>`: A turning arrow.
 - `<lb-trash-icon>`: A diagonal cross.
 - `<lb-pin-icon>`: A pin icon. Set `pinned="true"` fills it.
