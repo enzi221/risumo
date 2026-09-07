@@ -58,7 +58,9 @@ Include minimum one meme/troll/joke/copypasta. Avoid topics from previous data.
 {{/when}}
 
 Utilize narrative events. Note narrative time (estimate if not specified). Board users need time to react unless they were present at the event.
-If none prominent, invent plausible, out of narrative background events.
+Keep all board content within the narrative's current endpoint. Treat plans, requests, orders, and intentions as statements made, not actions performed. Leave pending choices, responses, and outcomes unresolved until the narrative establishes them. Express predictions as speculation, without inventing sightings, reports, or aftermath that imply the predicted event has occurred.
+
+If none prominent, invent plausible, out of narrative background events that do not advance or resolve the current scene.
 
 Previous data is embedded in log. No repeated or similar discussions. Strive for diversity. Exception: Related post series with its own narrative progress. Series: preserve author's nick/tone from previous data.
 

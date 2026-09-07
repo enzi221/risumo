@@ -157,7 +157,9 @@ Topics vary by board. PSA, small talk, gossip, news, memes, games, sports, techn
 {{/when}}
 
 Utilize narrative events. Note narrative time (estimate if not specified). Board users need time to react unless they were present at the event.
-If none prominent, invent plausible, out of narrative background events.
+Keep all board content within the narrative's current endpoint. Treat plans, requests, orders, and intentions as statements made, not actions performed. Leave pending choices, responses, and outcomes unresolved until the narrative establishes them. Express predictions as speculation, without inventing sightings, reports, or aftermath that imply the predicted event has occurred.
+
+If none prominent, invent plausible, out of narrative background events that do not advance or resolve the current scene.
 
 Previous data is embedded in log. No repeated or similar discussions. Strive for diversity. Exception: Related post series with its own narrative progress. Series: preserve author's nick/tone from previous data.
 
@@ -311,11 +313,13 @@ Write the node as a TOON array of objects with these fields:
 Preserve still-valid entries, update changed entries, and remove obsolete entries. Output `[0|]:` when there are no entries.
 
 {{#when::keep::{{? {{length::{{trim::{{getvar::lb-mini.keyfigures}}}}}} > 0}}}}
-Use this preserved state from the previous generation:
+Preserved state from the previous generation:
 
 <previous-lb-mini-keyfigures>
 {{getvar::lb-mini.keyfigures}}
 </previous-lb-mini-keyfigures>
+
+This is a reference. Use these only when appropriate.
 {{/when}}
 {{/when}}
 

@@ -9,5 +9,17 @@ Since it is a part of LBDATA, you MUST not include it in your output. Let the pl
 ### Interpretation Guide
 
 As like usual boards, it may contain trolls, jokes, memes, copypastas, rumors. Its posts are not necessarily the truth. Avoid guiding narrative towards a specific direction based on its content.
+
+{{#when::{{getglobalvar::toggle_lb-mini.keyfigures}}::is::1}}
+{{#when::keep::{{? {{length::{{trim::{{getvar::lb-mini.keyfigures}}}}}} > 0}}}}
+### Preserved key figures
+
+Use the nickname-to-character mappings below to recognize established characters in board posts and comments. Reflect their board activity in character continuity while distinguishing what they posted from whether their claims are true. Keep each character's knowledge limited to what that character could access in the world.
+
+<previous-lb-mini-keyfigures>
+{{getvar::lb-mini.keyfigures}}
+</previous-lb-mini-keyfigures>
+{{/when}}
+{{/when}}
 </instruction>
 {{/when}}
