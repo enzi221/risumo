@@ -1,0 +1,7 @@
+=🔮타로타로테=group
+astarot-enabled=켜기
+astarot-character=아스타로테
+astarot-reader-only=┗아스타로테만 리딩
+astarot-asset=┗아스타로테 에셋
+=타로타로테 1.0.0—amonamona=caption
+==groupEnd

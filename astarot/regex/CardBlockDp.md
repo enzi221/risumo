@@ -5,7 +5,7 @@ type: editdisplay
 ---
 
 IN:
-^\[astcard\|(?:(?<major>\d+)|(?:(?<suit>\w+)\/(?<num>\d+)))(?<reversed>i)?\][ \t]_\r?\n(?<content>[\s\S]_?)\r?\n^\[\/astcard\][ \t]\*\r?\n?
+^\[astcard\|(?:(?<major>\d+)|(?:(?<suit>\w+)\/(?<num>\d+)))(?<reversed>i)?\][ \t]*\r?\n(?<content>[\s\S]*?)\r?\n^\[\/astcard\][ \t]*\r?\n?
 OUT:
 {{#when::keep::toggle::astarot-enabled}}
 <div class="astarot-desc">

@@ -1,0 +1,523 @@
+local triggerId = ''
+
+local function setTriggerId(tid)
+  triggerId = tid
+  if type(prelude) ~= 'nil' then
+    return
+  end
+  local source = getLoreBooks(triggerId, 'lightboard-prelude')
+  if not source or #source == 0 then
+    error('라이트보드 백엔드를 찾지 못했습니다.')
+  end
+  load(source[1].content, '@prelude', 't')()
+end
+
+-- 잼민아 생각 블록 안에서 노드 좀 열지 마...
+local function sanitizeThoughts(data)
+  local thoughts = prelude.queryNodes('Thoughts', data)
+
+  for i = #thoughts, 1, -1 do
+    local node = thoughts[i]
+    local content = node.content:gsub('[<>%[%]]', '')
+    local replacement = node.openTag .. content .. '</Thoughts>'
+    data = data:sub(1, node.rangeStart - 1) .. replacement .. data:sub(node.rangeEnd + 1)
+  end
+
+  return data
+end
+
+local function sanitizeInlineTarotSpreadTags(data)
+  return data:gsub(
+    "(`+)<([^<>\r\n]+)>(`+)",
+    function(openTicks, tag, closeTicks)
+      local tarotSpreadTag = tag == 'tarot-spread' or
+          tag == '/tarot-spread' or
+          tag:match('^tarot%-spread%s+') ~= nil
+
+      if #openTicks ~= #closeTicks or not tarotSpreadTag then
+        return openTicks .. '<' .. tag .. '>' .. closeTicks
+      end
+
+      return openTicks .. tag .. closeTicks
+    end
+  )
+end
+
+listenEdit(
+  'editOutput',
+  function(tid, data)
+    setTriggerId(tid)
+    data = sanitizeInlineTarotSpreadTags(data)
+    return sanitizeThoughts(data)
+  end
+)
+
+local function shuffleDeck(deck)
+  local shuffled = { table.unpack(deck) }
+  for i = #shuffled, 2, -1 do
+    local j = math.random(i)
+    shuffled[i], shuffled[j] = shuffled[j], shuffled[i]
+  end
+
+  -- Add reversed orientation
+  for i = 1, #shuffled do
+    if math.random() < 0.3 then
+      shuffled[i] = shuffled[i] .. 'i'
+    end
+  end
+
+  return shuffled
+end
+
+local majorArcana = {
+  "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
+  "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21"
+}
+
+local majorArcanaNames = {
+  'THE FOOL', 'THE MAGICIAN', 'THE HIGH PRIESTESS', 'THE EMPRESS', 'THE EMPEROR',
+  'THE HIEROPHANT', 'THE LOVERS', 'THE CHARIOT', 'STRENGTH', 'THE HERMIT',
+  'WHEEL OF FORTUNE', 'JUSTICE', 'THE HANGED MAN', 'DEATH', 'TEMPERANCE',
+  'THE DEVIL', 'THE TOWER', 'THE STAR', 'THE MOON', 'THE SUN', 'JUDGEMENT', 'THE WORLD'
+}
+
+local minorArcanaRanks = {
+  'ACE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN',
+  'EIGHT', 'NINE', 'TEN', 'PAGE', 'KNIGHT', 'QUEEN', 'KING'
+}
+
+local minorArcanaSuits = {
+  coins = 'COINS',
+  cups = 'CUPS',
+  swords = 'SWORDS',
+  wands = 'WANDS',
+}
+
+local minorArcana = {
+  "wands/1", "wands/2", "wands/3", "wands/4", "wands/5", "wands/6", "wands/7",
+  "wands/8", "wands/9", "wands/10", "wands/11", "wands/12", "wands/13", "wands/14",
+  "cups/1", "cups/2", "cups/3", "cups/4", "cups/5", "cups/6", "cups/7",
+  "cups/8", "cups/9", "cups/10", "cups/11", "cups/12", "cups/13", "cups/14",
+  "swords/1", "swords/2", "swords/3", "swords/4", "swords/5", "swords/6", "swords/7",
+  "swords/8", "swords/9", "swords/10", "swords/11", "swords/12", "swords/13", "swords/14",
+  "coins/1", "coins/2", "coins/3", "coins/4", "coins/5", "coins/6", "coins/7",
+  "coins/8", "coins/9", "coins/10", "coins/11", "coins/12", "coins/13", "coins/14",
+}
+
+local function getFullDeck()
+  local deck = {}
+  for _, card in ipairs(majorArcana) do
+    table.insert(deck, card)
+  end
+  for _, card in ipairs(minorArcana) do
+    table.insert(deck, card)
+  end
+  return deck
+end
+
+local function getMajorDeck()
+  local deck = {}
+  for _, card in ipairs(majorArcana) do
+    table.insert(deck, card)
+  end
+  return deck
+end
+
+local function getCardDisplayName(cardName)
+  local majorNumber = tonumber(cardName)
+  if majorNumber then
+    return majorArcanaNames[majorNumber + 1] or cardName
+  end
+
+  local suit, rank = cardName:match('^(%a+)/(%d+)$')
+  local rankName = minorArcanaRanks[tonumber(rank)]
+  local suitName = minorArcanaSuits[suit]
+  if rankName and suitName then
+    return rankName .. ' OF ' .. suitName
+  end
+
+  return cardName
+end
+
+local function printDeck()
+  local lastMessage = getChat(triggerId, -1).data
+  local spreadCommand = prelude.queryNodes('tarot-spread', lastMessage)
+
+  if not spreadCommand or #spreadCommand == 0 then
+    return
+  end
+
+  local deckType = spreadCommand[1].attributes['deck'] or 'full'
+  local deck = deckType == 'full' and getFullDeck() or getMajorDeck()
+  local shuffledDeck = shuffleDeck(deck)
+
+  local spread = json.decode(spreadCommand[1].content)
+  if type(spread) ~= 'table' then
+    error('Tarot spread must be a JSON array.')
+  end
+
+  if #spread < 1 then
+    error('Tarot spread must contain at least 1 position.')
+  end
+
+  addChat(triggerId, 'user',
+    '<tarot-spread-cache>' ..
+    json.encode(spread) ..
+    '</tarot-spread-cache>\n' ..
+    '<tarot-deck length="' .. #spread .. '">' .. table.concat(shuffledDeck, ',') .. '</tarot-deck>')
+  setState(triggerId, 'tarotSelections', {})
+end
+
+local function renderDeck(data, length)
+  local state = getState(triggerId, 'tarotSelections') or {}
+
+  -- Create a lookup table for active cards
+  local activeCards = {}
+  for _, index in ipairs(state) do
+    activeCards[index] = true
+  end
+
+  local cards = prelude.split(data, ',')
+  local totalCards = #cards
+
+  -- Split cards into two rows
+  local cardsPerRow = math.ceil(totalCards / 2)
+
+  -- Calculate arc parameters
+  local arcAngle = 140 -- degrees for each arc
+  local radiusCqw = 40 -- radius in container query width units
+
+  -- Card dimensions
+  local cardWidthCqw = 10
+  local cardHeightCqh = cardWidthCqw * (4.75 / 2.75) * (3 / 4) -- maintain aspect ratio with container
+
+  local cards_e = {}
+  for idx = #cards, 1, -1 do
+    local i = idx
+    local active = activeCards[i]
+
+    -- Determine which row this card belongs to
+    local row = i <= cardsPerRow and 1 or 2
+    local indexInRow = row == 1 and i or (i - cardsPerRow)
+    local cardsInThisRow = row == 1 and cardsPerRow or (totalCards - cardsPerRow)
+
+    -- Row-specific parameters
+    local centerY = row == 1 and 50 or 85
+    local rowRadius = radiusCqw
+
+    -- Calculate angle for this card (spread evenly across the arc)
+    -- Start from left (180-arcAngle/2) to right (arcAngle/2)
+    local startAngle = 90 + arcAngle / 2
+    local endAngle = 90 - arcAngle / 2
+    local angleStep = (startAngle - endAngle) / (cardsInThisRow - 1)
+    local angle = startAngle - (indexInRow - 1) * angleStep
+    local angleRad = math.rad(angle)
+
+    -- Calculate position (polar to cartesian)
+    local x = 50 + rowRadius * math.cos(angleRad)
+    local y = centerY - rowRadius * math.sin(angleRad)
+
+    -- Adjust for card center
+    x = x - cardWidthCqw / 2
+    y = y - cardHeightCqh / 2
+
+    -- Card rotation to follow the arc (perpendicular to radius)
+    local cardRotation = 90 - angle
+
+    table.insert(cards_e, h.button {
+      class = 'astarot-card astarot-deck-card',
+      data_active = active and 'true' or 'false',
+      disabled = #state >= length and not active and 'true' or nil,
+      risu_btn = 'tarot__' .. i,
+      type = 'button',
+      style = string.format(
+        'left: %.2fcqw; top: %.2fcqh; transform: rotate(%.1fdeg); --rotation: %.1fdeg;',
+        x, y, cardRotation, cardRotation
+      ),
+    })
+  end
+
+  local html = h.div {
+    h.section['astarot-floor-container'] {
+      h.div {
+        class = 'astarot-floor',
+        cards_e,
+      },
+    },
+    h.p['astarot-deck-inst'] {
+      length .. '장을 선택하세요.',
+    },
+    h.button {
+      class = 'astarot-button',
+      disabled = #state ~= length and 'true' or nil,
+      risu_btn = 'tarot__submit',
+      type = 'button',
+      '다 골랐어요',
+    }
+  }
+
+  return tostring(html)
+end
+
+local function renderSelection(spreadData, selectionData)
+  local spread = json.decode(spreadData)
+  local selectionLines = prelude.split(prelude.trim(selectionData), '\n')
+  local selectedCards = selectionLines[2]
+  local cards = prelude.split(selectedCards, ',')
+
+  local card_es = {}
+  for i, position in ipairs(spread) do
+    local card = cards[i]
+    local isReversed = card and card:sub(-1) == 'i'
+    local cardName = isReversed and card:sub(1, -2) or card
+
+    -- Calculate position using percentage relative to available space
+    -- x=0 means left edge of card touches left edge of container
+    -- x=1 means right edge of card touches right edge of container
+    -- Card width: 10cqw
+    -- Card height in cqh: 10 * (4.75/2.75) * (3/4) = 12.954545...cqh
+    -- (card AR is 2.75/4.75, container AR is 4/3, so 1cqw = 0.75cqh)
+    local cardWidthCqw = 10
+    local cardHeightCqh = cardWidthCqw * (4.75 / 2.75) * (3 / 4) -- ≈ 12.9545
+    local leftPercent = position.x * (100 - cardWidthCqw)
+    local topPercent = position.y * (100 - cardHeightCqh)
+
+    -- Normalize rotation to -180~180 range for shortest rotation path
+    local rotation = position.rot
+    while rotation > 180 do
+      rotation = rotation - 360
+    end
+    while rotation < -180 do
+      rotation = rotation + 360
+    end
+
+    local imageCardName = cardName
+    -- if only number then it is major; use the number as the image name
+    -- if it is (suit)/(number) then use the minor arcana image name
+    if imageCardName:match('^(%a+)/(%d+)$') then
+      local suit, number = imageCardName:match('^(%a+)/(%d+)$')
+      imageCardName = 's-' .. suit .. '-' .. number
+    end
+
+    table.insert(card_es, h.label['astarot-spread-card-wrapper'] {
+      style = string.format(
+        'left: %.2fcqw; top: %.2fcqh; --card-x: %.2fcqw; --card-y: %.2fcqh; transform: rotate(%fdeg);',
+        leftPercent, topPercent, leftPercent, topPercent, rotation
+      ),
+      h.input {
+        hidden = true,
+        type = 'checkbox',
+      },
+      h.div['astarot-spread-card'] {
+        h.div['astarot-card astarot-spread-card-front'] {
+          style = string.format(
+            'background-image: url({{raw::astarot-%s}}); transform: rotate(%ddeg);',
+            imageCardName, isReversed and 180 or 0
+          ),
+        },
+        h.div['astarot-card astarot-spread-card-back'] {
+          h.span['astarot-spread-card-meta'] {
+            string.format('%02d / %s', i, isReversed and 'REVERSED' or 'UPRIGHT'),
+          },
+          h.strong['astarot-spread-card-meaning'] {
+            position.position_meaning or 'Unknown position',
+          },
+          h.span['astarot-spread-card-name'] {
+            getCardDisplayName(cardName),
+          },
+        },
+      }
+    })
+  end
+
+  local html = h.div {
+    h.section['astarot-floor-container'] {
+      h.div['astarot-floor'] {
+        card_es
+      }
+    },
+    h.p['astarot-selection-tip'] {
+      '팁: 입력 없이 한 번 더 제출하거나, 카드를 어떻게 뽑았는지 혹은 어떤 반응을 보였는지 입력 후 제출하세요.',
+    },
+  }
+
+  return tostring(html)
+end
+
+local function displayMain(tid, data)
+  if not data or data == '' then
+    return ''
+  end
+
+  if not data:find('<tarot-', 1, true) then
+    return data
+  end
+
+  setTriggerId(tid)
+
+  local deckData = prelude.queryNodes('tarot-deck', data)
+  if deckData and #deckData > 0 then
+    local output = ''
+    local lastIndex = 1
+
+    for i = 1, #deckData do
+      local match = deckData[i]
+      if match.rangeStart > lastIndex then
+        output = output .. data:sub(lastIndex, match.rangeStart - 1)
+      end
+      lastIndex = match.rangeEnd + 1
+    end
+
+    return output ..
+        data:sub(lastIndex) .. renderDeck(deckData[#deckData].content, tonumber(deckData[#deckData].attributes.length))
+  end
+
+  local selectionData = prelude.queryNodes('tarot-selection', data)
+  if selectionData and #selectionData > 0 then
+    local output = ''
+    local lastIndex = 1
+
+    local spread = prelude.queryNodes('tarot-spread-cache', data)
+    if not spread or #spread == 0 then
+      return data
+    end
+
+    for i = 1, #selectionData do
+      local match = selectionData[i]
+      if match.rangeStart > lastIndex then
+        output = output .. data:sub(lastIndex, match.rangeStart - 1)
+      end
+      lastIndex = match.rangeEnd + 1
+    end
+
+    return output ..
+        data:sub(lastIndex) .. renderSelection(spread[#spread].content, selectionData[#selectionData].content)
+  end
+
+  return data
+end
+
+listenEdit(
+  "editDisplay",
+  function(tid, data, meta)
+    if meta and meta.index ~= nil then
+      local position = meta.index - getChatLength(tid)
+      if position < -10 then
+        return data
+      end
+    end
+
+    local success, result = pcall(displayMain, tid, data)
+    if success then
+      return result
+    end
+
+    print("[Astarotte] Rendering failed:", tostring(result))
+    return data .. '\n\n[Astarotte] 타로 화면을 표시하지 못했어요. ' .. tostring(result)
+  end
+)
+
+onButtonClick = function(tid, code)
+  if code:sub(1, 7) ~= 'tarot__' then
+    return
+  end
+
+  local setup = function()
+    local success, result = pcall(setTriggerId, tid)
+    if not success then
+      print('[Astarotte] Initialization failed:', tostring(result))
+      alertNormal(tid, '아스타로테를 불러오지 못했어요.\n\n' .. tostring(result))
+      return false
+    end
+    return true
+  end
+
+  if code == 'tarot__retry' then
+    if not setup() then return end
+    local spreadCommand = prelude.queryNodes('tarot-spread', getChat(triggerId, -1).data)
+    if not spreadCommand or #spreadCommand == 0 then
+      alertNormal(triggerId, '다시 섞으려면 버튼 아래의 다른 메시지들을 모두 삭제해 주세요.')
+      return
+    end
+
+    local deckSuccess, deckResult = pcall(printDeck)
+    if not deckSuccess then
+      print('[Astarotte] Deck creation failed:', tostring(deckResult))
+      alertNormal(triggerId, '타로 덱을 만드는 중 오류가 발생했어요.\n\n' .. tostring(deckResult))
+    end
+    return
+  end
+
+  if code == 'tarot__submit' then
+    if not setup() then return end
+    local state = getState(tid, 'tarotSelections') or {}
+    if #state == 0 then
+      return
+    end
+
+    local tarotDeck = nil
+    local tarotSpread = nil
+    local fullChat = getFullChat(tid)
+    for i = #fullChat, 1, -1 do
+      if fullChat[i].role == 'user' then
+        local tarotNode = prelude.queryNodes('tarot-deck', fullChat[i].data)
+        local spreadNode = prelude.queryNodes('tarot-spread-cache', fullChat[i].data)
+        if spreadNode and #spreadNode > 0 and tarotNode and #tarotNode > 0 then
+          tarotDeck = tarotNode[1]
+          tarotSpread = spreadNode[1]
+          break
+        end
+      end
+    end
+
+    if not tarotSpread or not tarotDeck then
+      return
+    end
+
+    local shuffledCards = prelude.split(tarotDeck.content, ',')
+    local finalCards = {}
+    for _, index in ipairs(state) do
+      table.insert(finalCards, shuffledCards[index])
+    end
+
+    removeChat(tid, -1)
+    addChat(triggerId, 'user',
+      '<tarot-spread-cache>' ..
+      tarotSpread.content ..
+      '</tarot-spread-cache>\n' ..
+      '<tarot-selection>\n' ..
+      table.concat(state, ',') .. '\n' .. table.concat(finalCards, ',') .. '\n' ..
+      '</tarot-selection>')
+    setState(tid, 'tarotSelections', {})
+    return
+  end
+
+  local prefix = "tarot__"
+  local _, prefixEnd = string.find(code, prefix)
+
+  if prefixEnd then
+    local index = tonumber(code:sub(prefixEnd + 1))
+    if not index then
+      return
+    end
+
+    local state = getState(tid, 'tarotSelections') or {}
+
+    -- Check if index already exists in array
+    local found = false
+    for i, val in ipairs(state) do
+      if val == index then
+        table.remove(state, i)
+        found = true
+        break
+      end
+    end
+
+    -- If not found, add it
+    if not found then
+      table.insert(state, index)
+    end
+
+    setState(tid, 'tarotSelections', state)
+  end
+end

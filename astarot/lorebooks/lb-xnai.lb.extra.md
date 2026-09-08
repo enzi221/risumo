@@ -1,3 +1,6 @@
+{{#when::toggle::astarot-enabled}}
+{{#when::toggle::astarot-character}}
+
 ## Tagging guide for Astarotte
 
 These were the original appearance tags.
@@ -13,3 +16,6 @@ one shoulder visible, black bra strap, purple ribbed sweater, gray shawl on one 
 ```
 
 For clothing tags, only include what should be visible in each image as written in the base instruction.
+
+{{/when}}
+{{/when}}

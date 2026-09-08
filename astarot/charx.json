@@ -403,21 +403,6 @@
     },
     {
       "extension": "webp",
-      "file": "assets/others/astarot-cover.webp",
-      "name": "astarot-cover"
-    },
-    {
-      "extension": "webp",
-      "file": "assets/others/astarot-cover-cvs.webp",
-      "name": "astarot-cover-cvs"
-    },
-    {
-      "extension": "webp",
-      "file": "assets/others/astarot-cover-ice.webp",
-      "name": "astarot-cover-ice"
-    },
-    {
-      "extension": "webp",
       "file": "assets/others/astarot-button.webp",
       "name": "astarot-button"
     },
@@ -547,40 +532,29 @@
       "name": "astarot-nervous"
     }
   ],
-  "card": {
-    "alternate_greetings": [
-      "alternate_greetings/1.md",
-      "alternate_greetings/2.md",
-      "alternate_greetings/3.md",
-      "alternate_greetings/4.md"
-    ],
-    "defaultVariables": [
-      "astarot-lang=0",
-      "",
-      "astarot-asset=1",
-      "astarot-cards=1",
-      "astarot-hover=1",
-      "astarot-infdist=0",
-      "astarot-stats=1",
-      "astarot-reading=1",
-      "astarot-realtime=0"
-    ],
-    "description": "description.md",
-    "first_mes": "first_mes.md",
-    "globalNoteOverride": "global_note_override.md"
-  },
   "creator": "",
-  "description": "\n# `en`\n ",
+  "description": "어느 봇에서나 타로타로",
   "folders": [],
   "hideIcon": false,
-  "icon": "assets/icon.png",
   "lorebook": [
+    {
+      "alwaysActive": true,
+      "bookVersion": 2,
+      "comment": "Astarotte",
+      "file": "lorebooks/Astarotte.md",
+      "insertOrder": 100,
+      "key": "",
+      "mode": "normal",
+      "secondaryKey": "",
+      "selective": false,
+      "useRegex": false
+    },
     {
       "alwaysActive": true,
       "bookVersion": 2,
       "comment": "Assets",
       "file": "lorebooks/Assets.md",
-      "insertOrder": 800,
+      "insertOrder": 100,
       "key": "",
       "mode": "normal",
       "secondaryKey": "",
@@ -592,19 +566,7 @@
       "bookVersion": 2,
       "comment": "Phases",
       "file": "lorebooks/Phases.md",
-      "insertOrder": 900,
-      "key": "",
-      "mode": "normal",
-      "secondaryKey": "",
-      "selective": false,
-      "useRegex": false
-    },
-    {
-      "alwaysActive": true,
-      "bookVersion": 2,
-      "comment": "Stats",
-      "file": "lorebooks/Stats.md",
-      "insertOrder": 1000,
+      "insertOrder": 100,
       "key": "",
       "mode": "normal",
       "secondaryKey": "",
@@ -637,27 +599,19 @@
     }
   ],
   "lowLevelAccess": false,
-  "name": "Astarotte",
+  "name": "🔮 타로타로테 1.0.0",
   "regex": [
-    "regex/_온보딩 _onboard.md",
-    "regex/---------------.md",
     "regex/AstImgBk.md",
     "regex/AstImgDp.md",
     "regex/AstImgEx.md",
     "regex/AstImgIgnore.md",
     "regex/CardBlockDp.md",
-    "regex/ConfDp.md",
-    "regex/ConfIgnore.md",
+    "regex/DeckHide.md",
     "regex/DeckIgnore.md",
-    "regex/RealTimeHide.md",
-    "regex/RealTimeIns.md",
     "regex/SelectionHide.md",
     "regex/SpreadCacheHide.md",
     "regex/SpreadCacheIgnore.md",
-    "regex/SpreadHide.md",
-    "regex/StatsDp.md",
-    "regex/---------------.md",
-    "regex/ParenKiller.md"
+    "regex/SpreadHide.md"
   ],
   "tags": [],
   "triggers": [
@@ -670,5 +624,6 @@
       "type": "start"
     }
   ],
-  "version": ""
+  "version": "1.0.0",
+  "toggles": "toggles.txt"
 }
