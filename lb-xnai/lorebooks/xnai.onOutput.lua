@@ -232,10 +232,6 @@ local function main(tid, output, fullChatContent, index)
   end
 
   if not string.find(output, '<lb%-xnai') then
-    if forcedInsertion then
-      return output
-    end
-
     return nil
   end
 
