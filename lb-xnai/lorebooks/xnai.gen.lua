@@ -278,11 +278,194 @@ local function insertSlots(text)
   local slotIndex = 0
   local trimmed = text:match('^%s*(.-)%s*$') or text
   trimmed = trimmed:gsub('(\n+)', function(lineBreaks)
-    local out = lineBreaks .. '[Slot ' .. slotIndex .. ']\n'
+    local out = lineBreaks .. '[Slot ' .. slotIndex .. ']\n\n'
     slotIndex = slotIndex + 1
     return out
   end)
   return trimmed
+end
+
+---Maps visible newline boundaries to insertion positions outside XML blocks.
+---Existing lb-xnai nodes separate narrative fragments, including inline nodes.
+---@param text string
+---@return string input
+---@return string output
+---@return fun(text: string): string restore
+local function buildSlotMap(text)
+  local parts = {}
+  local spans = {}
+  local saved = {}
+  local masked = {}
+  local maskedLength = 0
+  local visibleLength = 0
+  local position = 1
+  local lastPos = 1
+
+  local function appendText(first, last)
+    if first > last then
+      return
+    end
+    local part = text:sub(first, last)
+    parts[#parts + 1] = part
+    masked[#masked + 1] = part
+    spans[#spans + 1] = {
+      finish = visibleLength + #part,
+      offset = maskedLength - visibleLength,
+    }
+    maskedLength = maskedLength + #part
+    visibleLength = visibleLength + #part
+  end
+
+  while true do
+    local tagStart = text:find('<', position, true)
+    if not tagStart then
+      break
+    end
+    local tagEnd = text:find('>', tagStart, true)
+    if not tagEnd then
+      break
+    end
+    local content = text:sub(tagStart + 1, tagEnd - 1)
+    local name = prelude.extractTagName(content)
+    local nodeEnd = nil
+    if name then
+      if content:match('/%s*$') then
+        nodeEnd = tagEnd
+      else
+        local _, closeEnd = text:find('</' .. prelude.escMatch(name) .. '>', tagEnd + 1)
+        nodeEnd = closeEnd
+      end
+    end
+    if nodeEnd then
+      appendText(lastPos, tagStart - 1)
+      saved[#saved + 1] = text:sub(tagStart, nodeEnd)
+      local marker = '\0XMLR_' .. #saved .. '\0'
+      masked[#masked + 1] = marker
+      maskedLength = maskedLength + #marker
+      if name == 'lb-xnai' then
+        parts[#parts + 1] = '\n'
+        spans[#spans + 1] = {
+          finish = visibleLength + 1,
+          offset = maskedLength - visibleLength - 1,
+        }
+        visibleLength = visibleLength + 1
+      end
+      lastPos = nodeEnd + 1
+      position = lastPos
+    else
+      position = tagEnd + 1
+    end
+  end
+  appendText(lastPos, #text)
+
+  text = table.concat(masked)
+  local visible = table.concat(parts)
+  local first, trimmed, last = visible:match('^%s*()(.-)()%s*$')
+  local output = {}
+  local originalPos = 1
+  local spanIndex = 1
+  local slotIndex = 0
+  local searchPos = first
+  while searchPos < last do
+    local startNL, endNL = visible:find('\n+', searchPos)
+    if not startNL or endNL >= last then
+      break
+    end
+    while spans[spanIndex].finish < endNL do
+      spanIndex = spanIndex + 1
+    end
+    local originalEnd = endNL + spans[spanIndex].offset
+    output[#output + 1] = text:sub(originalPos, originalEnd)
+    output[#output + 1] = '[Slot ' .. slotIndex .. ']\n\n'
+    originalPos = originalEnd + 1
+    slotIndex = slotIndex + 1
+    searchPos = endNL + 1
+  end
+  output[#output + 1] = text:sub(originalPos)
+  local function restore(value)
+    return (value:gsub('\0XMLR_(%d+)\0', function(index)
+      return saved[tonumber(index)]
+    end))
+  end
+  return insertSlots(trimmed), table.concat(output), restore
+end
+
+---@param triggerId string
+---@param text string
+---@return string input
+---@return string output
+---@return fun(text: string): string restore
+local function buildContextSlotMap(triggerId, text)
+  if getGlobalVar(triggerId, 'toggle_lightboard.preserveXML') ~= '1' then
+    return buildSlotMap(text)
+  end
+
+  local saved = {}
+  local function mask(value)
+    saved[#saved + 1] = value
+    return '\0XNAIR_' .. tostring(#saved) .. '\0'
+  end
+
+  local masked = text:gsub('%[LBDATA START%].-%[LBDATA END%]', mask)
+  local xnaiNodes = prelude.queryNodes('lb-xnai', masked)
+  for index = #xnaiNodes, 1, -1 do
+    local node = xnaiNodes[index]
+    masked = masked:sub(1, node.rangeStart - 1)
+        .. mask(masked:sub(node.rangeStart, node.rangeEnd))
+        .. masked:sub(node.rangeEnd + 1)
+  end
+  masked = masked:gsub('<[^>]+>', mask)
+
+  local _, slotted, restoreNodes = buildSlotMap(masked)
+  local function restore(value)
+    local restored = restoreNodes(value)
+    return (restored:gsub('\0XNAIR_(%d+)\0', function(index)
+      return saved[tonumber(index)]
+    end))
+  end
+
+  return restore(slotted), slotted, restore
+end
+
+local inputSlots = {}
+
+---@param tid string
+---@param input string
+local function setInputSlots(tid, input)
+  inputSlots[tid] = input
+end
+
+---@param tid string
+---@param scenes XNAIDescriptor[]?
+---@param slotted string?
+---@return string[] errors
+local function validateSceneSlots(tid, scenes, slotted)
+  local source = slotted or inputSlots[tid] or ''
+  local available = {}
+  local labels = {}
+  for slot in source:gmatch('%[Slot (%d+)%]') do
+    available[tonumber(slot)] = true
+    labels[#labels + 1] = slot
+  end
+
+  local errors = {}
+  local used = {}
+  for index, scene in ipairs(scenes or {}) do
+    if type(scene) == 'table' then
+      local slot = scene.slot
+      if type(slot) ~= 'number' or not available[slot] then
+        errors[#errors + 1] = 'Scene ' .. (index - 1) .. ' has unavailable slot ' .. tostring(slot) ..
+          '. Select an existing slot from: [' .. table.concat(labels, ', ') .. '].'
+      elseif used[slot] then
+        errors[#errors + 1] = 'Scene ' .. (index - 1) .. ' repeats slot ' .. tostring(slot) ..
+          '. Select a different existing slot for each Scene.'
+      else
+        used[slot] = true
+        scene.slot = math.floor(slot)
+      end
+    end
+  end
+  return errors
 end
 
 ---@param slotA string
@@ -444,18 +627,26 @@ local function persistStateAndHistory(triggerId, xnaiState)
 end
 
 ---@class XNAIGen
+---@field buildContextSlotMap fun (triggerId: string, text: string): string, string, fun(text: string): string
 ---@field buildRawPrompt fun (triggerId: string, desc: XNAIDescriptor): XNAIPromptSet
+---@field buildSlotMap fun (text: string): string, string, fun(text: string): string
 ---@field cleanDescriptionBlocks fun (text: string): string
 ---@field generate fun (triggerId: string, desc: XNAIDescriptor): string?
 ---@field insertSlots fun (text: string): string
 ---@field locateTargetChat fun (fullChat: Chat[]): number?
 ---@field persistStateAndHistory fun (triggerId: string, xnaiState: XNAIStackItem[]): XNAIStackItem[], string
+---@field setInputSlots fun (tid: string, input: string)
+---@field validateSceneSlots fun (tid: string, scenes: XNAIDescriptor[]?, slotted: string?): string[]
 
 return {
+  buildContextSlotMap = buildContextSlotMap,
   buildRawPrompt = buildRawPrompt,
+  buildSlotMap = buildSlotMap,
   cleanDescriptionBlocks = cleanDescriptionBlocks,
   generate = generate,
   insertSlots = insertSlots,
   locateTargetChat = locateTargetChat,
   persistStateAndHistory = persistStateAndHistory,
+  setInputSlots = setInputSlots,
+  validateSceneSlots = validateSceneSlots,
 }

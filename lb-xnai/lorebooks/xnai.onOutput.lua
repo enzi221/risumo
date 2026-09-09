@@ -6,117 +6,6 @@ local function verbose(tid, ...)
   prelude.verbose(tid, 'lb-xnai.onOutput', ...)
 end
 
----Strips all XML nodes from text, returning stripped text and a restore function.
----@param text string
----@return string stripped
----@return fun(s: string): string restore
-local function stripXMLNodes(text)
-  local saved = {}
-  local sections = {}
-  local position = 1
-
-  while true do
-    local tagStart = text:find("<", position)
-    if not tagStart then break end
-
-    local tagEnd = text:find(">", tagStart)
-    if not tagEnd then
-      position = tagStart + 1
-    else
-      local openTagContent = text:sub(tagStart + 1, tagEnd - 1)
-      local foundTagName = prelude.extractTagName(openTagContent)
-
-      if not foundTagName then
-        position = tagEnd + 1
-      else
-        local isSelfClosing = openTagContent:match("/%s*$")
-
-        if isSelfClosing then
-          local idx = #saved + 1
-          saved[idx] = text:sub(tagStart, tagEnd)
-          sections[#sections + 1] = { start = tagStart, finish = tagEnd, idx = idx }
-          position = tagEnd + 1
-        else
-          local closePattern = "</" .. prelude.escMatch(foundTagName) .. ">"
-          local closeStart, closeEnd = text:find(closePattern, tagEnd)
-
-          if not closeStart then
-            position = tagEnd + 1
-          else
-            local idx = #saved + 1
-            saved[idx] = text:sub(tagStart, closeEnd)
-            sections[#sections + 1] = { start = tagStart, finish = closeEnd, idx = idx }
-            position = closeEnd + 1
-          end
-        end
-      end
-    end
-  end
-
-  if #sections == 0 then
-    return text, function(s) return s end
-  end
-
-  -- Absorb surrounding newlines into saved content so that the placeholder
-  -- does not inflate the newline boundary count. This keeps slot numbering
-  -- consistent between the onInput path (removeAllNodes) and onOutput path
-  -- (stripXMLNodes).
-  --
-  -- Cases:
-  --   Node at text start + trailing \n  → absorb all trailing \n
-  --   Node at text end   + preceding \n → absorb all preceding \n from preText
-  --   Both sides have \n (middle)       → absorb one trailing \n
-  local parts = {}
-  local lastPos = 1
-
-  for _, section in ipairs(sections) do
-    local preText = text:sub(lastPos, section.start - 1)
-    local nodeEnd = section.finish
-    local prevIsNL = section.start > 1 and text:sub(section.start - 1, section.start - 1) == "\n"
-    local nextIsNL = text:sub(nodeEnd + 1, nodeEnd + 1) == "\n"
-
-    local absorbBefore = 0
-    local absorbAfter = 0
-
-    local isAtStart = section.start == 1 or not text:sub(1, section.start - 1):find('%S')
-    local isAtEnd = not text:find('%S', nodeEnd + 1)
-
-    if isAtStart and nextIsNL then
-      local afterNL = text:sub(nodeEnd + 1):match('^\n+')
-      if afterNL then absorbAfter = #afterNL end
-    elseif isAtEnd and prevIsNL then
-      local beforeNL = preText:match('\n+$')
-      if beforeNL then absorbBefore = #beforeNL end
-    elseif prevIsNL and nextIsNL then
-      absorbAfter = 1
-    end
-
-    if absorbBefore > 0 then
-      saved[section.idx] = preText:sub(-absorbBefore) .. saved[section.idx]
-      preText = preText:sub(1, -absorbBefore - 1)
-    end
-    if absorbAfter > 0 then
-      saved[section.idx] = saved[section.idx] .. text:sub(nodeEnd + 1, nodeEnd + absorbAfter)
-    end
-
-    parts[#parts + 1] = preText
-    parts[#parts + 1] = '\0XMLR_' .. section.idx .. '\0'
-    lastPos = nodeEnd + absorbAfter + 1
-  end
-
-  parts[#parts + 1] = text:sub(lastPos)
-
-  local stripped = table.concat(parts)
-
-  local function restore(s)
-    return (s:gsub('\0XMLR_(%d+)\0', function(i)
-      return saved[tonumber(i)]
-    end))
-  end
-
-  return stripped, restore
-end
-
 ---@param text string
 ---@param slot string
 ---@param replacement string
@@ -124,7 +13,7 @@ end
 ---@return string
 ---@return boolean replaced
 ---@return number availableSlots
-local function replaceSceneNode(text, slot, replacement, gen)
+local function replaceSceneNode(tid, text, slot, replacement, gen)
   local nodes = prelude.queryNodes('lb-xnai', text, { scene = slot })
   if #nodes > 0 then
     local node = nodes[1]
@@ -135,14 +24,13 @@ local function replaceSceneNode(text, slot, replacement, gen)
     }), true, 0
   end
 
-  local stripped, restoreNodes = stripXMLNodes(text)
-  local slotted = gen.insertSlots(stripped)
+  local _, slotted, restoreNodes = gen.buildContextSlotMap(tid, text)
   local _, availableSlots = slotted:gsub('%[Slot%s+%d+%]', '')
   local replacementCount
   slotted, replacementCount = slotted:gsub('%[Slot%s+' .. slot .. '%]', function()
     return replacement
   end, 1)
-  slotted = slotted:gsub('\n%[Slot%s+%d+%]\n', '\n')
+  slotted = slotted:gsub('%[Slot%s+%d+%]\n\n', '')
   return restoreNodes(slotted), replacementCount > 0, availableSlots
 end
 
@@ -183,6 +71,12 @@ local function applyInteraction(tid, response, fullChatContent, index, gen)
     return nil, '<lb-lazy id="lb-xnai" />'
   end
 
+  local _, replaceable, availableSlots = replaceSceneNode(tid, fullChatContent, slot, '', gen)
+  if not replaceable then
+    error('Interaction scene insertion unavailable. slot=' .. tostring(slot) ..
+      ', availableSlots=' .. tostring(availableSlots))
+  end
+
   local operationID = stackItem.operationID or tid
   stackItem.data.scenes[slot] = scene
   gen.persistStateAndHistory(tid, xnaiState)
@@ -211,7 +105,7 @@ local function applyInteraction(tid, response, fullChatContent, index, gen)
   end
 
   setState(tid, 'lb-xnai-interaction-target', nil)
-  local replacedText, replaced, availableSlots = replaceSceneNode(fullChatContent, slot, replacement, gen)
+  local replacedText, replaced, availableSlots = replaceSceneNode(tid, fullChatContent, slot, replacement, gen)
   if not replaced then
     info(tid, 'Interaction scene insertion failed. slot=' .. tostring(slot) ..
       ', availableSlots=' .. tostring(availableSlots))
@@ -256,6 +150,14 @@ local function main(tid, output, fullChatContent, index)
       ', scenes=' .. tostring(#(response.scenes or {})))
     if response.interaction == true then
       return applyInteraction(tid, response, fullChatContent, index, gen)
+    end
+
+    local _, slotted, restoreNodes = gen.buildContextSlotMap(tid, fullChatContent)
+    local _, availableSlots = slotted:gsub('%[Slot%s+%d+%]', '')
+    verbose(tid, 'Slot map built. availableSlots=' .. tostring(availableSlots))
+    local slotErrors = gen.validateSceneSlots(tid, response.scenes, slotted)
+    if #slotErrors > 0 then
+      error('Scene insertion unavailable. ' .. table.concat(slotErrors, '\n'))
     end
 
     ---@type XNAIStackItem[]
@@ -315,11 +217,6 @@ local function main(tid, output, fullChatContent, index)
     table.insert(xnaiState, stackItem)
     xnaiState = select(1, gen.persistStateAndHistory(tid, xnaiState))
 
-    local stripped, restoreNodes = stripXMLNodes(fullChatContent)
-    local slotted = gen.insertSlots(stripped)
-    local _, availableSlots = slotted:gsub('%[Slot%s+%d+%]', '')
-    verbose(tid, 'Slot map built. availableSlots=' .. tostring(availableSlots))
-
     for _, scene in ipairs(response.scenes or {}) do
       local slot = tostring(scene.slot)
       local replacement
@@ -342,7 +239,7 @@ local function main(tid, output, fullChatContent, index)
     end
 
     -- remove unreplaced [Slot #] tags
-    slotted = slotted:gsub('\n%[Slot%s+%d+%]\n', '\n')
+    slotted = slotted:gsub('%[Slot%s+%d+%]\n\n', '')
     slotted = restoreNodes(slotted)
 
     local finalOutput

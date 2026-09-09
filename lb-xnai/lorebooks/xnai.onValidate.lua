@@ -97,11 +97,12 @@ local function validateDescriptor(errors, desc, label, panelsRequired, slotRequi
 end
 
 ---@param errors string[]
+---@param tid string
 ---@param node Node
 ---@param label string
 ---@param gen XNAIGen
 ---@param comic boolean
-local function validateNode(errors, node, label, gen, comic)
+local function validateNode(errors, tid, node, label, gen, comic)
   local cleanedContent = gen.cleanDescriptionBlocks(node.content)
   local success, content = pcall(prelude.toon.decode, cleanedContent)
   if not success then
@@ -125,6 +126,28 @@ local function validateNode(errors, node, label, gen, comic)
   else
     for sceneIndex, desc in ipairs(response.scenes or {}) do
       validateDescriptor(errors, desc, label .. ', scene ' .. (sceneIndex - 1), comic, true)
+    end
+    local scenes = response.scenes
+    local slotted = nil
+    if response.interaction == true then
+      local target = getState(tid, 'lb-xnai-interaction-target')
+      if target then
+        local chat = getChat(tid, target.chatIndex)
+        slotted = ''
+        if chat then
+          local nodes = prelude.queryNodes('lb-xnai', chat.data, { scene = tostring(target.slot) })
+          if #nodes > 0 then
+            slotted = '[Slot ' .. tostring(target.slot) .. ']'
+          else
+            local _, mappedSlots = gen.buildContextSlotMap(tid, chat.data)
+            slotted = mappedSlots
+          end
+        end
+        scenes = { { slot = tonumber(target.slot) } }
+      end
+    end
+    for _, slotError in ipairs(gen.validateSceneSlots(tid, scenes, slotted)) do
+      table.insert(errors, slotError)
     end
   end
 
@@ -155,7 +178,7 @@ local function main(tid, output)
   local comic = comicMode == '1' or comicMode == '2'
 
   local errors = {}
-  validateNode(errors, nodes[#nodes], 'Output', gen, comic)
+  validateNode(errors, tid, nodes[#nodes], 'Output', gen, comic)
 
   if #errors > 0 then
     verbose(tid, 'Validation failed. errors=' .. tostring(#errors))

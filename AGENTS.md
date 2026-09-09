@@ -4,7 +4,7 @@ Risuai modules consist of Lua codes (bundled as one Lua file), module level "tog
 
 Global Risuai built-in Lua API definitions are available in `lib`.
 
-Read [CHARX.md](CHARX.md) before changing CharX manifests, module layouts, or packaged module sources.
+Read [CHARX.md](CHARX.md) before building or unpacking CharX, changing manifests, module layouts, or packaged module sources.
 
 Use the root package scripts for tooling. Bundle standalone Lua artifacts with `npm run bundle:lua -- <entry.lua> <output.lua>`. Build distributable CharX modules with `npm run build:charx -- <charx.json>`.
 
@@ -16,8 +16,14 @@ All lorebook contents are agent-facing texts.
 
 ## Bumping version
 
+Each edit does NOT mean a distribution. Do not bump versions unless requested.
+
 Each module's version is defined in `charx.json` AND `toggles.txt`. Bump them simultaneously.
 
 ## Building
 
 Do not bother inspecting the built CharX file and its content, you are being overdefensive.
+
+## Validation
+
+Validation should be permissive because LLM requests cost money. If an output can be reconciled, reconcile.

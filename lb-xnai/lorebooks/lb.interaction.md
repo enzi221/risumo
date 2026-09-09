@@ -1,6 +1,6 @@
 Generate exactly one replacement Scene for the insertion point selected by the `RegenerateScene/ChatIndex:I/Slot:N` action.
 
-Locate the exact `[Slot N]` marker in the selected log before choosing the depicted moment. Depict a complete moment established before the marker. Use prose after the marker only to preserve continuity, not to introduce an action, interaction, or reaction that has not occurred before the marker.
+Locate the exact `[Slot N]` insertion slot in the selected log before choosing the depicted moment. Depict a complete moment established before the slot. Use prose after the slot only to preserve continuity, not to introduce an action, interaction, or reaction that has not occurred before the slot.
 
 Rebuild the complete descriptor for the moment at `[Slot N]` from the narrative context. Preserve established character identity, appearance, attire, and environment continuity. Ignore the requested Scene count and Key Visual instructions. Follow every active Scene, composition, character, comic-mode, client-comment, and output-language rule from the main guideline.
 

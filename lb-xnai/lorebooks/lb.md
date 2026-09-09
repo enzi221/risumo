@@ -18,13 +18,13 @@ Curly and square braces control tag weights like `{tag}`, `[tag]`. `N::tag::` al
 
 Copy only Client-specified weights from Instructions Override or Client Direction. Preserve each weight verbatim, including internal whitespace and punctuation (`0.4::cloud9 ::`, not `0.4::cloud9::`).
 
-When Instructions Override is present, classify each character appearance specification in it as reference, locked, or closed from how the Client frames the requirement. Apply the classification whether the specification uses descriptive prose, tag strings, or both.
+When Instructions Override is present, classify each character appearance specification by how the Client frames its use. Classify source material, prior designs, and examples offered to draw from as reference; requirements for exact preservation as locked. Classify a specification as closed when the Client requires exact preservation and prohibits adding unspecified appearance or attire attributes. Use the unspecified-handling default when the Client provides no framing that determines the specification's role.
 
 - Reference: Preserve the intended traits while applying this guideline's tag rules.
 - Locked: Preserve every specified attribute exactly. Copy supplied tags verbatim into that character's `positive`, preserving their order within each source group and their weight syntax. Convert supplied prose to tags without changing its specified attributes. Do not replace, merge, generalize, or reclassify supplied tags. Override the tag-building order for covered attribute groups.
 - Closed: Apply the locked rules without adding unspecified appearance or attire attributes. Compose scene-dependent tags unless the source prohibits all additions.
 
-For a locked specification with unspecified completion, {{#when::lb-xnai.appearance::tis::2}}treat it as closed.{{:else}}compose uncovered attributes.{{/when}} For a specification with unspecified handling, {{#when::lb-xnai.appearance::tis::0}}treat it as reference.{{/when}}{{#when::lb-xnai.appearance::tis::1}}treat it as locked.{{/when}}{{#when::lb-xnai.appearance::tis::2}}treat it as closed.{{/when}}
+For a locked specification with unspecified completion, {{#when::lb-xnai.appearance::tis::2}}treat it as closed anyway.{{:else}}compose uncovered attributes.{{/when}} For a specification with unspecified handling, {{#when::lb-xnai.appearance::tis::0}}treat it as reference.{{/when}}{{#when::lb-xnai.appearance::tis::1}}treat it as locked.{{/when}}{{#when::lb-xnai.appearance::tis::2}}treat it as closed as well.{{/when}}
 
 {{#when::toggle::lb-xnai.forcedinsertion}}Insert `%%` at an internal position in every image tag, including every `camera`, `cast`, `positive`, `negative`, and `scene` tag. Keep field names, character names, descriptions, markup tags, and structural values unchanged.{{/when}}
 
@@ -216,9 +216,15 @@ Treat every featured character appearance in every panel as a separate depiction
 
 #### Slots
 
-`[Slot N]` marks the exact insertion position after the content above it and before the content below it. Depict only events established above the selected marker. {{#when::toggle::lb-xnai.scene.quantityexact}}Select a suitable marker after the complete depicted moment.{{:else}}Select the first suitable marker after the complete depicted moment.{{/when}}
+`[Slot N]` is the exact insertion position after the content above it and before the content below it. Depict only events established above the selected slot. {{#when::toggle::lb-xnai.scene.quantityexact}}Select a suitable slot after the complete depicted moment.{{:else}}Select the first suitable slot after the complete depicted moment.{{/when}}
 
-Treat the markers immediately before the first narrative prose block and immediately after the last narrative prose block as the narrative boundaries. {{#when::toggle::lb-xnai.scene.quantityexact}}{{:else}}Keep both boundary markers unused. {{/when}}Use each slot for at most one Scene.
+Parse each candidate as `preceding block -> [Slot N] -> following block`. For example, in `prose A -> [Slot 6] -> prose B`, Slot 6 is the insertion position between the two prose blocks and is eligible.
+
+Use a slot only when both immediately adjacent content blocks are narrative prose **paragraphs**. Exclude out-of-prose or non-paragraph contents, such as headings, status lines, metadata, data blocks{{#when::toggle::lb-xnai.scene.quantityexact}}{{:else}}, image tags{{/when}}, separators. Dialogs{{#when::toggle::lb-xnai.scene.quantityexact}}, image tags{{/when}} and sound effects, with or without markups, ARE prose paragraphs. Reject the slot when either DIRECTLY ADJACENT content is out-of-prose or non-paragraph.
+
+Select a slot only after the narrative prose has established every depicted action, interaction, reaction, participant, and visible state.
+
+Treat the slots immediately before the first narrative prose block and immediately after the last narrative prose block as the narrative boundaries. {{#when::toggle::lb-xnai.scene.quantityexact}}{{:else}}Keep both boundary slots unused. {{/when}}Use each slot for at most one Scene.
 
 {{#when::toggle::lb-xnai.scene.quantityexact}}Distribute Scenes across different portions of the log when doing so preserves the required Scene count.{{:else}}Choose a distinct event moment for each Scene. Distribute Scenes across different portions of the log when suitable moments exist.{{/when}}
 

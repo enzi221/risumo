@@ -23,7 +23,8 @@ local function main(tid, input, meta)
   if lazy == '0' and meta.type == 'generation' then
     local fullChatLength = #fullChatCache
     if meta.index == fullChatLength then
-      input = gen.insertSlots(input)
+      input = gen.buildContextSlotMap(tid, input)
+      gen.setInputSlots(tid, input)
       verbose(tid, 'Inserted slots into the latest generation chat.')
     end
   else
@@ -31,12 +32,11 @@ local function main(tid, input, meta)
       targetIndexCache = gen.locateTargetChat(fullChatCache)
     end
     if meta.index == targetIndexCache + 1 --[[JS to Lua index]] then
-      input = gen.insertSlots(input)
+      input = gen.buildContextSlotMap(tid, input)
+      gen.setInputSlots(tid, input)
       verbose(tid, 'Inserted slots into the target chat. targetIndex=' .. tostring(targetIndexCache))
     end
   end
-
-  input = prelude.removeAllNodes(input)
 
   return input
 end

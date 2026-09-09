@@ -8,9 +8,9 @@ The following template is your internal guide. Reason through it thoroughly, eve
 {{/reason-internal}}
 
 1. Interaction Action: `[Action, Selected Chat Index, Selected Slot]`
-2. Slot Context: `[Exact Slot Marker, Complete Depicted Moment Before Marker, Closest Prose After Marker for Continuity, Narrative State at Marker]`
+2. Slot Context: `[Exact Insertion Slot, Complete Depicted Moment Before Slot, Closest Prose After Slot for Continuity, Narrative State at Slot]`
 3. Eligible Featured Cast: `[Character, Eligibility Basis, Established Appearance or Generic Nondescript Design][]`
-4. Selected Scene: `[Event Completed Before Slot Marker, Eligible Visual Cast, Omitted Ineligible Participants, Featured Cast, Cast, Anonymous Background, Focal Information]`
+4. Selected Scene: `[Event Completed Before Insertion Slot, Eligible Visual Cast, Omitted Ineligible Participants, Featured Cast, Cast, Anonymous Background, Focal Information]`
 {{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.characters}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.characters}} != null }}}}}}{{#when::keep::lb-xnai.scene.comic::tis::0}}   - Limit the Scene to {{getglobalvar::toggle_lb-xnai.characters}} completely visible featured characters.
 {{/when}}{{/when}}
 {{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.characters}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.characters}} != null }}}}}}{{#when::keep::lb-xnai.scene.comic::tisnot::0}}   - Limit the Scene to {{getglobalvar::toggle_lb-xnai.characters}} distinct completely visible featured characters across all panels.
@@ -23,13 +23,13 @@ The following template is your internal guide. Reason through it thoroughly, eve
 7. Character Depictions: `[Character Entry, Hair, Eyes, Skin or Species, Body Type, Attire, Expression, Exposed Body Parts, Character Description, Base Posture, Action, Interaction, Frame Position, Depth Position][]`
 8. Validation:
 {{/when}}   - Client Instruction: `[pass or corrected]`
-   - Exact Slot Marker, Complete Preceding Moment, and Single Scene: `[pass or corrected]`
+   - Exact Insertion Slot, Complete Preceding Moment, and Single Scene: `[pass or corrected]`
    - Featured Character Eligibility and Appearance Handling: `[pass or corrected]`
 {{#when::keep::lb-xnai.scene.comic::tis::0}}   - Scene Cast Field and Character Array: `[pass or corrected]`
 {{/when}}{{#when::keep::lb-xnai.scene.comic::tisnot::0}}   - Scene-Wide Cast Union and Panel Character Arrays: `[pass or corrected]`
 {{/when}}
    - Appearance Groups, Character Descriptions, Posture, Action, and Visibility: `[pass or corrected]`
 {{#when::lb-xnai.scene.comic::tisnot::0}}   - Panel Objects and Panel-Scoped Depiction Entries: `[pass or corrected]`
-{{/when}}   - Interaction Marker: `[pass or corrected]`
+{{/when}}   - Interaction Slot: `[pass or corrected]`
 
 Fix every failed check before producing the final data.
