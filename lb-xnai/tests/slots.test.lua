@@ -111,6 +111,11 @@ describe('XNAI slot mapping', function()
     narrative
     </response>
 
+    <Thoughts>
+    hidden reasoning
+    across multiple lines
+    </Thoughts>
+
     ---
     [LBDATA START]
     <lb-lazy id="lb-news" />
@@ -124,12 +129,26 @@ describe('XNAI slot mapping', function()
     local preservedActual = onInput('preserve-test', preservedInput, { index = 1, type = 'generation' })
     test.assertTrue(preservedActual:find('<response kind="story">', 1, true) ~= nil, 'onInput preserves arbitrary XML')
     test.assertTrue(preservedActual:find('<lb-lazy id="lb-news" />', 1, true) ~= nil, 'onInput preserves lazy XML')
+    test.assertTrue(preservedActual:find('<Thoughts>', 1, true) == nil, 'onInput removes Thoughts XML')
     local preservedResponse = prelude.queryNodes('response', preservedActual)[1]
     test.assertTrue(preservedResponse and slots(preservedResponse.content) ~= '', 'onInput inserts slots inside arbitrary XML')
     local preservedLBDATA = preservedActual:match('%[LBDATA START%](.-)%[LBDATA END%]') or ''
     test.assertEquals(slots(preservedLBDATA), '', 'onInput does not insert slots inside LBDATA')
     local _, preservedOutputSlots = gen.buildContextSlotMap('preserve-test', preservedInput)
     test.assertEquals(slots(preservedActual), slots(preservedOutputSlots), 'onInput and onOutput use matching slot maps')
+    test.assertTrue(preservedOutputSlots:find('hidden reasoning', 1, true) == nil,
+      'onOutput slot mapping excludes Thoughts content')
+    globalVars['toggle_lightboard.preserveXML'] = nil
+  end)
+
+  it('restores Thoughts when composing scene insertions', function()
+    globalVars['toggle_lightboard.preserveXML'] = '1'
+    response = { scenes = { descriptor(0) } }
+    local output = onOutput('thoughts-test', '<lb-xnai>data</lb-xnai>',
+      'A\n<Thoughts>hidden\nreasoning</Thoughts>\nB', 22)
+    test.assertTrue(output:find('<Thoughts>hidden\nreasoning</Thoughts>', 1, true) ~= nil,
+      'Thoughts XML is restored')
+    test.assertTrue(output:find('scene="0"', 1, true) ~= nil, 'Scene uses the cleaned slot map')
     globalVars['toggle_lightboard.preserveXML'] = nil
   end)
 

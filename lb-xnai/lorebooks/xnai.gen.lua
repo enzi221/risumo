@@ -400,6 +400,14 @@ local function buildContextSlotMap(triggerId, text)
     return buildSlotMap(text)
   end
 
+  local thoughtValues = {}
+  local thoughts = prelude.queryNodes('Thoughts', text)
+  for index = #thoughts, 1, -1 do
+    local node = thoughts[index]
+    thoughtValues[index] = text:sub(node.rangeStart, node.rangeEnd)
+    text = text:sub(1, node.rangeStart - 1) .. '\0XNAIT_' .. tostring(index) .. '\0' .. text:sub(node.rangeEnd + 1)
+  end
+
   local saved = {}
   local function mask(value)
     saved[#saved + 1] = value
@@ -415,16 +423,28 @@ local function buildContextSlotMap(triggerId, text)
         .. masked:sub(node.rangeEnd + 1)
   end
   masked = masked:gsub('<[^>]+>', mask)
+  masked = masked:gsub('\0XNAIT_(%d+)\0', '<XNAIThoughtRef index="%1" />')
 
   local _, slotted, restoreNodes = buildSlotMap(masked)
-  local function restore(value)
+  local function restoreMasked(value)
     local restored = restoreNodes(value)
     return (restored:gsub('\0XNAIR_(%d+)\0', function(index)
       return saved[tonumber(index)]
     end))
   end
+  local function replaceThoughtRefs(value, keepThoughts)
+    local function replacement(index)
+      return keepThoughts and thoughtValues[tonumber(index)] or ''
+    end
 
-  return restore(slotted), slotted, restore
+    value = value:gsub('<XNAIThoughtRef index="(%d+)" />', replacement)
+    return (value:gsub('\0XNAIT_(%d+)\0', replacement))
+  end
+  local function restore(value)
+    return replaceThoughtRefs(restoreMasked(value), true)
+  end
+
+  return replaceThoughtRefs(restoreMasked(slotted), false), slotted, restore
 end
 
 local inputSlots = {}
