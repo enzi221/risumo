@@ -47,12 +47,7 @@ local function applyInteraction(tid, response, fullChatContent, index, gen)
     return nil, '<lb-lazy id="lb-xnai" />'
   end
 
-  local interactionTarget = getState(tid, 'lb-xnai-interaction-target')
-  if interactionTarget and interactionTarget.chatIndex ~= index then
-    return nil, '<lb-lazy id="lb-xnai" />'
-  end
-
-  local slot = interactionTarget and interactionTarget.slot or tostring(scene.slot)
+  local slot = tostring(scene.slot)
   info(tid, 'Applying interaction. chatIndex=' .. tostring(index) .. ', slot=' .. tostring(slot))
   scene.slot = tonumber(slot)
   local xnaiState = getState(tid, 'lb-xnai-stack') or {}
@@ -104,7 +99,6 @@ local function applyInteraction(tid, response, fullChatContent, index, gen)
     })
   end
 
-  setState(tid, 'lb-xnai-interaction-target', nil)
   local replacedText, replaced, availableSlots = replaceSceneNode(tid, fullChatContent, slot, replacement, gen)
   if not replaced then
     info(tid, 'Interaction scene insertion failed. slot=' .. tostring(slot) ..

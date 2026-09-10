@@ -447,6 +447,13 @@ local function validateSceneSlots(tid, scenes, slotted)
     available[tonumber(slot)] = true
     labels[#labels + 1] = slot
   end
+  for _, node in ipairs(prelude.queryNodes('lb-xnai', source)) do
+    local slot = tonumber(node.attributes.scene)
+    if slot and not available[slot] then
+      available[slot] = true
+      labels[#labels + 1] = tostring(slot)
+    end
+  end
 
   local errors = {}
   local used = {}

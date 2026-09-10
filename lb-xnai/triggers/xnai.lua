@@ -429,17 +429,6 @@ onButtonClick = async(function(tid, code)
   setTriggerId(tid)
   verbose('Button clicked. code=' .. tostring(code))
 
-  local interactionChatIndex, interactionSlot = code:match(
-    '^lb%-interaction__lb%-xnai__.-#RegenerateScene/ChatIndex:(%-?%d+)/Slot:(%d+)$'
-  )
-  if interactionChatIndex and interactionSlot then
-    setState(tid, 'lb-xnai-interaction-target', {
-      chatIndex = tonumber(interactionChatIndex),
-      slot = interactionSlot,
-    })
-    return
-  end
-
   if code == 'lb-xnai-clearHistory' then
     return cleanHandler.clearHistory(tid)
   end

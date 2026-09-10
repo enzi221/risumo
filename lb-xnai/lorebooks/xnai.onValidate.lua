@@ -127,26 +127,7 @@ local function validateNode(errors, tid, node, label, gen, comic)
     for sceneIndex, desc in ipairs(response.scenes or {}) do
       validateDescriptor(errors, desc, label .. ', scene ' .. (sceneIndex - 1), comic, true)
     end
-    local scenes = response.scenes
-    local slotted = nil
-    if response.interaction == true then
-      local target = getState(tid, 'lb-xnai-interaction-target')
-      if target then
-        local chat = getChat(tid, target.chatIndex)
-        slotted = ''
-        if chat then
-          local nodes = prelude.queryNodes('lb-xnai', chat.data, { scene = tostring(target.slot) })
-          if #nodes > 0 then
-            slotted = '[Slot ' .. tostring(target.slot) .. ']'
-          else
-            local _, mappedSlots = gen.buildContextSlotMap(tid, chat.data)
-            slotted = mappedSlots
-          end
-        end
-        scenes = { { slot = tonumber(target.slot) } }
-      end
-    end
-    for _, slotError in ipairs(gen.validateSceneSlots(tid, scenes, slotted)) do
+    for _, slotError in ipairs(gen.validateSceneSlots(tid, response.scenes)) do
       table.insert(errors, slotError)
     end
   end

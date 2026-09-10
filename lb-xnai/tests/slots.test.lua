@@ -163,7 +163,7 @@ describe('XNAI slot mapping', function()
       'Changed text causes no image generation or persistence')
   end)
 
-  it('replaces an existing interaction target only after validation', function()
+  it('uses the interaction response slot instead of a stale target state', function()
     local beforeGeneration = generated
     local beforePersistence = persisted
     local target = { chatIndex = 22, slot = '47' }
@@ -173,26 +173,25 @@ describe('XNAI slot mapping', function()
       end
       return { { chatIndex = 22, data = { scenes = {} }, operationID = 'previous' } }
         end
-        getChat = function()
-      return { data = 'A\n<lb-xnai scene="47">image</lb-xnai>\nB' }
-        end
+    local interactionText = 'A\n<lb-xnai scene="47">image</lb-xnai>\nB'
+        gen.setInputSlots('test', interactionText)
         response = { interaction = true, scenes = { descriptor(47) } }
         test.assertTrue(pcall(onValidate, 'test', '<lb-xnai>data</lb-xnai>'), 'Existing interaction node remains eligible')
         getChat = function()
       return { data = 'A\nB' }
         end
+        gen.setInputSlots('test', 'A\nB')
         test.assertTrue(not pcall(onValidate, 'test', '<lb-xnai>data</lb-xnai>'), 'Missing interaction location fails validation')
         test.assertTrue(not pcall(onOutput, 'test', '<lb-xnai>data</lb-xnai>', 'A\nB', 22),
       'Missing interaction location fails before generation')
         test.assertTrue(generated == beforeGeneration and persisted == beforePersistence,
       'Invalid interaction causes no image generation or persistence')
-        getChat = function()
-      return { data = 'A\n<lb-xnai scene="47">image</lb-xnai>\nB' }
-        end
         setState = function() end
-        local interactionOutput = onOutput('test', '<lb-xnai>data</lb-xnai>', getChat().data, 22)
-        test.assertTrue(interactionOutput:find('scene="47">{{inlay::test}}', 1, true) ~= nil,
-      'Existing interaction location is replaced')
+        response = { interaction = true, scenes = { descriptor(18) } }
+        local interactionOutput = onOutput('test', '<lb-xnai>data</lb-xnai>',
+          'A\n<lb-xnai scene="18">image</lb-xnai>\nB', 22)
+        test.assertTrue(interactionOutput:find('scene="18">{{inlay::test}}', 1, true) ~= nil,
+      'Response slot replaces its existing interaction location')
         test.assertEquals(generated, beforeGeneration + 1, 'Valid interaction generates one image')
   end)
 
