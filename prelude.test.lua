@@ -4,35 +4,9 @@ local test = require('test')
 local prelude = require('prelude')
 
 local assertEquals = test.assertEquals
+local assertDeepEquals = test.assertDeepEquals
 local describe = test.describe
 local it = test.it
-
-local function deepEqual(t1, t2)
-  if type(t1) ~= type(t2) then return false end
-  if type(t1) ~= "table" then return t1 == t2 end
-
-  local count1, count2 = 0, 0
-  for k, v in pairs(t1) do
-    count1 = count1 + 1
-    if not deepEqual(v, t2[k]) then return false end
-  end
-  for _ in pairs(t2) do count2 = count2 + 1 end
-
-  return count1 == count2
-end
-
-local function assertDeepEquals(actual, expected, message)
-  test.incrementTotal()
-  if deepEqual(actual, expected) then
-    test.incrementPassed()
-    print("✓ " .. message)
-  else
-    test.incrementFailed()
-    print("✗ " .. message)
-    print("  Expected: " .. test.tableToString(expected))
-    print("  Actual:   " .. test.tableToString(actual))
-  end
-end
 
 describe('queryNodes', function()
   it("extracts simple node", function()

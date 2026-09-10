@@ -1,59 +1,10 @@
-local sourcePath = debug.getinfo(1, 'S').source:sub(2)
-local lorebookDirectory = sourcePath:match('^(.*[/\\])') or ''
-local test = assert(loadfile(lorebookDirectory .. '../../test.lua'))()
-local applyJSONPatch = assert(loadfile(lorebookDirectory .. 'json-patch.lua'))()
+local test = require('test')
+local applyJSONPatch = require('json-patch')
 
 local describe = test.describe
 local it = test.it
-
-local function deepEqual(left, right)
-  if type(left) ~= type(right) then
-    return false
-  end
-  if type(left) ~= 'table' then
-    return left == right
-  end
-
-  local leftCount = 0
-  local rightCount = 0
-  for key, value in pairs(left) do
-    leftCount = leftCount + 1
-    if not deepEqual(value, right[key]) then
-      return false
-    end
-  end
-  for _ in pairs(right) do
-    rightCount = rightCount + 1
-  end
-  return leftCount == rightCount
-end
-
-local function assertDeepEquals(actual, expected, message)
-  test.incrementTotal()
-  if deepEqual(actual, expected) then
-    test.incrementPassed()
-    print('✓ ' .. message)
-  else
-    test.incrementFailed()
-    print('✗ ' .. message)
-    print('  Expected: ' .. test.tableToString(expected))
-    print('  Actual:   ' .. test.tableToString(actual))
-  end
-end
-
-local function assertFails(callback, expected, message)
-  test.incrementTotal()
-  local success, result = pcall(callback)
-  if not success and tostring(result):find(expected, 1, true) then
-    test.incrementPassed()
-    print('✓ ' .. message)
-  else
-    test.incrementFailed()
-    print('✗ ' .. message)
-    print('  Expected error containing: ' .. expected)
-    print('  Actual: ' .. tostring(result))
-  end
-end
+local assertDeepEquals = test.assertDeepEquals
+local assertFails = test.assertFails
 
 describe('add', function()
   it('appends an array value', function()

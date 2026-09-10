@@ -8,6 +8,7 @@
     "build:charx": "risupack build-charx",
     "bundle:lua": "risupack bundle-lua",
     "inspect:risusave": "risupack inspect-risusave",
+    "test": "node scripts/test.mjs",
     "unpack:charx": "risupack unpack-charx",
     "unpack:risum": "risupack unpack-risum"
   },

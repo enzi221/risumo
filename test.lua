@@ -17,6 +17,59 @@ function framework.assertEquals(actual, expected, message)
   end
 end
 
+function framework.assertTrue(condition, message)
+  framework.assertEquals(not not condition, true, message)
+end
+
+function framework.deepEqual(left, right)
+  if type(left) ~= type(right) then
+    return false
+  end
+  if type(left) ~= 'table' then
+    return left == right
+  end
+
+  local leftCount = 0
+  local rightCount = 0
+  for key, value in pairs(left) do
+    leftCount = leftCount + 1
+    if not framework.deepEqual(value, right[key]) then
+      return false
+    end
+  end
+  for _ in pairs(right) do
+    rightCount = rightCount + 1
+  end
+  return leftCount == rightCount
+end
+
+function framework.assertDeepEquals(actual, expected, message)
+  framework.incrementTotal()
+  if framework.deepEqual(actual, expected) then
+    framework.incrementPassed()
+    print('✓ ' .. message)
+  else
+    framework.incrementFailed()
+    print('✗ ' .. message)
+    print('  Expected: ' .. framework.tableToString(expected))
+    print('  Actual:   ' .. framework.tableToString(actual))
+  end
+end
+
+function framework.assertFails(callback, expected, message)
+  framework.incrementTotal()
+  local success, result = pcall(callback)
+  if not success and tostring(result):find(expected, 1, true) then
+    framework.incrementPassed()
+    print('✓ ' .. message)
+  else
+    framework.incrementFailed()
+    print('✗ ' .. message)
+    print('  Expected error containing: ' .. expected)
+    print('  Actual: ' .. tostring(result))
+  end
+end
+
 function framework.describe(name, fn)
   print("\n" .. name)
   fn()

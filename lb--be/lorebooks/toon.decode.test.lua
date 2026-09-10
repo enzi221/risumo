@@ -1,60 +1,12 @@
 _ENV.prelude = {}
 
-local sourcePath = debug.getinfo(1, 'S').source:sub(2)
-local lorebookDirectory = sourcePath:match('^(.*[/\\])') or ''
-local test = assert(loadfile(lorebookDirectory .. '../../test.lua'))()
-local toon = assert(loadfile(lorebookDirectory .. 'toon.decode.lua'))()
+local test = require('test')
+local toon = require('toon.decode')
 
 local assertEquals = test.assertEquals
+local assertDeepEquals = test.assertDeepEquals
 local describe = test.describe
 local it = test.it
-
-local function deepEqual(t1, t2)
-  if type(t1) ~= type(t2) then return false end
-  if type(t1) ~= "table" then return t1 == t2 end
-
-  local count1, count2 = 0, 0
-  for k, v in pairs(t1) do
-    count1 = count1 + 1
-    if not deepEqual(v, t2[k]) then return false end
-  end
-  for _ in pairs(t2) do count2 = count2 + 1 end
-
-  return count1 == count2
-end
-
-local function tableToString(t, indent)
-  indent = indent or 0
-  if type(t) ~= "table" then
-    return tostring(t)
-  end
-  local str = "{"
-  local first = true
-  for k, v in pairs(t) do
-    if not first then str = str .. ", " end
-    first = false
-    str = str .. "[" .. tostring(k) .. "]="
-    if type(v) == "table" then
-      str = str .. tableToString(v, indent + 1)
-    else
-      str = str .. tostring(v)
-    end
-  end
-  return str .. "}"
-end
-
-local function assertDeepEquals(actual, expected, message)
-  test.incrementTotal()
-  if deepEqual(actual, expected) then
-    test.incrementPassed()
-    print("✓ " .. message)
-  else
-    test.incrementFailed()
-    print("✗ " .. message)
-    print("  Expected: " .. tableToString(expected))
-    print("  Actual:   " .. tableToString(actual))
-  end
-end
 
 describe("primitives", function()
   it("decodes safe unquoted strings", function()
@@ -117,14 +69,7 @@ describe("objects (simple)", function()
   it("parses null values in objects", function()
     local toon_str = "id: 123\nvalue: null"
     local result = toon.decode(toon_str)
-    test.incrementTotal()
-    if result.id == 123 and result.value == nil then
-      test.incrementPassed()
-      print("✓ parse object with null value")
-    else
-      test.incrementFailed()
-      print("✗ parse object with null value")
-    end
+    assertEquals(result.id == 123 and result.value == nil, true, 'parse object with null value')
   end)
 
   it("parses empty nested object header", function()
@@ -251,16 +196,9 @@ describe("arrays of objects (tabular and list items)", function()
   it("parses nulls and quoted values in tabular rows", function()
     local toon_str = 'items[2]{id,value}:\n  1,null\n  2,"test"'
     local result = toon.decode(toon_str)
-    test.incrementTotal()
-    if result.items and #result.items == 2 and
+    assertEquals(result.items and #result.items == 2 and
         result.items[1].id == 1 and result.items[1].value == nil and
-        result.items[2].id == 2 and result.items[2].value == "test" then
-      test.incrementPassed()
-      print("✓ parse tabular with null values")
-    else
-      test.incrementFailed()
-      print("✗ parse tabular with null values")
-    end
+        result.items[2].id == 2 and result.items[2].value == "test", true, 'parse tabular with null values')
   end)
 
   it("parses quoted header keys in tabular arrays", function()
@@ -331,7 +269,7 @@ keyvis:
   end)
 
   it("normalizes mixed tabular row markers on round trip", function()
-    local encoder = assert(loadfile(lorebookDirectory .. 'toon.encode.lua'))()
+    local encoder = require('toon.encode')
     local value = toon.decode("items[2]{name,count}:\n  - apple,3\n  banana,2")
     local canonical = "items[2]{name,count}:\n  apple,3\n  banana,2"
     assertEquals(encoder.encode(value), canonical, "encode without row markers")

@@ -1,10 +1,8 @@
 _ENV.prelude = {}
 
-local sourcePath = debug.getinfo(1, 'S').source:sub(2)
-local lorebookDirectory = sourcePath:match('^(.*[/\\])') or ''
-local test = assert(loadfile(lorebookDirectory .. '../../test.lua'))()
-local toon = assert(loadfile(lorebookDirectory .. 'toon.encode.lua'))()
-local toonDecoder = assert(loadfile(lorebookDirectory .. 'toon.decode.lua'))()
+local test = require('test')
+local toon = require('toon.encode')
+local toonDecoder = require('toon.decode')
 
 local assertEquals = test.assertEquals
 local describe = test.describe
@@ -80,22 +78,13 @@ describe("objects (simple)", function()
   it("preserves key order in objects", function()
     local obj = { id = 123, name = "Ada", active = true }
     local result = toon.encode(obj)
-    local stats = test.getStats()
-    assert(result:find("id: 123"), "should contain 'id: 123'")
-    assert(result:find("name: Ada"), "should contain 'name: Ada'")
-    assert(result:find("active: true"), "should contain 'active: true'")
-    print("✓ preserves key order in objects (keys present)")
-    stats.total = stats.total + 1
-    stats.passed = stats.passed + 1
+    assertEquals(result:find("id: 123") ~= nil and result:find("name: Ada") ~= nil
+      and result:find("active: true") ~= nil, true, 'preserves key order in objects')
   end)
 
   it("encodes null values in objects", function()
     local result = toon.encode({ id = 123 })
-    local stats = test.getStats()
-    assert(result:find("id: 123"), "should contain 'id: 123'")
-    print("✓ encodes null values in objects (Lua limitation: nil not stored in tables)")
-    stats.total = stats.total + 1
-    stats.passed = stats.passed + 1
+    assertEquals(result:find("id: 123") ~= nil, true, 'encodes object fields with nil omitted')
   end)
 
   it("encodes empty objects as empty string", function()
@@ -222,20 +211,13 @@ describe("arrays of objects (tabular)", function()
       }
     }
     local result = toon.encode(obj)
-    local stats = test.getStats()
-    assert(result:find("items%[2%]"), "should have array header")
-    assert(result:find("A1"), "should contain A1")
-    assert(result:find("B2"), "should contain B2")
-    print("✓ encodes arrays of similar objects in tabular format")
-    stats.total = stats.total + 1
-    stats.passed = stats.passed + 1
+    assertEquals(result:find("items%[2%]") ~= nil and result:find("A1") ~= nil and result:find("B2") ~= nil,
+      true, 'encodes arrays of similar objects in tabular format')
   end)
 
   it("handles null values in tabular format", function()
-    local stats = test.getStats()
-    print("✓ handles null values in tabular format (skipped - Lua limitation)")
-    stats.total = stats.total + 1
-    stats.passed = stats.passed + 1
+    assertEquals(toon.encode({ items = { { id = 1 } } }), 'items[1]{id}:\n  1',
+      'omits nil fields in tabular rows')
   end)
 end)
 
@@ -248,11 +230,7 @@ describe("arrays of arrays", function()
   it("handles empty inner arrays", function()
     local obj = { pairs = { {}, {} } }
     local result = toon.encode(obj)
-    local stats = test.getStats()
-    assert(result:find("pairs"), "should contain pairs")
-    print("✓ handles empty inner arrays (empty tables as objects)")
-    stats.total = stats.total + 1
-    stats.passed = stats.passed + 1
+    assertEquals(result:find("pairs") ~= nil, true, 'handles empty inner arrays')
   end)
 
   it("handles mixed-length inner arrays", function()
@@ -270,11 +248,7 @@ describe("root arrays", function()
   it("encodes arrays of similar objects in tabular format", function()
     local arr = { { id = 1 }, { id = 2 } }
     local result = toon.encode(arr)
-    local stats = test.getStats()
-    assert(result:find("%[2%]"), "should have array header")
-    print("✓ encodes arrays of similar objects in tabular format")
-    stats.total = stats.total + 1
-    stats.passed = stats.passed + 1
+    assertEquals(result:find("%[2%]") ~= nil, true, 'encodes root arrays of similar objects')
   end)
 
   it("indents every field in non-tabular object items beneath the array item", function()
@@ -427,34 +401,13 @@ describe("whitespace and formatting invariants", function()
       items = { "a", "b" }
     }
     local result = toon.encode(obj)
-    local stats = test.getStats()
-    for line in result:gmatch("[^\n]+") do
-      if line:match(" $") then
-        stats.failed = stats.failed + 1
-        stats.total = stats.total + 1
-        print("✗ produces no trailing spaces")
-        print("  Line has trailing space: " .. line)
-        return
-      end
-    end
-    stats.passed = stats.passed + 1
-    stats.total = stats.total + 1
-    print("✓ produces no trailing spaces at end of lines")
+    assertEquals(result:find("[ \t]\n") == nil, true, 'produces no trailing spaces at end of lines')
   end)
 
   it("produces no trailing newline at end of output", function()
     local obj = { id = 123 }
     local result = toon.encode(obj)
-    local stats = test.getStats()
-    if result:match("\n$") then
-      stats.failed = stats.failed + 1
-      stats.total = stats.total + 1
-      print("✗ produces no trailing newline")
-    else
-      stats.passed = stats.passed + 1
-      stats.total = stats.total + 1
-      print("✓ produces no trailing newline at end of output")
-    end
+    assertEquals(result:match("\n$") == nil, true, 'produces no trailing newline at end of output')
   end)
 end)
 
