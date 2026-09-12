@@ -47,7 +47,7 @@ local function render(triggerId, data, options)
             h.span['lb-mini-time'] {
               (comment.time or '')
             },
-            h.button['lb-mini-icon-btn lb-mini-delete-comment'] {
+            h.button['lb-mini-delete-comment'] {
               risu_btn = 'lb-mini-delete/' .. chatIndex .. '_' .. pi .. '_' .. ci,
               title = '댓글 삭제',
               type = 'button',
@@ -60,26 +60,32 @@ local function render(triggerId, data, options)
         table.insert(comment_es, comment_e)
       end
 
+      local commentCount = #post.comments
+      local commentCount_e = nil
+      if commentCount > 0 then
+        commentCount_e = h.span['lb-mini-comment-count'] {
+          '[' .. commentCount .. ']'
+        }
+      end
+
       table.insert(post_es, h.details['lb-mini-post'] {
         name = 'lb-mini-post',
         h.summary['lb-mini-post-summary'] {
-          h.div['lb-mini-post-title-container'] {
+          h.div['lb-mini-post-title-row'] {
             h.span['lb-mini-post-title-text'] {
               post.title,
             },
-            h.div['lb-mini-meta'] {
-              h.span['lb-mini-author'] {
-                post.author,
-              },
-              h.span['lb-mini-time'] {
-                post.time,
-              },
-              h.span {
-                '▲ ' .. post.upvotes,
-              },
-              h.span {
-                '▼ ' .. post.downvotes,
-              },
+            commentCount_e,
+          },
+          h.div['lb-mini-meta'] {
+            h.span['lb-mini-author'] {
+              post.author,
+            },
+            h.span['lb-mini-time'] {
+              post.time,
+            },
+            h.span['lb-mini-votes'] {
+              '▲ ' .. post.upvotes .. '  ▼ ' .. post.downvotes,
             },
           },
         },
@@ -87,19 +93,20 @@ local function render(triggerId, data, options)
           h.p {
             post.content,
           },
-          h.hr['lb-mini-hr'] { void = true },
-          h.div['lb-mini-rowgap lb-mini-comments'] {
+          h.div['lb-mini-comments'] {
             h.div['lb-mini-comments-header'] {
-              h.span['lb-mini-comments-heading'] '댓글',
+              h.span['lb-mini-comments-heading'] {
+                '댓글 ' .. commentCount,
+              },
               h.div['lb-mini-comments-actions'] {
-                h.button['lb-mini-btn'] {
+                h.button['lb-mini-subtle-btn'] {
                   risu_btn = 'lb-mini-delete/' .. chatIndex .. '_' .. pi,
                   title = '게시글 삭제',
                   type = 'button',
                   h.lb_trash_icon { closed = true },
                   '삭제'
                 },
-                h.button['lb-mini-btn'] {
+                h.button['lb-mini-subtle-btn'] {
                   risu_btn = 'lb-interaction__lb-mini__AddComment/Title:' .. post.title,
                   type = 'button',
                   h.lb_comment_icon { closed = true },
@@ -107,7 +114,9 @@ local function render(triggerId, data, options)
                 },
               },
             },
-            comment_es
+            h.div['lb-mini-timeline'] {
+              comment_es,
+            },
           },
         },
       })
@@ -139,31 +148,32 @@ local function render(triggerId, data, options)
         h.button['lb-mini-btn'] {
           risu_btn = 'lb-interaction__lb-mini__ChangeBoard',
           type = 'button',
-          '게시판 둘러보기'
+          '둘러보기'
         },
         h.button['lb-mini-btn'] {
           risu_btn = 'lb-interaction__lb-mini__AddPost',
           style = 'margin-left:auto',
           type = 'button',
-          h.lb_comment_icon { closed = true },
           '게시글 쓰기'
         },
-        h.button['lb-reroll'] {
+        h.button['lb-mini-btn lb-mini-btn-icon lb-reroll'] {
           risu_btn = 'lb-reroll__lb-mini',
           type = 'button',
           h.lb_reroll_icon { closed = true }
         },
       },
       h.div['lb-mini-wrap'] {
-        h.div['lb-mini-container lb-mini-rowgap'] {
+        h.div['lb-mini-container'] {
           post_es,
         },
       },
-      h.button['lb-mini-close'] {
-        popovertarget = id,
-        type = 'button',
-        '닫기',
-      }
+      h.div['lb-mini-footer'] {
+        h.button['lb-mini-close'] {
+          popovertarget = id,
+          type = 'button',
+          '닫기',
+        },
+      },
     },
   }
 

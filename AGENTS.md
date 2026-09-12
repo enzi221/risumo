@@ -14,16 +14,34 @@ All lorebook contents are agent-facing texts.
 
 [lightboard](skills/lightboard) is an official Lightboard development skill. Reflect significant changes or new features of `lb--be`, the backend, into the skill and [version history](skills/lightboard/references/version-history.md), if and only if external frontend module developers should be aware of it.
 
+Refer to this skill for CBS API/syntax and Risuai's LUA API references as well.
+
+## Validation
+
+LLM output validation should be permissive because LLM requests cost money. If an output can be reconciled, reconcile. If it can be skipped, skip. Do not be a control freak. Have some faith.
+
 ## Bumping version
 
 Each edit does NOT mean a distribution. Do not bump versions unless requested.
 
 Each module's version is defined in `charx.json` AND `toggles.txt`. Bump them simultaneously.
 
-## Building
+## Accessibility
+
+Do care for contrast, keyboard and touch controls, but no need for screen readers, such as `aria-label`. Remove.
+
+## No Overprotectiveness
 
 Do not bother inspecting the built CharX file and its content, you are being overdefensive.
 
-## Validation
+When writing Lua tests, they must meaningful, not testing for the sake of testing which are overprotective AI slop. Test only the module in question. Do not test outside behaviors.
 
-Validation should be permissive because LLM requests cost money. If an output can be reconciled, reconcile.
+When changing contracts and writing a backward compatible code, ask yourself one more time: Is it really necessary? Ephemeral data goes in and never goes out. But you keep writing "backward compatible" codes for non-existent codes. Fuck you.
+
+## Testing
+
+`npm test` is for Lua codes only. No need to test HTML/CSS etc.
+
+## Building
+
+If you'd build a CharX, built into `dist/` not `/tmp/` because it's fucking confusing.

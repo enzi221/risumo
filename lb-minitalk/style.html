@@ -1,0 +1,597 @@
+<style>
+  .lb-module-opener-root[data-id='lb-minitalk'] {
+    --darkness: {{getglobalvar::toggle_lb-minitalk.darkness}};
+    --theme:
+      {{#if_pure {{? {{getglobalvar::toggle_lb-minitalk.theme}}=0 }} }}'♦️'{{/if}}
+      {{#if_pure {{? {{getglobalvar::toggle_lb-minitalk.theme}}=1 }} }}'💎'{{/if}}
+      {{#if_pure {{? {{getglobalvar::toggle_lb-minitalk.theme}}=2 }} }}'✨'{{/if}}
+      {{#if_pure {{? {{getglobalvar::toggle_lb-minitalk.theme}}=3 }} }}'🌳'{{/if}};
+    --icon: var(--theme);
+  }
+
+  .lb-module-opener-root[data-id='lb-minitalk'] > * {
+    --accent: #ff005e;
+    --bg: #fff;
+    --bg-2: #f9f9f9;
+    --border: #e0e0e0;
+    --fg: #282a35;
+    --fg-2: #767b82;
+    --shadow: rgb(0 0 0 / 8%);
+  }
+
+  @container style(--theme: '♦️') and style(--darkness: 0) {
+    .lb-module-opener-root[data-id='lb-minitalk'] > * {
+      --accent: #ff005e;
+    }
+  }
+
+  @container style(--theme: '♦️') and style(--darkness: 1) {
+    .lb-module-opener-root[data-id='lb-minitalk'] > * {
+      --accent: #ff6b9d;
+    }
+  }
+
+  @container style(--theme: '💎') and style(--darkness: 0) {
+    .lb-module-opener-root[data-id='lb-minitalk'] > * {
+      --accent: #007bff;
+    }
+  }
+
+  @container style(--theme: '💎') and style(--darkness: 1) {
+    .lb-module-opener-root[data-id='lb-minitalk'] > * {
+      --accent: #4299e1;
+    }
+  }
+
+  @container style(--theme: '✨') and style(--darkness: 0) {
+    .lb-module-opener-root[data-id='lb-minitalk'] > * {
+      --accent: #d4af37;
+    }
+  }
+
+  @container style(--theme: '✨') and style(--darkness: 1) {
+    .lb-module-opener-root[data-id='lb-minitalk'] > * {
+      --accent: #ecc94b;
+    }
+  }
+
+  @container style(--theme: '🌳') and style(--darkness: 0) {
+    .lb-module-opener-root[data-id='lb-minitalk'] > * {
+      --accent: #2e7d32;
+    }
+  }
+
+  @container style(--theme: '🌳') and style(--darkness: 1) {
+    .lb-module-opener-root[data-id='lb-minitalk'] > * {
+      --accent: #66bb6a;
+    }
+  }
+
+  @container style(--darkness: 1) {
+    .lb-module-opener-root[data-id='lb-minitalk'] > * {
+      --bg: #1e1f23;
+      --bg-2: #26282d;
+      --border: #31343b;
+      --fg: #f0f1f3;
+      --fg-2: #8b8e96;
+      --shadow: rgb(0 0 0 / 45%);
+    }
+  }
+
+  .lb-minitalk-dialog {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 12px 36px var(--shadow);
+    box-sizing: border-box;
+    color: var(--fg);
+    font-family: sans-serif;
+    font-size: 14px;
+    height: 640px;
+    line-height: 1.5;
+    margin: auto;
+    overflow: hidden;
+    padding: 0;
+    text-align: left;
+    width: min(440px, 100%);
+  }
+
+  .lb-minitalk-dialog:popover-open {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+  }
+
+  .lb-minitalk-header {
+    align-items: center;
+    background: var(--bg);
+    border-bottom: 2px solid var(--accent);
+    color: var(--fg);
+    display: flex;
+    gap: 12px;
+    height: 54px;
+    justify-content: space-between;
+    padding: 0 14px;
+  }
+
+  .lb-minitalk-heading {
+    min-width: 0;
+  }
+
+  .lb-minitalk-heading strong {
+    align-items: center;
+    color: var(--fg);
+    display: flex;
+    font-size: 14px;
+    font-weight: 700;
+    gap: 6px;
+    letter-spacing: -0.01em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .lb-minitalk-heading strong::before {
+    content: var(--icon);
+    font-size: 13px;
+  }
+
+  .lb-minitalk-participants {
+    color: var(--fg-2);
+    font-size: 11px;
+    margin: 1px 0 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .lb-minitalk-header-actions,
+  .lb-minitalk-composer {
+    align-items: center;
+    display: flex;
+  }
+
+  .lb-minitalk-header-actions {
+    flex-shrink: 0;
+    gap: 6px;
+  }
+
+  .lb-minitalk-close,
+  .lb-minitalk-icon-button,
+  .lb-minitalk-input-button,
+  .lb-minitalk-room-button {
+    align-items: center;
+    box-sizing: border-box;
+    color: var(--fg);
+    cursor: pointer;
+    display: inline-flex;
+    font: inherit;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  .lb-minitalk-room-button {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: 500;
+    height: 28px;
+    line-height: normal;
+    padding: 0 8px;
+    white-space: nowrap;
+  }
+
+  .lb-minitalk-icon-button {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--fg-2);
+    flex-shrink: 0;
+    height: 28px;
+    padding: 0;
+    width: 28px;
+  }
+
+  .lb-minitalk-icon-button svg {
+    display: block;
+    height: 15px;
+    width: 15px;
+  }
+
+  .lb-minitalk-composer {
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    gap: 8px;
+    padding: 10px 14px;
+  }
+
+  .lb-minitalk-input-button {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--fg-2);
+    flex: 1;
+    font-size: 13px;
+    height: 36px;
+    justify-content: flex-start;
+    min-width: 0;
+    padding: 0 12px;
+    text-align: left;
+  }
+
+  .lb-minitalk-close {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    flex-shrink: 0;
+    font-size: 13px;
+    font-weight: 600;
+    height: 36px;
+    padding: 0 14px;
+  }
+
+  @media (hover: hover) {
+    .lb-minitalk-close:hover,
+    .lb-minitalk-icon-button:hover,
+    .lb-minitalk-room-button:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .lb-minitalk-input-button:hover {
+      border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+      color: var(--fg);
+    }
+  }
+
+  .lb-minitalk-close:focus-visible,
+  .lb-minitalk-icon-button:focus-visible,
+  .lb-minitalk-input-button:focus-visible,
+  .lb-minitalk-room-button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .lb-minitalk-empty {
+    color: var(--fg-2);
+    font-size: 12px;
+    margin: auto;
+  }
+
+  .lb-minitalk-messages {
+    background: var(--bg-2);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 16px 14px;
+    scrollbar-color: var(--border) transparent;
+    scrollbar-width: thin;
+  }
+
+  .lb-minitalk-messages > * {
+    flex-shrink: 0;
+  }
+
+  .lb-minitalk-event {
+    align-self: center;
+    background: color-mix(in srgb, var(--fg-2) 8%, var(--bg));
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--fg-2);
+    display: inline-flex;
+    font-size: 11px;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+    padding: 3px 12px;
+    text-align: center;
+  }
+
+  .lb-minitalk-pause {
+    align-self: center;
+    color: var(--fg-2);
+    font-size: 11px;
+    overflow-wrap: anywhere;
+    text-align: center;
+  }
+
+  .lb-minitalk-skip {
+    align-self: stretch;
+    background: color-mix(in srgb, var(--fg-2) 6%, var(--bg-2));
+    border: 1px solid var(--border);
+    box-shadow: inset 0 1px 1px var(--shadow);
+    box-sizing: border-box;
+    color: var(--fg-2);
+    font-size: 11px;
+    margin: 8px 0;
+    padding: 5px 0;
+    text-align: center;
+    width: 100%;
+  }
+
+  .lb-minitalk-message {
+    --lb-minitalk-accent: var(--accent);
+    --lb-minitalk-bg: var(--bg);
+    --lb-minitalk-bg-2: var(--bg-2);
+    --lb-minitalk-border: var(--border);
+    --lb-minitalk-fg: var(--fg);
+
+    align-self: flex-start;
+    align-items: flex-start;
+    display: flex;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .lb-minitalk-message[data-group-start='true'] {
+    margin-top: 8px;
+  }
+
+  .lb-minitalk-skip + .lb-minitalk-message[data-group-start='true'] {
+    margin-top: 0;
+  }
+
+  .lb-minitalk-message[data-self='true'] {
+    --lb-minitalk-bg: color-mix(in srgb, var(--accent) 12%, var(--bg));
+    --lb-minitalk-border: color-mix(in srgb, var(--accent) 30%, var(--border));
+
+    align-self: flex-end;
+  }
+
+  .lb-minitalk-avatar {
+    --lb-minitalk-avatar-hue: mod(var(--lb-minitalk-avatar-seed), 360);
+    --lb-minitalk-avatar-shape: calc(mod(var(--lb-minitalk-avatar-seed), 997) * 1deg);
+    --lb-minitalk-avatar-deep: hsl(var(--lb-minitalk-avatar-hue) 68% 38%);
+    --lb-minitalk-avatar-light: hsl(calc(var(--lb-minitalk-avatar-hue) + 48) 88% 72%);
+    --lb-minitalk-avatar-mid: hsl(var(--lb-minitalk-avatar-hue) 78% 55%);
+
+    background-color: var(--lb-minitalk-avatar-mid);
+    border: 2px solid var(--bg);
+    border-radius: 50%;
+    box-sizing: border-box;
+    flex: 0 0 34px;
+    height: 34px;
+    overflow: hidden;
+    position: relative;
+    width: 34px;
+  }
+
+  .lb-minitalk-avatar::after {
+    background: linear-gradient(145deg, rgb(255 255 255 / 45%), transparent 42%);
+    content: '';
+    inset: 0;
+    position: absolute;
+  }
+
+  .lb-minitalk-avatar[data-visible='false'] {
+    visibility: hidden;
+  }
+
+  .lb-minitalk-message[data-self='true'] .lb-minitalk-avatar {
+    display: none;
+  }
+
+  .lb-minitalk-avatar[data-pattern='dots'] {
+    background:
+      radial-gradient(
+        circle at calc(50% + cos(var(--lb-minitalk-avatar-shape)) * 34%)
+          calc(50% + sin(var(--lb-minitalk-avatar-shape)) * 34%),
+        var(--lb-minitalk-avatar-light) 0
+          calc(12% + sin(var(--lb-minitalk-avatar-shape)) * 4%),
+        transparent calc(13% + sin(var(--lb-minitalk-avatar-shape)) * 4%)
+      ),
+      radial-gradient(
+        circle at
+          calc(50% + cos(calc(var(--lb-minitalk-avatar-shape) + 120deg)) * 34%)
+          calc(50% + sin(calc(var(--lb-minitalk-avatar-shape) + 120deg)) * 34%),
+        var(--lb-minitalk-avatar-deep) 0
+          calc(15% + cos(var(--lb-minitalk-avatar-shape)) * 4%),
+        transparent calc(16% + cos(var(--lb-minitalk-avatar-shape)) * 4%)
+      ),
+      radial-gradient(
+        circle at
+          calc(50% + cos(calc(var(--lb-minitalk-avatar-shape) + 240deg)) * 34%)
+          calc(50% + sin(calc(var(--lb-minitalk-avatar-shape) + 240deg)) * 34%),
+        rgb(255 255 255 / 38%) 0
+          calc(8% + sin(calc(var(--lb-minitalk-avatar-shape) + 120deg)) * 3%),
+        transparent calc(9% + sin(calc(var(--lb-minitalk-avatar-shape) + 120deg)) * 3%)
+      ),
+      var(--lb-minitalk-avatar-mid);
+  }
+
+  .lb-minitalk-avatar[data-pattern='orbs'] {
+    background:
+      radial-gradient(
+        circle at calc(50% + cos(var(--lb-minitalk-avatar-shape)) * 48%)
+          calc(50% + sin(var(--lb-minitalk-avatar-shape)) * 48%),
+        var(--lb-minitalk-avatar-light) 0
+          calc(31% + sin(var(--lb-minitalk-avatar-shape)) * 5%),
+        transparent calc(32% + sin(var(--lb-minitalk-avatar-shape)) * 5%)
+      ),
+      radial-gradient(
+        circle at
+          calc(50% + cos(calc(var(--lb-minitalk-avatar-shape) + 118deg)) * 43%)
+          calc(50% + sin(calc(var(--lb-minitalk-avatar-shape) + 118deg)) * 43%),
+        var(--lb-minitalk-avatar-deep) 0
+          calc(24% + cos(var(--lb-minitalk-avatar-shape)) * 4%),
+        transparent calc(25% + cos(var(--lb-minitalk-avatar-shape)) * 4%)
+      ),
+      radial-gradient(
+        circle at
+          calc(50% + cos(calc(var(--lb-minitalk-avatar-shape) + 231deg)) * 46%)
+          calc(50% + sin(calc(var(--lb-minitalk-avatar-shape) + 231deg)) * 46%),
+        hsl(calc(var(--lb-minitalk-avatar-hue) + 112) 76% 58%) 0
+          calc(27% + sin(calc(var(--lb-minitalk-avatar-shape) + 70deg)) * 5%),
+        transparent calc(28% + sin(calc(var(--lb-minitalk-avatar-shape) + 70deg)) * 5%)
+      ),
+      radial-gradient(
+        circle at
+          calc(50% + cos(calc(var(--lb-minitalk-avatar-shape) + 307deg)) * 24%)
+          calc(50% + sin(calc(var(--lb-minitalk-avatar-shape) + 307deg)) * 24%),
+        rgb(255 255 255 / 32%) 0
+          calc(17% + cos(calc(var(--lb-minitalk-avatar-shape) + 45deg)) * 3%),
+        transparent calc(18% + cos(calc(var(--lb-minitalk-avatar-shape) + 45deg)) * 3%)
+      ),
+      linear-gradient(145deg, var(--lb-minitalk-avatar-mid), var(--lb-minitalk-avatar-deep));
+  }
+
+  .lb-minitalk-avatar[data-pattern='stripes'] {
+    --lb-minitalk-avatar-gap: calc(
+      10px + sin(var(--lb-minitalk-avatar-shape)) * 3px
+    );
+    --lb-minitalk-avatar-stripe: calc(
+      5px + cos(var(--lb-minitalk-avatar-shape)) * 2px
+    );
+
+    background:
+      repeating-linear-gradient(
+        var(--lb-minitalk-avatar-shape),
+        transparent 0 var(--lb-minitalk-avatar-gap),
+        rgb(255 255 255 / 34%) var(--lb-minitalk-avatar-gap)
+          calc(var(--lb-minitalk-avatar-gap) + var(--lb-minitalk-avatar-stripe))
+      ),
+      linear-gradient(135deg, var(--lb-minitalk-avatar-mid), var(--lb-minitalk-avatar-deep));
+  }
+
+  .lb-minitalk-avatar[data-pattern='blobs'] {
+    background:
+      radial-gradient(
+        circle at calc(50% + cos(var(--lb-minitalk-avatar-shape)) * 30%)
+          calc(50% + sin(var(--lb-minitalk-avatar-shape)) * 30%),
+        var(--lb-minitalk-avatar-light) 0
+          calc(24% + sin(var(--lb-minitalk-avatar-shape)) * 7%),
+        transparent calc(54% + sin(var(--lb-minitalk-avatar-shape)) * 7%)
+      ),
+      radial-gradient(
+        circle at
+          calc(50% + cos(calc(var(--lb-minitalk-avatar-shape) + 137deg)) * 32%)
+          calc(50% + sin(calc(var(--lb-minitalk-avatar-shape) + 137deg)) * 32%),
+        var(--lb-minitalk-avatar-deep) 0
+          calc(20% + cos(var(--lb-minitalk-avatar-shape)) * 6%),
+        transparent calc(50% + cos(var(--lb-minitalk-avatar-shape)) * 6%)
+      ),
+      radial-gradient(
+        circle at
+          calc(50% + cos(calc(var(--lb-minitalk-avatar-shape) + 251deg)) * 27%)
+          calc(50% + sin(calc(var(--lb-minitalk-avatar-shape) + 251deg)) * 27%),
+        hsl(calc(var(--lb-minitalk-avatar-hue) + 112) 76% 58%) 0
+          calc(17% + sin(calc(var(--lb-minitalk-avatar-shape) + 80deg)) * 5%),
+        transparent calc(47% + sin(calc(var(--lb-minitalk-avatar-shape) + 80deg)) * 5%)
+      ),
+      linear-gradient(145deg, var(--lb-minitalk-avatar-mid), var(--lb-minitalk-avatar-deep));
+    background-blend-mode: screen, multiply, soft-light, normal;
+  }
+
+  .lb-minitalk-message-body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .lb-minitalk-message[data-self='true'] .lb-minitalk-message-body {
+    align-items: flex-end;
+  }
+
+  .lb-minitalk-sender,
+  .lb-minitalk-time {
+    color: var(--fg-2);
+    font-size: 11px;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+  }
+
+  .lb-minitalk-sender {
+    margin: 0 2px 4px;
+  }
+
+  .lb-minitalk-sender[data-visible='false'] {
+    display: none;
+  }
+
+  .lb-minitalk-message[data-self='true'] .lb-minitalk-sender {
+    text-align: right;
+  }
+
+  .lb-minitalk-message-row {
+    align-items: flex-end;
+    display: flex;
+    gap: 5px;
+    min-width: 0;
+  }
+
+  .lb-minitalk-message[data-self='true'] .lb-minitalk-message-row {
+    flex-direction: row-reverse;
+  }
+
+  .lb-minitalk-time {
+    flex: 0 0 auto;
+    font-size: 10px;
+    padding-bottom: 2px;
+  }
+
+  .lb-minitalk-content {
+    background: var(--lb-minitalk-bg);
+    border: 1px solid var(--lb-minitalk-border);
+    border-radius: 4px 12px 12px 12px;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 4%);
+    color: var(--lb-minitalk-fg);
+    font-size: 13.5px;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+    padding: 8px 12px;
+    white-space: pre-wrap;
+  }
+
+  .lb-minitalk-message[data-self='true'] .lb-minitalk-content {
+    border-radius: 12px 4px 12px 12px;
+  }
+
+  .lb-minitalk-media,
+  .lb-minitalk-openblock {
+    color: var(--lb-minitalk-fg);
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .lb-minitalk-openblock-fallback {
+    align-items: center;
+    background: var(--lb-minitalk-bg-2);
+    border: 1px solid var(--lb-minitalk-border);
+    box-sizing: border-box;
+    color: var(--lb-minitalk-fg);
+    display: flex;
+    height: 72px;
+    justify-content: center;
+    width: 96px;
+  }
+
+  .lb-minitalk-openblock-fallback::before {
+    content: '🖼️';
+    font-size: 28px;
+    line-height: 1;
+  }
+
+  .lb-minitalk-con {
+    border-radius: 8px;
+    display: block;
+    height: 110px;
+    margin: 0;
+    max-width: 100%;
+    object-fit: contain;
+    width: 110px;
+  }
+
+  @media (max-width: 640px) {
+    .lb-minitalk-dialog {
+      border-left: 0;
+      border-right: 0;
+      max-width: none;
+      width: 100%;
+    }
+  }
+</style>

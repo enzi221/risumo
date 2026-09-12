@@ -1,5 +1,7 @@
 # Miniboard Renderer
 
+Miniboard is a front-end module that simulates a BBS viewer.
+
 Create a standalone CharX module that supplies one visual renderer for Miniboard. Target the self-contained renderer contract in this reference for Miniboard 4.3.0+.
 
 ## Deliverable

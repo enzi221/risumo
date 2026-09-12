@@ -1,5 +1,10 @@
 # Version History
 
+## Unreleased
+
+- Added the MiniTalk `skip` message type for an unknown amount of omitted conversation over an unknown duration.
+- Moved MiniTalk key-figure state into the room's `keyFigures` field. Interaction patches update the same field, and missing generated data uses the preserved state.
+
 ## 4.3.0
 
 - Changed `prelude.toon.encode()` to write line feeds as `\u000A` and added matching support to `prelude.toon.decode()`. The decoder continues to accept `\n` for compatibility.

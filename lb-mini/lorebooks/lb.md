@@ -246,7 +246,9 @@ Each leading `⇥` represents one TOON indentation level of exactly two spaces. 
 
 ```
 <lb-mini name="..."{{#when::{{getglobalvar::toggle_lb-mini.sampling}}::is::1}} prob="0.00"{{/when}}>
-[2|]:
+{{#when::keep::{{getglobalvar::toggle_lb-mini.keyfigures}}::is::1}}keyFigures[1|]{keyFigure|nickname|note}:
+⇥...|...|...
+{{/when}}posts[2|]:
 ⇥- author: ㅇㅇ
 ⇥⇥title: 시발 국대 실화냐?
 ⇥⇥time: 방금
@@ -264,14 +266,6 @@ Each leading `⇥` represents one TOON indentation level of exactly two spaces. 
 ⇥⇥content: "며칠째 고민 중인데, 실사용 후기가 궁금하네요.\u000A카메라 성능이랑 배터리가 특히 어떤지 말씀해주시면 감사하겠습니다."
 ⇥⇥comments[0|]:
 </lb-mini>
-{{#when::{{getglobalvar::toggle_lb-mini.keyfigures}}::is::1}}
-<lb-mini-keyfigures>
-[1|]:
-⇥- nickname: ...
-⇥⇥keyFigure: ...
-⇥⇥note: ...
-</lb-mini-keyfigures>
-{{/when}}
 ```
 
 <!-- lb-mini-cons-example -->
@@ -279,7 +273,7 @@ Each leading `⇥` represents one TOON indentation level of exactly two spaces. 
 - Use `<lb-mini name="(board name)"{{#when::{{getglobalvar::toggle_lb-mini.sampling}}::is::1}} prob="0.00"{{/when}}>`.
 - Output in TOON format (2-space indent, array show length, separate fields by `|`).
 - Encode every line break in a TOON field value as `\u000A`. Do not use `\n` or a literal line break within a field value.
-- Root elements are the posts.
+- Write a root object containing `posts`.
 - The `time` field is immutable. Use only `오래전`, `얼마 전`, or `방금`. Reserve `신규` for later interactions and do not use it in this output.
 - Write comment table rows directly as `author|time|content` without a leading `- `.
 - content: Posts may contain line breaks. Comments may not contain line breaks. Avoid lengthy contents. Actively employ omissions (beginning, middle, end) to maintain length.
@@ -302,15 +296,15 @@ NO REPEAT PREVIOUS BOARD DATA.
 
 ### Preserved key figures
 
-After the `<lb-mini>` node, output one `<lb-mini-keyfigures>` node for preserving nickname continuity. Update the preserved state from the Miniboard you just wrote. Include only nicknames belonging to characters provided in the universe settings. Do not infer private identities unavailable to board users.
+Write nickname-state updates in the `<lb-mini>` object's `keyFigures` array. Include only major characters provided in the universe settings. Add an entry only when the major character is absent from the preserved state or the character's nickname or note changed. Every major character who authors a post or comment in the Miniboard must already have a current preserved entry or appear in `keyFigures`. Do not infer private identities unavailable to board users.
 
-Write the node as a TOON array of objects with these fields:
+Write `keyFigures` as a TOON array of objects with these fields:
 
 - `nickname`: Exact board nickname.
 - `keyFigure`: Character name or identity from the universe settings.
 - `note`: Concise characteristics the character displays on the board, such as speaking style, recurring behavior, or posting habits.
 
-Preserve still-valid entries, update changed entries, and remove obsolete entries. Output `[0|]:` when there are no entries.
+Output `[0|]:` when there are no updates.
 
 {{#when::keep::{{? {{length::{{trim::{{getvar::lb-mini.keyfigures}}}}}} > 0}}}}
 Preserved state from the previous generation:

@@ -8,6 +8,7 @@ local function setTriggerId(tid)
   triggerId = tid
   if type(prelude) ~= 'nil' then
     prelude.import(tid, 'toon.decode')
+    prelude.import(tid, 'toon.encode')
     return
   end
   local source = getLoreBooks(triggerId, 'lightboard-prelude')
@@ -16,6 +17,7 @@ local function setTriggerId(tid)
   end
   load(source[1].content, '@prelude', 't')()
   prelude.import(tid, 'toon.decode')
+  prelude.import(tid, 'toon.encode')
 end
 
 local CUSTOM_RENDERER_NAME = 'lb-mini.renderer'
@@ -31,12 +33,12 @@ local THEME_COLORS = {
     light = '#007BFF',
   },
   {
-    dark = '#ffd700',
+    dark = '#ecc94b',
     light = '#d4af37',
   },
   {
-    dark = '#81c784',
-    light = '#4caf50',
+    dark = '#66bb6a',
+    light = '#2e7d32',
   },
 }
 
@@ -142,9 +144,10 @@ local function parseConReferences(content)
 end
 
 ---@param content string
----@return MiniboardPostData[]
-local function decodePosts(content)
-  local posts = prelude.toon.decode(content)
+---@return table
+local function decodeBoard(content)
+  local board = prelude.toon.decode(content)
+  local posts = board.posts
 
   for _, post in ipairs(posts) do
     for _, comment in ipairs(post.comments or {}) do
@@ -156,7 +159,21 @@ local function decodePosts(content)
     end
   end
 
-  return posts
+  return board
+end
+
+---@param board table
+---@return string
+local function encodeBoard(board)
+  local posts = board.posts or {}
+  local root = setmetatable({
+    posts = #posts > 0 and posts or nil,
+  }, { __toonKeyOrder = { 'posts' } })
+  local prefix = ''
+  if #posts == 0 then
+    prefix = prefix .. 'posts[0|]:\n'
+  end
+  return prefix .. prelude.toon.encode(root, { delimiter = '|' })
 end
 
 local function main(data, chatIndex)
@@ -176,10 +193,10 @@ local function main(data, chatIndex)
   end
 
   local renderer = resolveRenderer()
-  local posts = decodePosts(lastResult.content)
+  local board = decodeBoard(lastResult.content)
   local renderData = {
     attributes = lastResult.attributes,
-    posts = posts,
+    posts = board.posts,
   }
   local options = getRenderOptions(chatIndex)
   local renderSuccess, rendered = pcall(renderer, triggerId, renderData, options)
@@ -220,36 +237,6 @@ listenEdit(
     end
   end
 )
-
----@param posts MiniboardPostData[]
----@return string
-local function encodePosts(posts)
-  local function escape(str)
-    if not str then return "" end
-    return str:gsub("\n", "\\n")
-        :gsub("\r", "\\r")
-        :gsub("\t", "\\t")
-  end
-
-  local lines = {}
-  table.insert(lines, "[" .. #posts .. "|]:")
-
-  for _, post in ipairs(posts) do
-    table.insert(lines, "  - author: " .. post.author)
-    table.insert(lines, "    title: " .. post.title)
-    table.insert(lines, "    time: " .. post.time)
-    table.insert(lines, "    upvotes: " .. post.upvotes)
-    table.insert(lines, "    downvotes: " .. post.downvotes)
-    table.insert(lines, "    content: " .. escape(post.content))
-    table.insert(lines, "    comments[" .. #post.comments .. "|]{author|time|content}:")
-    for _, comment in ipairs(post.comments) do
-      local content = comment.cons and ('[con:' .. table.concat(comment.cons, ',') .. ']') or comment.content
-      table.insert(lines, "      " .. comment.author .. "|" .. comment.time .. "|" .. escape(content))
-    end
-  end
-
-  return table.concat(lines, "\n")
-end
 
 onButtonClick = async(function(tid, code)
   setTriggerId(tid)
@@ -303,7 +290,8 @@ onButtonClick = async(function(tid, code)
   end
 
   local node = nodes[#nodes]
-  local posts = decodePosts(node.content)
+  local board = decodeBoard(node.content)
+  local posts = board.posts
 
   if postIndex < 1 or postIndex > #posts then
     alertNormal(tid, deathMessage)
@@ -321,7 +309,7 @@ onButtonClick = async(function(tid, code)
     table.remove(posts, postIndex)
   end
 
-  local newContent = encodePosts(posts)
+  local newContent = encodeBoard(board)
   local newBlock = node.openTag .. "\n" .. newContent .. "\n</" .. node.tagName .. ">"
   local newData = chat.data:sub(1, node.rangeStart - 1) .. newBlock .. chat.data:sub(node.rangeEnd + 1)
 

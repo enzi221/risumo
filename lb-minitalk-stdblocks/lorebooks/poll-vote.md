@@ -1,0 +1,3 @@
+identifier=poll-vote
+Use when the sender casts a vote in an existing poll. Write `content` on a single line as `poll question § selected option`. Apply the enclosing TOON string escaping to the complete payload.
+Use only when the conversation establishes both the poll and the sender's choice. Copy the poll question and selected option label exactly from the matching `poll`. The enclosing message sender identifies the voter. Whenever adding a `poll-vote`, also update the matching `poll` counts in the same room output or interaction patch. Increment the selected option for a first vote. When the sender changes a vote, decrement the previous option and increment the new option instead of adding another vote.

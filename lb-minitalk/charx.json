@@ -1,0 +1,90 @@
+{
+  "CSS": "style.html",
+  "description": "범용 메신저 모듈",
+  "lorebook": [
+    {
+      "alwaysActive": false,
+      "comment": "manifest.lb",
+      "file": "lorebooks/manifest.md"
+    },
+    {
+      "alwaysActive": false,
+      "comment": "lb-minitalk.lb",
+      "file": "lorebooks/lb.md"
+    },
+    {
+      "alwaysActive": false,
+      "comment": "lb-minitalk.lb.format",
+      "file": "lorebooks/lb.format.md"
+    },
+    {
+      "alwaysActive": false,
+      "comment": "lb-minitalk.lb.onInstructions",
+      "file": "lorebooks/lb-minitalk.onInstructions.lua"
+    },
+    {
+      "alwaysActive": false,
+      "comment": "lb-minitalk.lb.onValidate",
+      "file": "lorebooks/lb-minitalk.onValidate.lua"
+    },
+    {
+      "alwaysActive": false,
+      "comment": "lb-minitalk.lb.onOutput",
+      "file": "lorebooks/lb-minitalk.onOutput.lua"
+    },
+    {
+      "alwaysActive": false,
+      "comment": "lb-minitalk.runtime",
+      "file": "lorebooks/lb-minitalk.runtime.lua"
+    },
+    {
+      "alwaysActive": false,
+      "comment": "lb-minitalk.renderer.default",
+      "file": "lorebooks/lb-minitalk.renderer.default.lua"
+    },
+    {
+      "alwaysActive": false,
+      "comment": "lb-minitalk.lb.interaction",
+      "file": "lorebooks/lb.interaction.md"
+    },
+    {
+      "alwaysActive": false,
+      "comment": "lb-minitalk.lb.onMutation",
+      "file": "lorebooks/lb-minitalk.onMutation.lua"
+    },
+    {
+      "alwaysActive": false,
+      "comment": "lb-minitalk.lb.thoughts",
+      "file": "lorebooks/lb.thoughts.md"
+    },
+    {
+      "alwaysActive": false,
+      "comment": "lb-minitalk.lb.thoughts-interaction",
+      "file": "lorebooks/lb.thoughts-interaction.md"
+    },
+    {
+      "alwaysActive": true,
+      "comment": "MiniTalk",
+      "file": "lorebooks/minitalk.md",
+      "insertOrder": 4567
+    }
+  ],
+  "name": "🔦라이트보드 ♦️미니톡 4.3.2",
+  "namespace": "lb-minitalk",
+  "regex": [
+    "regex/display-timer-icon.md",
+    "regex/filter-response.md",
+    "regex/ignore-old.md",
+    "regex/lazy.md",
+    "regex/hide-unparsed.md"
+  ],
+  "toggles": "toggles.txt",
+  "triggers": [
+    {
+      "bundle": true,
+      "lua": "triggers/minitalk.lua",
+      "type": "start"
+    }
+  ],
+  "version": "4.3.2"
+}

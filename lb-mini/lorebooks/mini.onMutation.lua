@@ -77,13 +77,41 @@ local function truncateCons(content)
   return '[con:' .. table.concat(identifiers, ',') .. ']'
 end
 
+---@param comment table
+local function normalizeComment(comment)
+  local content = truncateCons(comment.content)
+  if parseCons(content) then
+    comment.content = content
+    return
+  end
+  if type(content) ~= 'string' or not content:find('[con:', 1, true) then
+    return
+  end
+
+  local removed = false
+  local text = content:gsub('%[con:([^%]]+)%]', function(value)
+    local con = truncateCons('[con:' .. value .. ']')
+    if not parseCons(con) then
+      return '[con:' .. value .. ']'
+    end
+    removed = true
+    return ''
+  end)
+  if not removed then
+    return
+  end
+
+  text = prelude.trim(text)
+  comment.content = text
+end
+
 ---@param posts table[]
 local function normalizeCons(posts)
   for _, post in ipairs(posts) do
     post.content = removeCons(post.content)
 
     for _, comment in ipairs(post.comments) do
-      comment.content = truncateCons(comment.content)
+      normalizeComment(comment)
     end
   end
 end
@@ -131,7 +159,6 @@ local function validateBoard(board)
   if not denseArray(board.posts) then
     error('Invalid patched miniboard: posts must be an array.')
   end
-
   for postIndex, post in ipairs(board.posts) do
     local postLabel = 'posts[' .. tostring(postIndex - 1) .. ']'
     if type(post) ~= 'table' then
@@ -234,10 +261,10 @@ local function main(_, action, fullChat, mutation)
 
   local patch = json.decode(prelude.trim(patchNode.content))
   local previousNode = mutation.previousNode
-  local posts = previousNode and prelude.toon.decode(previousNode.content) or {}
+  local previous = previousNode and prelude.toon.decode(previousNode.content) or {}
   local board = {
     name = previousNode and previousNode.attributes.name or '미니보드',
-    posts = posts,
+    posts = previous.posts or {},
   }
   local patched = prelude.applyJSONPatch(board, patch)
 
@@ -245,7 +272,14 @@ local function main(_, action, fullChat, mutation)
   normalizeCons(patched.posts)
   validateCons(patched.posts)
 
-  local content = prelude.toon.encode(patched.posts, { delimiter = '|' })
+  local root = setmetatable({
+    posts = #patched.posts > 0 and patched.posts or nil,
+  }, { __toonKeyOrder = { 'posts' } })
+  local prefix = ''
+  if #patched.posts == 0 then
+    prefix = prefix .. 'posts[0|]:\n'
+  end
+  local content = prefix .. prelude.toon.encode(root, { delimiter = '|' })
   local replacement = createOpenTag(previousNode, patched.name) .. '\n'
       .. content
       .. '\n</lb-mini>'

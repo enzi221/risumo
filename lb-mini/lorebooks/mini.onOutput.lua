@@ -48,25 +48,58 @@ local function normalizeCons(posts)
 end
 
 ---@param triggerId string
----@param output string
-local function preserveKeyFigures(triggerId, output)
+---@param keyFigures table[]
+local function preserveKeyFigures(triggerId, keyFigures)
   if getGlobalVar(triggerId, 'toggle_lb-mini.keyfigures') ~= '1' then
     return
   end
-
-  local nodes = prelude.queryNodes('lb-mini-keyfigures', output)
-  if #nodes == 0 then
+  if #keyFigures == 0 then
     return
   end
 
-  local keyFigures = prelude.trim(nodes[#nodes].content)
-  if keyFigures == '[0|]:' then
-    keyFigures = ''
+  prelude.import(triggerId, 'toon.decode')
+  prelude.import(triggerId, 'toon.encode')
+  local preserved = getChatVar(triggerId, KEYFIGURES_VARIABLE)
+  local entries = {}
+  if type(preserved) == 'string' and prelude.trim(preserved) ~= '' and preserved ~= 'null' then
+    local success, decoded = pcall(prelude.toon.decode, preserved)
+    if success and type(decoded) == 'table' then
+      entries = decoded
+    end
   end
 
-  if getChatVar(triggerId, KEYFIGURES_VARIABLE) ~= keyFigures then
-    setChatVar(triggerId, KEYFIGURES_VARIABLE, keyFigures)
+  local indices = {}
+  for index, entry in ipairs(entries) do
+    indices[entry.keyFigure] = index
   end
+  for _, entry in ipairs(keyFigures) do
+    local index = indices[entry.keyFigure]
+    if index then
+      entries[index] = entry
+    else
+      table.insert(entries, entry)
+      indices[entry.keyFigure] = #entries
+    end
+  end
+
+  local content = prelude.toon.encode(entries, { delimiter = '|' })
+
+  if preserved ~= content then
+    setChatVar(triggerId, KEYFIGURES_VARIABLE, content)
+  end
+end
+
+local function encodeData(triggerId, data)
+  prelude.import(triggerId, 'toon.encode')
+  local posts = data.posts or {}
+  local root = setmetatable({
+    posts = #posts > 0 and posts or nil,
+  }, { __toonKeyOrder = { 'posts' } })
+  local prefix = ''
+  if #posts == 0 then
+    prefix = prefix .. 'posts[0|]:\n'
+  end
+  return prefix .. prelude.toon.encode(root, { delimiter = '|' })
 end
 
 local function main(triggerId, output)
@@ -80,33 +113,27 @@ local function main(triggerId, output)
   end
 
   if not string.find(output, "</lb%-mini>") then
-    local keyFiguresStart = string.find(output, '<lb%-mini%-keyfigures[%s>/]')
-    if keyFiguresStart then
-      output = output:sub(1, keyFiguresStart - 1)
-          .. '</lb-mini>\n'
-          .. output:sub(keyFiguresStart)
-    else
-      output = output .. '\n</lb-mini>'
-    end
+    output = output .. '\n</lb-mini>'
   end
 
   local nodes = prelude.queryNodes('lb-mini', output)
   local node = nodes[#nodes]
   local extracted = output:sub(node.rangeStart, node.rangeEnd)
-  local success, posts = pcall(prelude.toon.decode, node.content)
+  local success, data = pcall(prelude.toon.decode, node.content)
   if not success then
     return extracted
   end
 
-  preserveKeyFigures(triggerId, output)
-  normalizeCons(posts)
+  data.keyFigures = data.keyFigures or {}
+  normalizeCons(data.posts)
+  preserveKeyFigures(triggerId, data.keyFigures)
 
   local openTag = extracted:match('^(<lb%-mini[^>]*>)')
   if not openTag then
     return extracted
   end
 
-  local content = prelude.toon.encode(posts, { delimiter = '|' })
+  local content = encodeData(triggerId, data)
   return openTag .. '\n' .. content .. '\n</lb-mini>'
 end
 

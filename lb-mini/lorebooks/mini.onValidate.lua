@@ -86,27 +86,16 @@ end
 
 ---@param triggerId string
 ---@param output string
-local function validateKeyFigures(triggerId, output)
+local function validateKeyFigures(triggerId, data)
   if getGlobalVar(triggerId, 'toggle_lb-mini.keyfigures') ~= '1' then
     return
   end
 
-  local nodes = prelude.queryNodes('lb-mini-keyfigures', output)
-  if #nodes == 0 then
-    error('InvalidOutput: Missing <lb-mini-keyfigures> node.')
+  if type(data.keyFigures) ~= 'table' then
+    error('InvalidOutput: Missing keyFigures array in <lb-mini>.')
   end
 
-  local content = prelude.trim(nodes[#nodes].content)
-  if not content:match('^%[%d+%|%]:') then
-    error('InvalidOutput: <lb-mini-keyfigures> must contain a TOON array.')
-  end
-
-  local success, keyFigures = pcall(prelude.toon.decode, content)
-  if not success or type(keyFigures) ~= 'table' then
-    error('InvalidOutput: Invalid <lb-mini-keyfigures> TOON format.')
-  end
-
-  for _, keyFigure in ipairs(keyFigures) do
+  for _, keyFigure in ipairs(data.keyFigures) do
     if type(keyFigure) ~= 'table'
         or type(keyFigure.nickname) ~= 'string'
         or type(keyFigure.keyFigure) ~= 'string'
@@ -138,8 +127,12 @@ local function main(triggerId, output)
     error('InvalidOutput: Invalid TOON format. ' .. tostring(content))
   end
 
-  validateCons(content)
-  validateKeyFigures(triggerId, output)
+  if type(content) ~= 'table' or type(content.posts) ~= 'table' then
+    error('InvalidOutput: <lb-mini> must contain a TOON object with a posts array.')
+  end
+
+  validateCons(content.posts)
+  validateKeyFigures(triggerId, content)
 end
 
 return main

@@ -1,0 +1,137 @@
+<style>
+  .lb-minitalk-stdblock-card {
+    background: var(--lb-minitalk-bg);
+    border: 1px solid var(--lb-minitalk-border);
+    border-radius: 14px;
+    box-sizing: border-box;
+    color: var(--lb-minitalk-fg);
+    display: flex;
+    flex-direction: column;
+    font-family: sans-serif;
+    font-size: 14px;
+    gap: 12px;
+    line-height: 1.5;
+    max-width: 100%;
+    overflow: hidden;
+    padding: 16px;
+    text-align: left;
+    white-space: normal;
+    width: 320px;
+    overflow-wrap: anywhere;
+  }
+  .lb-minitalk-stdblock-eyebrow {
+    color: var(--lb-minitalk-accent);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  .lb-minitalk-stdblock-title {
+    color: var(--lb-minitalk-fg);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+  .lb-minitalk-stdblock-description {
+    color: var(--lb-minitalk-fg);
+    font-size: 13px;
+    opacity: 0.75;
+    white-space: pre-line;
+  }
+  .lb-minitalk-stdblock-description:empty {
+    display: none;
+  }
+  .lb-minitalk-stdblock-opengraph-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .lb-minitalk-stdblock-url {
+    border-top: 1px solid var(--lb-minitalk-border);
+    color: var(--lb-minitalk-fg);
+    font-size: 11px;
+    opacity: 0.65;
+    padding-top: 10px;
+  }
+  .lb-minitalk-stdblock-options {
+    display: grid;
+    gap: 14px;
+  }
+  .lb-minitalk-stdblock-option-line {
+    align-items: baseline;
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .lb-minitalk-stdblock-label {
+    color: var(--lb-minitalk-fg);
+    font-size: 13px;
+    min-width: 0;
+  }
+  .lb-minitalk-stdblock-count {
+    color: var(--lb-minitalk-fg);
+    flex-shrink: 0;
+    font-size: 11px;
+    opacity: 0.65;
+  }
+  .lb-minitalk-stdblock-track {
+    background: var(--lb-minitalk-bg-2);
+    border-radius: 4px;
+    height: 6px;
+    overflow: hidden;
+  }
+  .lb-minitalk-stdblock-fill {
+    background: var(--lb-minitalk-accent);
+    border-radius: 4px;
+    height: 100%;
+  }
+  .lb-minitalk-stdblock-footer {
+    color: var(--lb-minitalk-fg);
+    font-size: 11px;
+    opacity: 0.65;
+  }
+  .lb-minitalk-stdblock-vote-choice {
+    background: var(--lb-minitalk-bg-2);
+    border-left: 3px solid var(--lb-minitalk-accent);
+    border-radius: 8px;
+    color: var(--lb-minitalk-fg);
+    font-size: 13px;
+    font-weight: 700;
+    padding: 10px 12px;
+  }
+  .lb-minitalk-stdblock-calendar-details {
+    background: var(--lb-minitalk-bg-2);
+    border-radius: 10px;
+    display: grid;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+  .lb-minitalk-stdblock-calendar-row {
+    align-items: baseline;
+    color: var(--lb-minitalk-fg);
+    display: grid;
+    font-size: 13px;
+    gap: 8px;
+    grid-template-columns: 16px minmax(0, 1fr);
+  }
+  .lb-minitalk-stdblock-calendar-icon {
+    color: var(--lb-minitalk-accent);
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+  }
+  .lb-minitalk-stdblock-calendar-value {
+    min-width: 0;
+  }
+  .lb-minitalk-stdblock-calendar-description {
+    border-top: 1px solid var(--lb-minitalk-border);
+    color: var(--lb-minitalk-fg);
+    font-size: 13px;
+    opacity: 0.75;
+    padding-top: 10px;
+    white-space: pre-line;
+  }
+  .lb-minitalk-stdblock-calendar-description:empty {
+    display: none;
+  }
+</style>

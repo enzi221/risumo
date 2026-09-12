@@ -1,0 +1,20 @@
+=♦️미니톡=group
+lb-minitalk.mode=모　　드=select=끄기,메인,보조
+lb-minitalk.lazy=발　　동=select=즉시,누르면
+=———————📒주　제=divider
+lb-minitalk.pov=시　　점=text
+=기본 {{user}}=caption
+lb-minitalk.speak=┗사칭 허용
+lb-minitalk.characters=등장인물=select=주요 인물,장면 내 인물,장면 내 주요 인물,자율
+lb-minitalk.room=채팅방　=select=자동,1:1,그룹
+=———————🎨외　형=divider
+lb-minitalk.cons=미니콘 허용
+lb-minitalk.openblock=커스텀 블록 허용
+lb-minitalk.renderer=커스텀 렌더러 허용
+lb-minitalk.darkness=밝　　기=select=☀️,🌙
+lb-minitalk.theme=테　　마=select=♦️,💎,✨,🌳
+=———————⚙️시스템=divider
+lb-minitalk.thoughts=생각보조=select=적고 제거,생각만,안하기
+lb-minitalk.context=컨　　텍=select=포함,제거
+=라이트보드 미니톡 4.3.2=caption
+==groupEnd

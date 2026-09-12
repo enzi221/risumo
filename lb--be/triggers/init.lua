@@ -699,7 +699,6 @@ onStart = async(function(tid)
 
   local fullChat = getFullChat(tid)
   local lastChat = fullChat[#fullChat]
-  print(lastChat.data)
   if commands.handle(tid, lastChat and lastChat.data) then
     return
   end

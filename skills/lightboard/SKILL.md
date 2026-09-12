@@ -76,9 +76,13 @@ Use Lua to implement stateful buttons with `risu-trigger` or `risu-btn` and cust
 - To understand Risuai's double-curly-brace templating language for lorebooks, background embeddings, and regex output values, read `references/000-cbs.md`.
 - To review feature availability by backend release, read `references/version-history.md`.
 
-For a complete Lightboard module development, read `references/000-lightboard.md`.
+For a complete Lightboard module development from scratch, read `references/000-lightboard.md`.
 
-For a Lightboard Miniboard renderer code, read `references/000-miniboard-renderer.md`.
+For a Lightboard module extensions:
+
+- Miniboard renderer: `references/000-miniboard-renderer.md`
+- MiniTalk OpenBlock: `references/000-minitalk-openblock.md`
+- MiniTalk renderer: `references/000-minitalk-renderer.md`
 
 ## Packing
 
