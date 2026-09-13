@@ -91,7 +91,7 @@
       "name": "mini-yes"
     }
   ],
-  "description": "♦️미니보드 미니 미니콘 for 미니보드 4.3.0+",
+  "description": "미니보드 미니 미니콘 for 미니보드 4.3.0+",
   "hideIcon": false,
   "lorebook": [
     {
@@ -102,7 +102,7 @@
     }
   ],
   "lowLevelAccess": false,
-  "name": "♦️미니보드 미니 미니콘 1.0.0",
+  "name": "♦️미니보드 미니 미니콘 1.0.1",
   "namespace": "lb-mini-cons",
-  "version": "1.0.0"
+  "version": "1.0.1"
 }

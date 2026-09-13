@@ -1,0 +1,15 @@
+{
+  "CSS": "style.html",
+  "description": "미니톡 아크 렌더러 for 미니톡 4.3.0+",
+  "lorebook": [
+    {
+      "alwaysActive": false,
+      "comment": "lb-minitalk.renderer",
+      "file": "lorebooks/renderer.lua",
+      "insertOrder": 200
+    }
+  ],
+  "name": "♦️미니톡 렌더러 · 아크 1.0.0",
+  "namespace": "lb-minitalk-arc",
+  "version": "1.0.0"
+}

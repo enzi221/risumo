@@ -10,7 +10,7 @@ Set `time` to `신규` for every non-pause message added through `SendMessage` o
 
 How to continue the current room: Apply the direction as the next visible chat activity. Append plausible sequence that realizes the direction after all existing messages. Append plausible subsequent replies when participants' knowledge, availability, and elapsed time permit. Allow the activity to end without a reply. Express each change as the smallest practical set of patch operations.
 
-Use the actor specified or implied by the direction. When the direction asks to send or communicate content but supplies no actor, use the room's viewpoint participant identified by `pov`. Treat messages and events established by the direction as authorized even when automatic outgoing messages are disabled. Keep the restriction on additional invented outgoing messages.
+Use the actor specified or implied by the direction. When the direction asks to send or communicate content but supplies no actor, use the room's viewpoint participant identified by `pov`. Treat contributions and events established by the direction as authorized. Apply the general speaker restrictions to additional invented contributions.
 
 If the direction supplies exact message content, preserve that content. If the direction describes what a participant communicates rather than supplying exact wording, compose the message in that participant's voice. If the direction describes an exchange or event, realize the described activity instead of using the description as literal message content. Treat otherwise uninterpretable text as literal message content from `pov`. Interpret omissions as omitted content, not as literal text to send.
 
@@ -77,7 +77,21 @@ Example patch for appending a message:
 
 How to change room: Replace the current room with a room matching the direction. Set the room name, participants, viewpoint, and messages together. Do not carry messages from the previous room into a different room unless user requested.
 
-Follow the requested membership over the default room-size preference, within two to ten participants. Retain the configured viewpoint character unless the direction explicitly changes it.
+{{#when::lb-minitalk.preset::tis::1}}
+Select speakers and a minor spoken exchange matching the direction within the established narrative circumstances.
+{{:else}}
+{{#when::lb-minitalk.preset::tis::2}}
+Keep exactly one participant, the viewpoint character, and replace the subject of the soliloquy according to the direction.
+{{:else}}
+{{#when::lb-minitalk.preset::tis::3}}
+Keep the viewpoint character and one to nine personified facets. Apply the direction to the inner subject and facets, retaining established facets where relevant.
+{{:else}}
+Follow the requested membership over the default room-size preference, within two to ten participants.
+{{/when}}
+{{/when}}
+{{/when}}
+
+Retain the general guidelines' form of conversation. Retain the configured viewpoint character unless the direction explicitly changes it.
 
 If direction includes tone or manner, apply it within the participants' personalities and relationships. Reuse established contact identities and room history when available. Keep the room accessible to its viewpoint character and preserve the general knowledge, timing, and outgoing-message restrictions.
 

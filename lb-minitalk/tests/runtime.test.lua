@@ -41,11 +41,26 @@ local validate = require('lb-minitalk/lorebooks/lb-minitalk.onValidate')
 local output = require('lb-minitalk/lorebooks/lb-minitalk.onOutput')
 local instructions = require('lb-minitalk/lorebooks/lb-minitalk.onInstructions')
 local source = read('lb-minitalk/lorebooks/lb.md')
-local example = assert(source:match('```toon\n(.-)\n```')):gsub('⇥', '  ')
-local roomExample = example:gsub(
+local fixture = [[<lb-minitalk>
+messages[6|]{sender|type|time|content}:
+  p2|text|얼마 전|아직 회사야
+  p2|text|얼마 전|나 먼저 감
+  p2|text|얼마 전|충전기 안내 데스크에 맡겨둠
+  p2|text|얼마 전|아
+  p2|text|얼마 전|1층 말고 2층
+  p2|text|방금|찾으면 말해줘
+name: 민지
+participants[2|]{id|name}:
+  p1|퇴근시켜줘
+  p2|귤두개
+pov: p1
+keyFigures[1|]{keyFigure|nickname|note}:
+  민지|귤두개|모두에게 짧게 연속 전송하며 정정은 새 메시지로 보냄
+</lb-minitalk>]]
+local roomFixture = fixture:gsub(
   'keyFigures%[1|%]{keyFigure|nickname|note}:\n  [^\n]+\n', '')
-local content = runtime.extract(example).content
-local normalized = output('test', example)
+local content = runtime.extract(fixture).content
+local normalized = output('test', fixture)
 local function rejects(value)
   test.assertFails(function()
     validate('test', value)
@@ -55,7 +70,7 @@ end
 local function countVisibleAvatars(rendered)
   local count = 0
   for tag in rendered:gmatch('<div [^>]*>') do
-    if tag:find('class="lb-minitalk-avatar"', 1, true)
+    if tag:find('class="lb-minitalk-avatar lb-minitalk-gradient"', 1, true)
         and tag:find('data-visible="true"', 1, true) then
       count = count + 1
     end
@@ -93,16 +108,16 @@ local success
 
 describe('Messenger validation', function()
   it('validates room schema, messages, and output normalization', function()
-    validate('test', example)
-    test.assertEquals(#runtime.decode('test', content, true).messages, 6, 'Korean example decoded')
-    pause = example:gsub('p2|text|방금|찾으면 말해줘', '-|pause|-|10분 후')
+    validate('test', fixture)
+    test.assertEquals(#runtime.decode('test', content, true).messages, 6, 'Korean fixture decoded')
+    pause = fixture:gsub('p2|text|방금|찾으면 말해줘', '-|pause|-|10분 후')
     validate('test', pause)
     rejects(pause:gsub('%-|pause|%-|10분 후', 'p2|pause|-|10분 후'))
     rejects(pause:gsub('%-|pause|%-|10분 후', '-|pause|방금|10분 후'))
     rejects(pause:gsub('%-|pause|%-|10분 후', '-|pause|-|'))
     test.assertTrue(output('test', pause):find('pause', 1, true) and output('test', pause):find('10분 후', 1, true),
       'Pause preserved in output')
-    skip = example:gsub('p2|text|방금|찾으면 말해줘', '-|skip|-|-')
+    skip = fixture:gsub('p2|text|방금|찾으면 말해줘', '-|skip|-|-')
     validate('test', skip)
     rejects(skip:gsub('%-|skip|%-|%-', 'p2|skip|-|-'))
     rejects(skip:gsub('%-|skip|%-|%-', '-|skip|방금|-'))
@@ -110,22 +125,22 @@ describe('Messenger validation', function()
     local storedSkip = runtime.decode('test', runtime.extract(output('test', skip)).content, false).messages[6]
     test.assertTrue(storedSkip.sender == '-' and storedSkip.time == '-'
       and storedSkip.type == 'skip' and storedSkip.content == '-', 'Skip preserved in output')
-    test.assertEquals(output('test', 'preface\n' .. example .. '\ntrailer'), normalized,
+    test.assertEquals(output('test', 'preface\n' .. fixture .. '\ntrailer'), normalized,
       'Output strips surrounding prose')
-    test.assertEquals(output('test', '<lb-minitalk>invalid</lb-minitalk>' .. example), normalized,
+    test.assertEquals(output('test', '<lb-minitalk>invalid</lb-minitalk>' .. fixture), normalized,
       'Last complete node selected')
-    rejects(example .. '<lb-minitalk>invalid</lb-minitalk>')
-    rejects(example:gsub('</lb%-minitalk>', ''))
-    rejects(example:gsub('messages%[6', 'messages[7'))
-    rejects(example:gsub('pov: p1', 'pov: unknown'))
-    rejects(example:gsub('p2|text', 'unknown|text'))
-    rejects(example:gsub('p2|귤두개', 'p1|귤두개'))
-    rejects(example:gsub('찾으면 말해줘', '안녕|추가'))
+    rejects(fixture .. '<lb-minitalk>invalid</lb-minitalk>')
+    rejects(fixture:gsub('</lb%-minitalk>', ''))
+    rejects(fixture:gsub('messages%[6', 'messages[7'))
+    rejects(fixture:gsub('pov: p1', 'pov: unknown'))
+    rejects(fixture:gsub('p2|text', 'unknown|text'))
+    rejects(fixture:gsub('p2|귤두개', 'p1|귤두개'))
+    rejects(fixture:gsub('찾으면 말해줘', '안녕|추가'))
     test.assertEquals(
-      runtime.decode('test', runtime.extract(example:gsub('찾으면 말해줘', '[con:wave]')).content, true).messages[6].content,
+      runtime.decode('test', runtime.extract(fixture:gsub('찾으면 말해줘', '[con:wave]')).content, true).messages[6].content,
       '[con:wave]', 'Text may contain literal MiniCon syntax')
-    rejects(example:gsub('pov: p1', 'pov: p1\npov: p2'))
-    local multiline = example:gsub('찾으면 말해줘', '찾으면\\u000A말해줘')
+    rejects(fixture:gsub('pov: p1', 'pov: p1\npov: p2'))
+    local multiline = fixture:gsub('찾으면 말해줘', '찾으면\\u000A말해줘')
     test.assertTrue(output('test', multiline:gsub('\\u000A', '\\n')):find('\\u000A', 1, true),
       'Stored newline normalized')
     validate('test', normalized)
@@ -137,10 +152,7 @@ describe('Messenger validation', function()
     validate('test', empty)
     test.assertEquals(#runtime.decode('test', runtime.extract(empty).content, true).messages, 0, 'Empty room')
     validate('test', output('test', empty))
-    toggles['toggle_lb-minitalk.room'] = '2'
-    rejects(example)
-    toggles['toggle_lb-minitalk.room'] = '0'
-    con = example:gsub('p2|text|방금|찾으면 말해줘', 'p2|con|방금|wave')
+    con = fixture:gsub('p2|text|방금|찾으면 말해줘', 'p2|con|방금|wave')
     validate('test', con)
     test.assertTrue(output('test', con):find('wave', 1, true), 'Disabled MiniCons preserved in output')
     rejects(con:gsub('|wave', '|wave,smile'))
@@ -162,7 +174,7 @@ describe('Messenger validation', function()
     }]]
     books['lb-minitalk.openblock'] = { { content = 'identifier=card\nUse the literal payload string.' } }
     books['lb-minitalk.openblock.card'] = { { content = extensionCode } }
-    block = example:gsub('p2|text|방금|찾으면 말해줘', 'p2|openblock:card|방금|payload')
+    block = fixture:gsub('p2|text|방금|찾으면 말해줘', 'p2|openblock:card|방금|payload')
     rejects(block)
     test.assertTrue(not instructions('test', { guideline = source }).guideline:find('identifier=card', 1, true),
       'Disabled OpenBlock prompt omitted')
@@ -187,6 +199,14 @@ describe('Messenger validation', function()
           'OpenBlock mentions match supplied instructions')
       end
     end
+    toggles['toggle_lb-minitalk.preset'] = '1'
+    local sideStory = instructions('test', { guideline = source }).guideline
+    test.assertTrue(not sideStory:find('### MiniCons', 1, true)
+      and not sideStory:find('### OpenBlocks', 1, true)
+      and not sideStory:find('<!-- lb-minitalk-cons-guideline -->', 1, true)
+      and not sideStory:find('<!-- lb-minitalk-openblock-guideline -->', 1, true),
+      'Side story omits enabled media instructions and their markers')
+    toggles['toggle_lb-minitalk.preset'] = '0'
     local consBooks = books['lb-mini.cons']
     local blockBooks = books['lb-minitalk.openblock']
     books['lb-mini.cons'] = nil
@@ -215,7 +235,7 @@ describe('Messenger rendering', function()
     test.assertTrue(renderedGroupRoom:find(
       '<p class="lb-minitalk-participants">퇴근시켜줘, 귤두개 외 2명</p>', 1, true),
       'Participant list summarizes names after the first two')
-    test.assertTrue(html:find('%-%-lb%-minitalk%-avatar%-seed:%d+'), 'Generated avatar has a nickname seed')
+    test.assertTrue(html:find('%-%-lb%-minitalk%-gradient%-seed:%d+'), 'Generated avatar has a nickname seed')
     test.assertTrue(html:find('class="lb-minitalk-message-row"', 1, true)
       and html:find('class="lb-minitalk-time"', 1, true), 'Time renders beside message content')
     test.assertTrue(html:find('<div class="lb-minitalk-openblock"><b>payload</b></div>', 1, true),
@@ -253,7 +273,7 @@ pov: p1
     test.assertTrue(renderedSkip:find('<div class="lb-minitalk-skip">생략됨</div>', 1, true),
       'Skip renders as a separator')
     for _, eventType in ipairs({ 'invited', 'exit' }) do
-      local event = example:gsub('p2|text|방금|찾으면 말해줘', '-|' .. eventType .. '|방금|p2')
+      local event = fixture:gsub('p2|text|방금|찾으면 말해줘', '-|' .. eventType .. '|방금|p2')
       validate('test', event)
       local roundtrip = runtime.decode('test', runtime.extract(output('test', event)).content, true)
       test.assertTrue(roundtrip.messages[6].content == 'p2' and roundtrip.messages[6].type == eventType,
@@ -280,18 +300,18 @@ pov: p1
     local disabledBlock = display('test', block, { index = 9 })
     test.assertTrue(disabledBlock:find('lb-minitalk-openblock-fallback', 1, true)
       and not disabledBlock:find('payload', 1, true), 'Disabled OpenBlock uses an opaque fallback')
-    local hostile = example:gsub('찾으면 말해줘', '<script>{{button::x::bad}}</script>')
+    local hostile = fixture:gsub('찾으면 말해줘', '<script>{{button::x::bad}}</script>')
     local safe = display('test', hostile, { index = 9 })
     test.assertTrue(not safe:find('<script>', 1, true) and not safe:find('{{button', 1, true), 'HTML and CBS escaped')
     toggles['toggle_lb-minitalk.renderer'] = '1'
     books['lb-minitalk.renderer'] = { { content = 'return function() return "<div>custom</div>" end' } }
-    test.assertEquals(display('test', roomExample, { index = 9 }), '<div>custom</div>', 'Custom renderer selected')
+    test.assertEquals(display('test', roomFixture, { index = 9 }), '<div>custom</div>', 'Custom renderer selected')
     books['lb-minitalk.renderer'] = { { content = 'return function() error("broken") end' } }
-    test.assertTrue(display('test', example, { index = 9 }):find('lb-minitalk-dialog', 1, true),
+    test.assertTrue(display('test', fixture, { index = 9 }):find('lb-minitalk-dialog', 1, true),
       'Custom failure fallback')
-    test.assertEquals(display('test', example, { index = 0 }), example, 'Old display skipped')
+    test.assertEquals(display('test', fixture, { index = 0 }), fixture, 'Old display skipped')
     toggles['toggle_lb-minitalk.renderer'] = '0'
-    local outgoing = example:gsub('p2|text|방금|찾으면', 'p1|text|방금|찾으면')
+    local outgoing = fixture:gsub('p2|text|방금|찾으면', 'p1|text|방금|찾으면')
     test.assertTrue(display('test', outgoing, { index = 9 }):find('data-self="true"', 1, true),
       'Viewpoint bubble aligned right')
   end)
@@ -317,7 +337,7 @@ describe('Messenger mutation', function()
         previousNode = previous,
       })
     end
-    previous = runtime.extract(example)
+    previous = runtime.extract(fixture)
     operations = {}
     test.assertEquals(output('test', patchOutput), patchOutput, 'Patch survives onOutput')
     local appended = apply({ {
@@ -369,17 +389,17 @@ describe('Messenger mutation', function()
     test.assertTrue(not success, 'Invalid patched room rejected')
     success = pcall(apply, { { op = 'remove', path = '/messages/99' } }, previous)
     test.assertTrue(not success, 'Invalid patch path rejected')
-    test.assertEquals(mutate('test', 'reroll', example), example, 'Reroll unchanged')
+    test.assertEquals(mutate('test', 'reroll', fixture), fixture, 'Reroll unchanged')
   end)
 end)
 
 describe('Messenger key-figure state', function()
   it('merges key-figure updates into cached state without storing them in the room', function()
-    validate('test', roomExample)
-    rejects(example:gsub('민지|귤두개|모두에게 짧게 연속 전송하며 정정은 새 메시지로 보냄', '민지|귤두개'))
-    local stored = output('test', example)
+    validate('test', roomFixture)
+    rejects(fixture:gsub('민지|귤두개|모두에게 짧게 연속 전송하며 정정은 새 메시지로 보냄', '민지|귤두개'))
+    local stored = output('test', fixture)
     local preserved = variables['lb-minitalk.keyfigures']
-    test.assertEquals(output('test', roomExample), normalized, 'Missing key figures accepted')
+    test.assertEquals(output('test', roomFixture), normalized, 'Missing key figures accepted')
     test.assertEquals(variables['lb-minitalk.keyfigures'], preserved, 'Missing key figures preserve state')
     test.assertTrue(stored:find('keyFigures', 1, true) == nil, 'Key figures removed from stored room output')
     test.assertEquals(#runtime.decode('test', runtime.extract(stored).content, false).keyFigures, 1,
@@ -396,18 +416,18 @@ describe('Messenger key-figure state', function()
     local updated = apply({ { op = 'replace', path = '/name', value = 'changed room' } }, runtime.extract(stored))
     test.assertTrue(updated:find('keyFigures', 1, true) == nil, 'Mutation keeps key figures out of room output')
     test.assertEquals(variables['lb-minitalk.keyfigures'], preserved, 'Mutation preserves cached key figures')
-    local cleared = example:gsub(
+    local cleared = fixture:gsub(
       'keyFigures%[1|%]{keyFigure|nickname|note}:\n  [^\n]+\n', 'keyFigures[0|]:\n')
     output('test', cleared)
     test.assertEquals(variables['lb-minitalk.keyfigures'], preserved, 'Empty key-figure updates preserve state')
-    local added = example:gsub(
+    local added = fixture:gsub(
       'keyFigures%[1|%]{keyFigure|nickname|note}:\n  [^\n]+',
       [[keyFigures[1|]{keyFigure|nickname|note}:
   Vergilius|베르|단호한 말투]])
     output('test', added)
     test.assertEquals(#prelude.toon.decode(variables['lb-minitalk.keyfigures']), 2,
       'New key-figure updates merge into preserved state')
-    local replaced = example:gsub(
+    local replaced = fixture:gsub(
       'keyFigures%[1|%]{keyFigure|nickname|note}:\n  [^\n]+',
       [[keyFigures[1|]{keyFigure|nickname|note}:
   민지|귤셋|모두에게 짧게 보내고 친한 친구에게만 문장 끝을 생략함]])

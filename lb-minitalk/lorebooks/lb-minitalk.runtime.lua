@@ -174,8 +174,8 @@ local function validateData(triggerId, data, generation)
   validateKeyFigures(data.keyFigures)
   array(data.messages)
   array(data.participants)
-  if prelude.trim(data.name) == '' or #data.participants < 2 or #data.participants > 10 then
-    fail('A room needs a name and two to ten participants.')
+  if prelude.trim(data.name) == '' or #data.participants < 1 or #data.participants > 10 then
+    fail('A room needs a name and one to ten participants.')
   end
   local participants = {}
   for _, participant in ipairs(data.participants) do
@@ -188,12 +188,6 @@ local function validateData(triggerId, data, generation)
   end
   if not participants[data.pov] then
     fail('pov must reference a participant.')
-  end
-  if generation then
-    local room = getGlobalVar(triggerId, 'toggle_lb-minitalk.room')
-    if (room == '1' and #data.participants ~= 2) or (room == '2' and #data.participants < 3) then
-      fail('Participant count does not match the room setting.')
-    end
   end
   local extensions = openblocks(triggerId)
   for _, message in ipairs(data.messages) do
@@ -365,6 +359,10 @@ local function preserveKeyFigures(triggerId, entries)
   local keyFigures = {}
   local indices = {}
   local function merge(entry)
+    if type(entry) ~= 'table' or type(entry.keyFigure) ~= 'string' or entry.keyFigure == '' then
+      return
+    end
+
     local index = indices[entry.keyFigure]
     if index then
       keyFigures[index] = entry
@@ -376,7 +374,8 @@ local function preserveKeyFigures(triggerId, entries)
   if type(preserved) == 'string' and prelude.trim(preserved) ~= '' and preserved ~= 'null' then
     local success, decoded = pcall(prelude.toon.decode, preserved)
     if success and type(decoded) == 'table' then
-      for _, entry in ipairs(decoded) do
+      local source = type(decoded.keyFigures) == 'table' and decoded.keyFigures or decoded
+      for _, entry in ipairs(source) do
         merge(entry)
       end
     end

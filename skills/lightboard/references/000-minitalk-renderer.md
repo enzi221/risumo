@@ -75,7 +75,7 @@ Call `options.renderContent(message)` for every message except `pause` and `skip
 
 Respecting other visual preferences is not a requirement. It should depend on the user requested design.
 
-### OpenBlock colors
+### OpenBlock styling
 
 Set these inherited custom properties on each message wrapper that contains `options.renderContent(message)`:
 
@@ -84,8 +84,17 @@ Set these inherited custom properties on each message wrapper that contains `opt
 - `--lb-minitalk-bg-2`: Secondary content surface.
 - `--lb-minitalk-border`: Content border color.
 - `--lb-minitalk-fg`: Content foreground color.
+- `--lb-minitalk-radius`: Complete CSS `border-radius` value for text bubbles and OpenBlock outer surfaces.
 
 Set the properties per message. Apply outgoing-message surface variants to the properties so text bubbles and OpenBlocks receive the same sender-specific palette. Keep palette calculations in the message wrapper and consume the properties directly in content CSS.
+
+Set sender-specific corner shapes through `--lb-minitalk-radius` on the message wrapper. Use `border-radius: var(--lb-minitalk-radius)` on text bubbles and OpenBlock outer surfaces.
+
+### Profile gradients
+
+Add the shared `lb-minitalk-gradient` class to a profile element and set the inline custom property `--lb-minitalk-gradient-seed` to a stable integer for each participant. Omit `data-pattern` for the default blobs gradient, or set `data-pattern` to `blobs`, `dots`, `orbs`, or `stripes`.
+
+Define profile dimensions, shape, placement, and visibility in the renderer's own classes. Use `lb-minitalk-gradient` only for the seeded background.
 
 ### Icons
 

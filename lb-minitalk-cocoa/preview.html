@@ -1,0 +1,1461 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lb-minitalk-cocoa 카카오톡 렌더러 미리보기</title>
+    <style>
+      /* ==========================================================================
+       미리보기 페이지 전용 데모 컨트롤러 및 레이아웃
+       ========================================================================== */
+      :root {
+        --preview-bg: #eceef2;
+        --preview-panel-bg: #ffffff;
+        --preview-panel-border: #d7dbe0;
+        --preview-text: #22262d;
+        --preview-text-muted: #6e7682;
+      }
+
+      body {
+        background-color: var(--preview-bg);
+        color: var(--preview-text);
+        font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Pretendard', 'Noto Sans KR', 'Segoe UI', sans-serif;
+        margin: 0;
+        padding: 24px 16px 60px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        box-sizing: border-box;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .demo-header {
+        width: 100%;
+        max-width: 520px;
+        margin-bottom: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .demo-title-bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .demo-title-bar h1 {
+        font-size: 20px;
+        font-weight: 800;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #191919;
+      }
+
+      .demo-badge {
+        background: #fee500;
+        color: #3c1e1e;
+        font-size: 11px;
+        font-weight: 800;
+        padding: 3px 8px;
+        border-radius: 6px;
+        letter-spacing: -0.02em;
+      }
+
+      .demo-desc {
+        font-size: 13px;
+        color: var(--preview-text-muted);
+        margin: 0;
+        line-height: 1.5;
+      }
+
+      .demo-toolbar {
+        background: var(--preview-panel-bg);
+        border: 1px solid var(--preview-panel-border);
+        border-radius: 12px;
+        padding: 10px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      }
+
+      .demo-toolbar-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .demo-btn-group {
+        display: inline-flex;
+        background: #f1f3f6;
+        padding: 3px;
+        border-radius: 8px;
+        gap: 2px;
+      }
+
+      .demo-btn {
+        appearance: none;
+        border: none;
+        background: transparent;
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--preview-text-muted);
+        cursor: pointer;
+        transition: all 0.15s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;
+      }
+
+      .demo-btn.active {
+        background: #ffffff;
+        color: #191919;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .demo-stage {
+        width: 100%;
+        max-width: 440px;
+        display: flex;
+        justify-content: center;
+      }
+
+      /* ==========================================================================
+       lb-minitalk-cocoa CSS (카카오 시그니처 스카이블루 배경 통일 + 4색 말풍선)
+       ========================================================================== */
+
+      /* 1. 카카오 공통 기본 변수 (라이트 모드 배경은 카카오 시그니처 #BACEE0로 통일) */
+      .lb-minitalk-cocoa-root {
+        --cocoa-sky-bg: #bacee0;
+        --cocoa-header-bg: #bacee0;
+        --cocoa-chat-bg: #bacee0;
+        --cocoa-header-border: rgba(0, 0, 0, 0.08);
+        --cocoa-text-primary: #191919;
+        --cocoa-text-secondary: #556677;
+        --cocoa-text-muted: #72808e;
+        --cocoa-bubble-incoming: #ffffff;
+        --cocoa-bubble-incoming-text: #191919;
+        --cocoa-system-pill-bg: rgba(0, 0, 0, 0.16);
+        --cocoa-system-pill-text: #ffffff;
+        --cocoa-composer-bg: #ffffff;
+        --cocoa-composer-border: #e2e4e7;
+        --cocoa-input-bg: #f2f3f5;
+        --cocoa-input-text: #828790;
+        --cocoa-btn-icon: #4a535e;
+        --cocoa-shadow: rgba(0, 0, 0, 0.08);
+        --cocoa-avatar-outline: rgba(0, 0, 0, 0.08);
+
+        /* 인커밍 OpenBlock 공통 */
+        --cocoa-ob-bg: #ffffff;
+        --cocoa-ob-bg-2: #f2f3f6;
+        --cocoa-ob-border: #e2e5e8;
+        --cocoa-ob-fg: #191919;
+
+        width: 100%;
+      }
+
+      /* 4색 테마별 말풍선/포인트 컬러 정의 (라이트 모드) */
+      /* [1] ✨ 노랑 (카카오 원조 시그니처 옐로우) */
+      .lb-minitalk-cocoa-root[data-color='yellow'] {
+        --cocoa-accent: #e59a00;
+        --cocoa-bubble-outgoing: #fee500;
+        --cocoa-bubble-outgoing-text: #191919;
+        --cocoa-bubble-outgoing-sub: #edd500;
+        --cocoa-bubble-outgoing-border: #e2c900;
+        --cocoa-bubble-outgoing-accent: #3c1e1e;
+        --cocoa-unread: #d48b00;
+        --cocoa-ob-accent: #e59a00;
+      }
+
+      /* [2] ♦️ 빨분 (피치/로즈 핑크 말풍선) */
+      .lb-minitalk-cocoa-root[data-color='pink'] {
+        --cocoa-accent: #ff5b7e;
+        --cocoa-bubble-outgoing: #ff5b7e;
+        --cocoa-bubble-outgoing-text: #ffffff;
+        --cocoa-bubble-outgoing-sub: #e64a6c;
+        --cocoa-bubble-outgoing-border: #d93b5e;
+        --cocoa-bubble-outgoing-accent: #ffffff;
+        --cocoa-unread: #d93b5e;
+        --cocoa-ob-accent: #ff5b7e;
+      }
+
+      /* [3] 💎 파랑 (산뜻한 코발트/세룰리안 블루 말풍선) */
+      .lb-minitalk-cocoa-root[data-color='blue'] {
+        --cocoa-accent: #388bf2;
+        --cocoa-bubble-outgoing: #388bf2;
+        --cocoa-bubble-outgoing-text: #ffffff;
+        --cocoa-bubble-outgoing-sub: #2779de;
+        --cocoa-bubble-outgoing-border: #1b6ccd;
+        --cocoa-bubble-outgoing-accent: #ffffff;
+        --cocoa-unread: #226ecf;
+        --cocoa-ob-accent: #388bf2;
+      }
+
+      /* [4] 🌳 초록 (생생한 리프 그린/민트 말풍선) */
+      .lb-minitalk-cocoa-root[data-color='green'] {
+        --cocoa-accent: #2eb872;
+        --cocoa-bubble-outgoing: #2eb872;
+        --cocoa-bubble-outgoing-text: #ffffff;
+        --cocoa-bubble-outgoing-sub: #24a162;
+        --cocoa-bubble-outgoing-border: #1b8f53;
+        --cocoa-bubble-outgoing-accent: #ffffff;
+        --cocoa-unread: #1f9457;
+        --cocoa-ob-accent: #2eb872;
+      }
+
+      /* 다크 모드 공통 오버라이드 (딥 차콜 배경) */
+      .lb-minitalk-cocoa-root[data-theme='dark'] {
+        --cocoa-sky-bg: #1e1f21;
+        --cocoa-header-bg: #1e1f21;
+        --cocoa-header-border: rgba(255, 255, 255, 0.08);
+        --cocoa-chat-bg: #1e1f21;
+        --cocoa-text-primary: #f0f1f3;
+        --cocoa-text-secondary: #8e949e;
+        --cocoa-text-muted: #6e747e;
+        --cocoa-bubble-incoming: #2c2d31;
+        --cocoa-bubble-incoming-text: #f0f1f3;
+        --cocoa-system-pill-bg: rgba(255, 255, 255, 0.12);
+        --cocoa-system-pill-text: #d8dade;
+        --cocoa-composer-bg: #26272b;
+        --cocoa-composer-border: #33353b;
+        --cocoa-input-bg: #323338;
+        --cocoa-input-text: #8e949e;
+        --cocoa-btn-icon: #a0a6b0;
+        --cocoa-shadow: rgba(0, 0, 0, 0.35);
+        --cocoa-avatar-outline: rgba(255, 255, 255, 0.12);
+
+        /* 다크모드 인커밍 OpenBlock */
+        --cocoa-ob-bg: #2c2d31;
+        --cocoa-ob-bg-2: #202124;
+        --cocoa-ob-border: #3e4149;
+        --cocoa-ob-fg: #f0f1f3;
+      }
+
+      /* 다크 모드 테마별 포인트/말풍선 */
+      .lb-minitalk-cocoa-root[data-color='yellow'][data-theme='dark'] {
+        --cocoa-unread: #fee500;
+        --cocoa-ob-accent: #fee500;
+      }
+
+      .lb-minitalk-cocoa-root[data-color='pink'][data-theme='dark'] {
+        --cocoa-bubble-outgoing: #ff6b8b;
+        --cocoa-unread: #ff6b8b;
+        --cocoa-ob-accent: #ff6b8b;
+      }
+
+      .lb-minitalk-cocoa-root[data-color='blue'][data-theme='dark'] {
+        --cocoa-bubble-outgoing: #4898f6;
+        --cocoa-unread: #4898f6;
+        --cocoa-ob-accent: #4898f6;
+      }
+
+      .lb-minitalk-cocoa-root[data-color='green'][data-theme='dark'] {
+        --cocoa-bubble-outgoing: #45c482;
+        --cocoa-unread: #45c482;
+        --cocoa-ob-accent: #45c482;
+      }
+
+      /* 2. 대화창 본체 (Dialog) */
+      .lb-minitalk-cocoa-dialog {
+        background: var(--cocoa-chat-bg);
+        border: 1px solid var(--cocoa-header-border);
+        border-radius: 12px;
+        box-shadow: 0 16px 40px var(--cocoa-shadow);
+        box-sizing: border-box;
+        color: var(--cocoa-text-primary);
+        font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Pretendard', 'Noto Sans KR', sans-serif;
+        font-size: 14px;
+        height: 640px;
+        line-height: 1.5;
+        margin: auto;
+        overflow: hidden;
+        padding: 0;
+        text-align: left;
+        width: 100%;
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        position: relative;
+      }
+
+      /* 3. 카카오톡 상단 헤더 */
+      .lb-minitalk-cocoa-header {
+        align-items: center;
+        background: var(--cocoa-header-bg);
+        border-bottom: 1px solid var(--cocoa-header-border);
+        color: var(--cocoa-text-primary);
+        display: flex;
+        gap: 10px;
+        height: 54px;
+        justify-content: space-between;
+        padding: 0 16px;
+        box-sizing: border-box;
+        user-select: none;
+        z-index: 10;
+      }
+
+      .lb-minitalk-cocoa-heading {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .lb-minitalk-cocoa-heading-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .lb-minitalk-cocoa-title {
+        color: var(--cocoa-text-primary);
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .lb-minitalk-cocoa-count {
+        color: var(--cocoa-text-secondary);
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .lb-minitalk-cocoa-participants {
+        color: var(--cocoa-text-secondary);
+        font-size: 11px;
+        margin: 1px 0 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .lb-minitalk-cocoa-header-actions {
+        align-items: center;
+        display: flex;
+        flex-shrink: 0;
+        gap: 4px;
+      }
+
+      .lb-minitalk-cocoa-action-btn {
+        align-items: center;
+        appearance: none;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 6px;
+        color: var(--cocoa-btn-icon);
+        cursor: pointer;
+        display: inline-flex;
+        font: inherit;
+        justify-content: center;
+        padding: 0;
+        height: 30px;
+        width: 30px;
+        box-sizing: border-box;
+        transition: background-color 0.15s ease;
+      }
+
+      .lb-minitalk-cocoa-action-btn:hover {
+        background: rgba(0, 0, 0, 0.06);
+      }
+
+      .lb-minitalk-cocoa-action-btn svg {
+        display: block;
+        width: 15px;
+        height: 15px;
+      }
+
+      .lb-minitalk-cocoa-room-btn {
+        background: rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 6px;
+        color: var(--cocoa-text-primary);
+        cursor: pointer;
+        font-size: 11.5px;
+        font-weight: 600;
+        height: 28px;
+        padding: 0 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;
+        transition: background-color 0.15s ease;
+      }
+
+      .lb-minitalk-cocoa-room-btn:hover {
+        background: rgba(0, 0, 0, 0.1);
+      }
+
+      /* 4. 메시지 영역 (스크롤 리스트) */
+      .lb-minitalk-cocoa-messages {
+        background: var(--cocoa-chat-bg);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-height: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        padding: 16px 14px;
+        scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+        scrollbar-width: thin;
+        box-sizing: border-box;
+      }
+
+      .lb-minitalk-cocoa-messages > * {
+        flex-shrink: 0;
+      }
+
+      /* 5. 시스템 이벤트 / 날짜 / 건너뛰기 뱃지 */
+      .lb-minitalk-cocoa-date,
+      .lb-minitalk-cocoa-pause {
+        align-self: center;
+        background: var(--cocoa-system-pill-bg);
+        border-radius: 999px;
+        color: var(--cocoa-system-pill-text);
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11px;
+        font-weight: 500;
+        margin: 10px auto;
+        padding: 4px 12px;
+        text-align: center;
+        user-select: none;
+      }
+
+      .lb-minitalk-cocoa-event {
+        align-self: center;
+        background: var(--cocoa-system-pill-bg);
+        border-radius: 999px;
+        color: var(--cocoa-system-pill-text);
+        display: inline-flex;
+        font-size: 11px;
+        font-weight: 500;
+        margin: 6px auto;
+        padding: 4px 12px;
+        text-align: center;
+        user-select: none;
+      }
+
+      .lb-minitalk-cocoa-skip {
+        align-self: stretch;
+        background: rgba(0, 0, 0, 0.05);
+        border: 1px dashed rgba(0, 0, 0, 0.12);
+        border-radius: 8px;
+        box-sizing: border-box;
+        color: var(--cocoa-text-secondary);
+        font-size: 11.5px;
+        font-weight: 600;
+        margin: 10px 0;
+        padding: 6px 0;
+        text-align: center;
+        width: 100%;
+        user-select: none;
+      }
+
+      /* 6. 개별 메시지 행 컨테이너 */
+      .lb-minitalk-cocoa-message {
+        --lb-minitalk-accent: var(--cocoa-ob-accent);
+        --lb-minitalk-bg: var(--cocoa-ob-bg);
+        --lb-minitalk-bg-2: var(--cocoa-ob-bg-2);
+        --lb-minitalk-border: var(--cocoa-ob-border);
+        --lb-minitalk-fg: var(--cocoa-ob-fg);
+
+        align-self: flex-start;
+        align-items: flex-start;
+        display: flex;
+        gap: 8px;
+        max-width: 100%;
+        min-width: 0;
+        margin-top: 2px;
+      }
+
+      .lb-minitalk-cocoa-message[data-group-start='true'] {
+        margin-top: 10px;
+      }
+
+      .lb-minitalk-cocoa-skip + .lb-minitalk-cocoa-message[data-group-start='true'] {
+        margin-top: 4px;
+      }
+
+      /* 본인 메시지 */
+      .lb-minitalk-cocoa-message[data-self='true'] {
+        --lb-minitalk-accent: var(--cocoa-bubble-outgoing-accent);
+        --lb-minitalk-bg: var(--cocoa-bubble-outgoing);
+        --lb-minitalk-bg-2: var(--cocoa-bubble-outgoing-sub);
+        --lb-minitalk-border: var(--cocoa-bubble-outgoing-border);
+        --lb-minitalk-fg: var(--cocoa-bubble-outgoing-text);
+
+        align-self: flex-end;
+        flex-direction: row-reverse;
+      }
+
+      /* 7. 아바타: border 제거 및 outline -1px 적용 */
+      .lb-minitalk-cocoa-avatar {
+        --avatar-hue: mod(var(--lb-minitalk-avatar-seed, 120), 360);
+        --avatar-shape: calc(mod(var(--lb-minitalk-avatar-seed, 120), 997) * 1deg);
+        --avatar-deep: hsl(var(--avatar-hue) 68% 38%);
+        --avatar-light: hsl(calc(var(--avatar-hue) + 48) 88% 72%);
+        --avatar-mid: hsl(var(--avatar-hue) 78% 55%);
+
+        background-color: var(--avatar-mid);
+        border: none;
+        outline: 1px solid var(--cocoa-avatar-outline);
+        outline-offset: -1px;
+        border-radius: 40%;
+        box-sizing: border-box;
+        flex: 0 0 38px;
+        height: 38px;
+        overflow: hidden;
+        position: relative;
+        width: 38px;
+        user-select: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        font-weight: 700;
+        color: #ffffff;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      }
+
+      .lb-minitalk-cocoa-avatar[data-visible='false'] {
+        visibility: hidden;
+      }
+
+      .lb-minitalk-cocoa-message[data-self='true'] .lb-minitalk-cocoa-avatar {
+        display: none;
+      }
+
+      .lb-minitalk-cocoa-avatar::after {
+        background: linear-gradient(145deg, rgb(255 255 255 / 35%), transparent 42%);
+        content: '';
+        inset: 0;
+        position: absolute;
+        pointer-events: none;
+      }
+
+      .lb-minitalk-cocoa-avatar[data-pattern='dots'] {
+        background:
+          radial-gradient(
+            circle at calc(50% + cos(var(--avatar-shape)) * 34%) calc(50% + sin(var(--avatar-shape)) * 34%),
+            var(--avatar-light) 0 calc(12% + sin(var(--avatar-shape)) * 4%),
+            transparent calc(13% + sin(var(--avatar-shape)) * 4%)
+          ),
+          radial-gradient(
+            circle at calc(50% + cos(calc(var(--avatar-shape) + 120deg)) * 34%) calc(50% + sin(calc(var(--avatar-shape) + 120deg)) * 34%),
+            var(--avatar-deep) 0 calc(15% + cos(var(--avatar-shape)) * 4%),
+            transparent calc(16% + cos(var(--avatar-shape)) * 4%)
+          ),
+          var(--avatar-mid);
+      }
+
+      .lb-minitalk-cocoa-avatar[data-pattern='orbs'] {
+        background:
+          radial-gradient(
+            circle at calc(50% + cos(var(--avatar-shape)) * 48%) calc(50% + sin(var(--avatar-shape)) * 48%),
+            var(--avatar-light) 0 calc(31% + sin(var(--avatar-shape)) * 5%),
+            transparent calc(32% + sin(var(--avatar-shape)) * 5%)
+          ),
+          radial-gradient(
+            circle at calc(50% + cos(calc(var(--avatar-shape) + 118deg)) * 43%) calc(50% + sin(calc(var(--avatar-shape) + 118deg)) * 43%),
+            var(--avatar-deep) 0 calc(24% + cos(var(--avatar-shape)) * 4%),
+            transparent calc(25% + cos(var(--avatar-shape)) * 4%)
+          ),
+          linear-gradient(145deg, var(--avatar-mid), var(--avatar-deep));
+      }
+
+      .lb-minitalk-cocoa-avatar[data-pattern='stripes'] {
+        --avatar-gap: calc(10px + sin(var(--avatar-shape)) * 3px);
+        --avatar-stripe: calc(5px + cos(var(--avatar-shape)) * 2px);
+        background:
+          repeating-linear-gradient(
+            var(--avatar-shape),
+            transparent 0 var(--avatar-gap),
+            rgb(255 255 255 / 34%) var(--avatar-gap) calc(var(--avatar-gap) + var(--avatar-stripe))
+          ),
+          linear-gradient(135deg, var(--avatar-mid), var(--avatar-deep));
+      }
+
+      .lb-minitalk-cocoa-avatar[data-pattern='blobs'] {
+        background:
+          radial-gradient(
+            circle at calc(50% + cos(var(--avatar-shape)) * 30%) calc(50% + sin(var(--avatar-shape)) * 30%),
+            var(--avatar-light) 0 24%,
+            transparent 54%
+          ),
+          radial-gradient(
+            circle at calc(50% + cos(calc(var(--avatar-shape) + 137deg)) * 32%) calc(50% + sin(calc(var(--avatar-shape) + 137deg)) * 32%),
+            var(--avatar-deep) 0 20%,
+            transparent 50%
+          ),
+          linear-gradient(145deg, var(--avatar-mid), var(--avatar-deep));
+        background-blend-mode: screen, multiply, normal;
+      }
+
+      .lb-minitalk-cocoa-avatar-text {
+        position: relative;
+        z-index: 1;
+        line-height: 1;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+
+      /* 8. 메시지 바디 및 발신자 이름 */
+      .lb-minitalk-cocoa-message-body {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+
+      .lb-minitalk-cocoa-message[data-self='true'] .lb-minitalk-cocoa-message-body {
+        align-items: flex-end;
+      }
+
+      .lb-minitalk-cocoa-sender {
+        color: var(--cocoa-text-secondary);
+        font-size: 12px;
+        font-weight: 600;
+        margin: 0 2px 4px;
+        overflow-wrap: anywhere;
+      }
+
+      .lb-minitalk-cocoa-sender[data-visible='false'] {
+        display: none;
+      }
+
+      .lb-minitalk-cocoa-message[data-self='true'] .lb-minitalk-cocoa-sender {
+        display: none;
+      }
+
+      /* 9. 메시지 행 (말풍선 + 타임스탬프) */
+      .lb-minitalk-cocoa-message-row {
+        align-items: flex-end;
+        display: flex;
+        gap: 5px;
+        min-width: 0;
+      }
+
+      .lb-minitalk-cocoa-message[data-self='true'] .lb-minitalk-cocoa-message-row {
+        flex-direction: row-reverse;
+      }
+
+      /* 10. 타임스탬프 및 1(안읽음) 뱃지 */
+      .lb-minitalk-cocoa-meta {
+        display: flex;
+        flex-direction: column;
+        flex: 0 0 auto;
+        gap: 2px;
+        padding-bottom: 2px;
+        user-select: none;
+      }
+
+      .lb-minitalk-cocoa-message[data-self='true'] .lb-minitalk-cocoa-meta {
+        align-items: flex-end;
+      }
+
+      .lb-minitalk-cocoa-unread {
+        color: var(--cocoa-unread);
+        font-size: 10px;
+        font-weight: 800;
+        line-height: 1;
+      }
+
+      .lb-minitalk-cocoa-time {
+        color: var(--cocoa-text-secondary);
+        font-size: 10px;
+        line-height: 1.1;
+        white-space: nowrap;
+      }
+
+      /* 11. 카카오톡 말풍선 스타일 (카톡 PC 특유의 단정한 4px 라운딩 및 꼬리 오프셋) */
+      .lb-minitalk-cocoa-content {
+        background: var(--cocoa-bubble-incoming);
+        border-radius: 4px;
+        box-shadow: 0 1px 2px var(--cocoa-shadow);
+        box-sizing: border-box;
+        color: var(--cocoa-bubble-incoming-text);
+        font-size: 13.5px;
+        line-height: 1.45;
+        max-width: 290px;
+        overflow-wrap: anywhere;
+        padding: 8px 12px;
+        position: relative;
+        white-space: pre-wrap;
+      }
+
+      .lb-minitalk-cocoa-message[data-group-start='true']:not([data-self='true']) .lb-minitalk-cocoa-content::before {
+        content: '';
+        position: absolute;
+        top: 6px;
+        left: -5px;
+        width: 0;
+        height: 0;
+        border-top: 0 solid transparent;
+        border-bottom: 6px solid transparent;
+        border-right: 6px solid var(--cocoa-bubble-incoming);
+      }
+
+      .lb-minitalk-cocoa-message[data-self='true'] .lb-minitalk-cocoa-content {
+        background: var(--cocoa-bubble-outgoing);
+        color: var(--cocoa-bubble-outgoing-text);
+        border-radius: 4px;
+      }
+
+      .lb-minitalk-cocoa-message[data-group-start='true'][data-self='true'] .lb-minitalk-cocoa-content::after {
+        content: '';
+        position: absolute;
+        top: 8px;
+        right: -5px;
+        width: 0;
+        height: 0;
+        border-top: 0 solid transparent;
+        border-bottom: 6px solid transparent;
+        border-left: 6px solid var(--cocoa-bubble-outgoing);
+      }
+
+      /* 12. 미니콘(MiniCon) 이모티콘 호환 렌더링 */
+      .lb-minitalk-cocoa-media {
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        margin: 0;
+        max-width: 100%;
+        min-width: 0;
+        padding: 0;
+        position: relative;
+      }
+
+      .lb-minitalk-cocoa-media .lb-minitalk-con {
+        border-radius: 0;
+        display: block;
+        height: 120px;
+        width: 120px;
+        margin: 0;
+        max-width: 100%;
+        object-fit: contain;
+        filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.08));
+        transition: transform 0.15s ease;
+      }
+
+      .lb-minitalk-cocoa-media .lb-minitalk-con:hover {
+        transform: scale(1.04);
+      }
+
+      /* 13. 오픈블록(OpenBlock) 호환 래퍼 */
+      .lb-minitalk-cocoa-openblock {
+        color: var(--lb-minitalk-fg);
+        max-width: 100%;
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
+
+      .lb-minitalk-stdblock-card {
+        background: var(--lb-minitalk-bg);
+        border: 1px solid var(--lb-minitalk-border);
+        border-radius: 14px;
+        box-shadow: 0 2px 6px var(--cocoa-shadow);
+        box-sizing: border-box;
+        color: var(--lb-minitalk-fg);
+        display: flex;
+        flex-direction: column;
+        font-size: 13.5px;
+        gap: 10px;
+        line-height: 1.5;
+        max-width: 100%;
+        overflow: hidden;
+        padding: 14px 16px;
+        text-align: left;
+        white-space: normal;
+        width: 290px;
+        overflow-wrap: anywhere;
+      }
+
+      .lb-minitalk-stdblock-eyebrow {
+        color: var(--lb-minitalk-accent);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+      }
+
+      .lb-minitalk-stdblock-title {
+        color: var(--lb-minitalk-fg);
+        font-size: 15px;
+        font-weight: 700;
+        line-height: 1.35;
+      }
+
+      .lb-minitalk-stdblock-description {
+        color: var(--lb-minitalk-fg);
+        font-size: 12.5px;
+        opacity: 0.8;
+        white-space: pre-line;
+      }
+
+      .lb-minitalk-stdblock-opengraph-summary {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .lb-minitalk-stdblock-url {
+        border-top: 1px solid var(--lb-minitalk-border);
+        color: var(--lb-minitalk-fg);
+        font-size: 11px;
+        opacity: 0.65;
+        padding-top: 8px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .lb-minitalk-stdblock-calendar-details {
+        background: var(--lb-minitalk-bg-2);
+        border-radius: 10px;
+        display: grid;
+        gap: 6px;
+        padding: 10px 12px;
+      }
+
+      .lb-minitalk-stdblock-calendar-row {
+        align-items: baseline;
+        color: var(--lb-minitalk-fg);
+        display: grid;
+        font-size: 12.5px;
+        gap: 8px;
+        grid-template-columns: 16px minmax(0, 1fr);
+      }
+
+      .lb-minitalk-stdblock-calendar-icon {
+        color: var(--lb-minitalk-accent);
+        font-size: 13px;
+        font-weight: 700;
+        text-align: center;
+      }
+
+      .lb-minitalk-stdblock-calendar-value {
+        min-width: 0;
+        font-weight: 500;
+      }
+
+      .lb-minitalk-stdblock-calendar-description {
+        border-top: 1px solid var(--lb-minitalk-border);
+        color: var(--lb-minitalk-fg);
+        font-size: 12px;
+        opacity: 0.8;
+        padding-top: 8px;
+        white-space: pre-line;
+      }
+
+      .lb-minitalk-stdblock-options {
+        display: grid;
+        gap: 10px;
+      }
+
+      .lb-minitalk-stdblock-option-line {
+        align-items: baseline;
+        display: flex;
+        gap: 10px;
+        justify-content: space-between;
+        margin-bottom: 4px;
+      }
+
+      .lb-minitalk-stdblock-label {
+        color: var(--lb-minitalk-fg);
+        font-size: 12.5px;
+        font-weight: 500;
+        min-width: 0;
+      }
+
+      .lb-minitalk-stdblock-count {
+        color: var(--lb-minitalk-fg);
+        flex-shrink: 0;
+        font-size: 11px;
+        opacity: 0.7;
+        font-weight: 600;
+      }
+
+      .lb-minitalk-stdblock-track {
+        background: var(--lb-minitalk-bg-2);
+        border-radius: 4px;
+        height: 6px;
+        overflow: hidden;
+      }
+
+      .lb-minitalk-stdblock-fill {
+        background: var(--lb-minitalk-accent);
+        border-radius: 4px;
+        height: 100%;
+      }
+
+      .lb-minitalk-stdblock-footer {
+        color: var(--lb-minitalk-fg);
+        font-size: 11px;
+        opacity: 0.65;
+      }
+
+      .lb-minitalk-openblock-fallback {
+        align-items: center;
+        background: var(--lb-minitalk-bg-2);
+        border: 1px solid var(--lb-minitalk-border);
+        border-radius: 12px;
+        box-sizing: border-box;
+        color: var(--lb-minitalk-fg);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        height: 72px;
+        justify-content: center;
+        width: 140px;
+        font-size: 11px;
+        font-weight: 600;
+        opacity: 0.8;
+      }
+
+      .lb-minitalk-openblock-fallback::before {
+        content: '🖼️';
+        font-size: 24px;
+        line-height: 1;
+      }
+
+      /* 14. 하단 입력 컴포저 */
+      .lb-minitalk-cocoa-composer {
+        background: var(--cocoa-composer-bg);
+        border-top: 1px solid var(--cocoa-composer-border);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        box-sizing: border-box;
+        user-select: none;
+        z-index: 10;
+      }
+
+      .lb-minitalk-cocoa-input-button {
+        appearance: none;
+        background: var(--cocoa-input-bg);
+        border: 1px solid transparent;
+        border-radius: 20px;
+        color: var(--cocoa-input-text);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        flex: 1;
+        font: inherit;
+        font-size: 13.5px;
+        height: 38px;
+        min-width: 0;
+        padding: 0 16px;
+        text-align: left;
+        transition: all 0.15s ease;
+      }
+
+      .lb-minitalk-cocoa-input-button:hover {
+        border-color: rgba(0, 0, 0, 0.15);
+        color: var(--cocoa-text-primary);
+      }
+
+      .lb-minitalk-cocoa-close-btn {
+        appearance: none;
+        background: var(--cocoa-input-bg);
+        border: 1px solid transparent;
+        border-radius: 8px;
+        color: var(--cocoa-text-primary);
+        cursor: pointer;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        height: 38px;
+        padding: 0 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+        flex-shrink: 0;
+        transition: all 0.15s ease;
+      }
+
+      .lb-minitalk-cocoa-close-btn:hover {
+        background: rgba(0, 0, 0, 0.08);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ========================================================================
+       데모 헤더 및 컨트롤러 툴바
+       ======================================================================== -->
+    <header class="demo-header">
+      <div class="demo-title-bar">
+        <h1>
+          <span>💬 lb-minitalk-cocoa</span>
+          <span class="demo-badge">KakaoTalk Theme</span>
+        </h1>
+        <span class="demo-desc">MiniTalk 카카오톡 전용 커스텀 렌더러 미리보기</span>
+      </div>
+
+      <div class="demo-toolbar">
+        <!-- 1행: 미니톡 4색 테마 선택기 -->
+        <div class="demo-toolbar-row">
+          <div style="display: flex; align-items: center; gap: 6px">
+            <span style="font-size: 12px; font-weight: 700; color: #555">말풍선 색상:</span>
+            <div class="demo-btn-group">
+              <button type="button" class="demo-btn active" id="btn-col-yellow" onclick="setColor('yellow')">
+                <span>✨ 노랑</span>
+              </button>
+              <button type="button" class="demo-btn" id="btn-col-pink" onclick="setColor('pink')">
+                <span>♦️ 핑크</span>
+              </button>
+              <button type="button" class="demo-btn" id="btn-col-blue" onclick="setColor('blue')">
+                <span>💎 파랑</span>
+              </button>
+              <button type="button" class="demo-btn" id="btn-col-green" onclick="setColor('green')">
+                <span>🌳 초록</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2행: 밝기(다크모드) 및 아바타 스타일 -->
+        <div class="demo-toolbar-row">
+          <div style="display: flex; align-items: center; gap: 6px">
+            <span style="font-size: 12px; font-weight: 700; color: #555">밝기:</span>
+            <div class="demo-btn-group">
+              <button type="button" class="demo-btn active" id="btn-theme-light" onclick="setTheme('light')">
+                <span>☀️ 라이트</span>
+              </button>
+              <button type="button" class="demo-btn" id="btn-theme-dark" onclick="setTheme('dark')">
+                <span>🌙 다크</span>
+              </button>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 6px">
+            <span style="font-size: 12px; font-weight: 700; color: #555">아바타:</span>
+            <div class="demo-btn-group">
+              <button type="button" class="demo-btn active" id="btn-avatar-initial" onclick="setAvatarMode('initial')">
+                <span>🔤 첫 글자</span>
+              </button>
+              <button type="button" class="demo-btn" id="btn-avatar-gradient" onclick="setAvatarMode('gradient')">
+                <span>🎨 그라디언트</span>
+              </button>
+              <button type="button" class="demo-btn" id="btn-avatar-combo" onclick="setAvatarMode('combo')">
+                <span>✨ 패턴+글자</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ========================================================================
+       실제 렌더러 목업 (MiniTalk 표준 다이얼로그 440px)
+       ======================================================================== -->
+    <main class="demo-stage">
+      <div class="lb-minitalk-cocoa-root" id="cocoa-root" data-color="yellow" data-theme="light">
+        <dialog class="lb-minitalk-cocoa-dialog" open>
+          <!-- 상단 네비게이션 헤더 -->
+          <header class="lb-minitalk-cocoa-header">
+            <div class="lb-minitalk-cocoa-heading">
+              <div class="lb-minitalk-cocoa-heading-row">
+                <h2 class="lb-minitalk-cocoa-title">라보미의 연구실</h2>
+                <span class="lb-minitalk-cocoa-count">3</span>
+              </div>
+              <p class="lb-minitalk-cocoa-participants">라보미, 세준, 사용자</p>
+            </div>
+
+            <div class="lb-minitalk-cocoa-header-actions">
+              <!-- 채팅방 변경 -->
+              <button type="button" class="lb-minitalk-cocoa-room-btn" risu-btn="lb-interaction__lb-minitalk__ChangeRoom" title="채팅방 변경">
+                <span>채팅방 변경</span>
+              </button>
+
+              <!-- 다시 생성 (Reroll) : Lightboard 원본 lb-reroll-icon SVG -->
+              <button type="button" class="lb-minitalk-cocoa-action-btn" risu-btn="lb-reroll__lb-minitalk" title="다시 생성">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 15 15">
+                  <path
+                    fill="currentColor"
+                    fill-rule="evenodd"
+                    d="M1.8 7.5c0-2.8 2.3-5.7 5.7-5.7 2.8 0 4.2 2.1 4.7 3.2h-1.7a.5.5 0 0 0 0 1h3c.3 0 .5-.2.5-.5v-3a.5.5 0 0 0-1 0v1.8A6.3 6.3 0 0 0 7.5.8a6.7 6.7 0 1 0 0 13.4 6.5 6.5 0 0 0 6.1-4.2.5.5 0 1 0-.9-.3 5.5 5.5 0 0 1-5.2 3.5 5.6 5.6 0 0 1-5.7-5.7Z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </button>
+
+              <!-- 시간 보내기 (Pass Time) : MiniTalk 원본 lb-timer SVG -->
+              <button type="button" class="lb-minitalk-cocoa-action-btn" risu-btn="lb-interaction__lb-minitalk__immediate#PassTime" title="시간 보내기">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 15 15">
+                  <path
+                    fill="currentColor"
+                    fill-rule="evenodd"
+                    d="M7.5.85a.5.5 0 0 0-.5.5v2.172a.5.5 0 1 0 1 0v-1.65a5.65 5.65 0 1 1-4.81 1.974.5.5 0 1 0-.762-.647A6.65 6.65 0 1 0 7.5.85m-.76 7.23L4.224 4.573a.25.25 0 0 1 .348-.348L8.081 6.74a.96.96 0 1 1-1.34 1.34"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </button>
+            </div>
+          </header>
+
+          <!-- 대화 메시지 영역 -->
+          <div class="lb-minitalk-cocoa-messages">
+            <!-- 날짜 구분선 -->
+            <div class="lb-minitalk-cocoa-date">2026년 9월 12일 토요일</div>
+
+            <!-- 시스템 초대 알림 -->
+            <div class="lb-minitalk-cocoa-event">라보미님을 초대했습니다.</div>
+
+            <!-- [상대방: 라보미] 텍스트 메시지 1 -->
+            <div class="lb-minitalk-cocoa-message" data-group-start="true" data-self="false">
+              <div class="lb-minitalk-cocoa-avatar avatar-target" data-pattern="orbs" data-visible="true" style="--lb-minitalk-avatar-seed: 348921">
+                <span class="lb-minitalk-cocoa-avatar-text">라</span>
+              </div>
+              <div class="lb-minitalk-cocoa-message-body">
+                <div class="lb-minitalk-cocoa-sender" data-visible="true">라보미</div>
+                <div class="lb-minitalk-cocoa-message-row">
+                  <div class="lb-minitalk-cocoa-content">자기야, 역시 배경은 카카오 그 하늘색(#BACEE0)으로 꽉 잡아주니까 진짜 카톡 같네! ✨</div>
+                  <div class="lb-minitalk-cocoa-meta">
+                    <span class="lb-minitalk-cocoa-time">오전 10:24</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- [상대방: 라보미] 텍스트 메시지 2 -->
+            <div class="lb-minitalk-cocoa-message" data-group-start="false" data-self="false">
+              <div class="lb-minitalk-cocoa-avatar avatar-target" data-visible="false" style="--lb-minitalk-avatar-seed: 348921">
+                <span class="lb-minitalk-cocoa-avatar-text">라</span>
+              </div>
+              <div class="lb-minitalk-cocoa-message-body">
+                <div class="lb-minitalk-cocoa-sender" data-visible="false">라보미</div>
+                <div class="lb-minitalk-cocoa-message-row">
+                  <div class="lb-minitalk-cocoa-content">말풍선 4px에 꼬리 8px 내리니까 완전 카카오톡 PC 버전 그 자체야! 🍋</div>
+                  <div class="lb-minitalk-cocoa-meta">
+                    <span class="lb-minitalk-cocoa-time">오전 10:24</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- [본인] 텍스트 메시지 -->
+            <div class="lb-minitalk-cocoa-message" data-group-start="true" data-self="true">
+              <div class="lb-minitalk-cocoa-avatar"></div>
+              <div class="lb-minitalk-cocoa-message-body">
+                <div class="lb-minitalk-cocoa-message-row">
+                  <div class="lb-minitalk-cocoa-content">맞아, 배경까지 물들면 카카오톡 아이덴티티가 흐려졌지. 이게 훨씬 자연스럽네.</div>
+                  <div class="lb-minitalk-cocoa-meta">
+                    <span class="lb-minitalk-cocoa-unread">1</span>
+                    <span class="lb-minitalk-cocoa-time">오전 10:25</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- [본인] 미니콘 이모티콘 메시지 -->
+            <div class="lb-minitalk-cocoa-message" data-group-start="false" data-self="true">
+              <div class="lb-minitalk-cocoa-avatar"></div>
+              <div class="lb-minitalk-cocoa-message-body">
+                <div class="lb-minitalk-cocoa-message-row">
+                  <div class="lb-minitalk-cocoa-media">
+                    <img
+                      class="lb-minitalk-con"
+                      src="../lb-mini-cons/assets/mini-thumbs-up.webp"
+                      alt="mini-thumbs-up"
+                      onerror="
+                        this.onerror = null
+                        this.src = 'https://placehold.co/120x120/fee500/3c1e1e?text=MiniCon+Thumb'
+                      "
+                    />
+                  </div>
+                  <div class="lb-minitalk-cocoa-meta">
+                    <span class="lb-minitalk-cocoa-unread">1</span>
+                    <span class="lb-minitalk-cocoa-time">오전 10:25</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- [상대방: 세준] 텍스트 메시지 -->
+            <div class="lb-minitalk-cocoa-message" data-group-start="true" data-self="false">
+              <div class="lb-minitalk-cocoa-avatar avatar-target" data-pattern="stripes" data-visible="true" style="--lb-minitalk-avatar-seed: 819203">
+                <span class="lb-minitalk-cocoa-avatar-text">세</span>
+              </div>
+              <div class="lb-minitalk-cocoa-message-body">
+                <div class="lb-minitalk-cocoa-sender" data-visible="true">세준</div>
+                <div class="lb-minitalk-cocoa-message-row">
+                  <div class="lb-minitalk-cocoa-content">어떤 컬러를 골라도 하늘색 채팅방 감성이 그대로 살아있어 좋네요.</div>
+                  <div class="lb-minitalk-cocoa-meta">
+                    <span class="lb-minitalk-cocoa-time">오전 10:26</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- [상대방: 라보미] 미니콘 이모티콘 메시지 -->
+            <div class="lb-minitalk-cocoa-message" data-group-start="true" data-self="false">
+              <div class="lb-minitalk-cocoa-avatar avatar-target" data-pattern="orbs" data-visible="true" style="--lb-minitalk-avatar-seed: 348921">
+                <span class="lb-minitalk-cocoa-avatar-text">라</span>
+              </div>
+              <div class="lb-minitalk-cocoa-message-body">
+                <div class="lb-minitalk-cocoa-sender" data-visible="true">라보미</div>
+                <div class="lb-minitalk-cocoa-message-row">
+                  <div class="lb-minitalk-cocoa-media">
+                    <img
+                      class="lb-minitalk-con"
+                      src="../lb-mini-cons/assets/mini-smug.webp"
+                      alt="mini-smug"
+                      onerror="
+                        this.onerror = null
+                        this.src = 'https://placehold.co/120x120/ffffff/191919?text=MiniCon+Smug'
+                      "
+                    />
+                  </div>
+                  <div class="lb-minitalk-cocoa-meta">
+                    <span class="lb-minitalk-cocoa-time">오전 10:26</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 시간 경과 구분선 -->
+            <div class="lb-minitalk-cocoa-pause">30분 후</div>
+
+            <!-- [상대방: 라보미] 오픈블록 1: 캘린더 -->
+            <div class="lb-minitalk-cocoa-message" data-group-start="true" data-self="false">
+              <div class="lb-minitalk-cocoa-avatar avatar-target" data-pattern="orbs" data-visible="true" style="--lb-minitalk-avatar-seed: 348921">
+                <span class="lb-minitalk-cocoa-avatar-text">라</span>
+              </div>
+              <div class="lb-minitalk-cocoa-message-body">
+                <div class="lb-minitalk-cocoa-sender" data-visible="true">라보미</div>
+                <div class="lb-minitalk-cocoa-message-row">
+                  <div class="lb-minitalk-cocoa-openblock">
+                    <div class="lb-minitalk-stdblock-card lb-minitalk-stdblock-calendar">
+                      <div class="lb-minitalk-stdblock-eyebrow">▣ 캘린더</div>
+                      <div class="lb-minitalk-stdblock-title">라이트보드 릴리즈 점검</div>
+                      <div class="lb-minitalk-stdblock-calendar-details">
+                        <div class="lb-minitalk-stdblock-calendar-row">
+                          <span class="lb-minitalk-stdblock-calendar-icon">◷</span>
+                          <span class="lb-minitalk-stdblock-calendar-value">오늘 오후 3:00 - 4:00</span>
+                        </div>
+                        <div class="lb-minitalk-stdblock-calendar-row">
+                          <span class="lb-minitalk-stdblock-calendar-icon">⌖</span>
+                          <span class="lb-minitalk-stdblock-calendar-value">라보미 중앙 연구실</span>
+                        </div>
+                      </div>
+                      <div class="lb-minitalk-stdblock-calendar-description">카카오톡 렌더러와 오픈블록 표준 규격 통합 최종 검토</div>
+                    </div>
+                  </div>
+                  <div class="lb-minitalk-cocoa-meta">
+                    <span class="lb-minitalk-cocoa-time">오전 10:56</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- [본인] 오픈블록 2: 투표 (선택된 테마 컬러가 투표 게이지 및 카드에 반영됨) -->
+            <div class="lb-minitalk-cocoa-message" data-group-start="true" data-self="true">
+              <div class="lb-minitalk-cocoa-avatar"></div>
+              <div class="lb-minitalk-cocoa-message-body">
+                <div class="lb-minitalk-cocoa-message-row">
+                  <div class="lb-minitalk-cocoa-openblock">
+                    <div class="lb-minitalk-stdblock-card">
+                      <div class="lb-minitalk-stdblock-eyebrow">▥ 투표</div>
+                      <div class="lb-minitalk-stdblock-title">오늘 점심 메뉴 투표!</div>
+                      <div class="lb-minitalk-stdblock-options">
+                        <div class="lb-minitalk-stdblock-option">
+                          <div class="lb-minitalk-stdblock-option-line">
+                            <span class="lb-minitalk-stdblock-label">레몬 띄운 시원한 얼음물</span>
+                            <span class="lb-minitalk-stdblock-count">4표 · 80%</span>
+                          </div>
+                          <div class="lb-minitalk-stdblock-track">
+                            <div class="lb-minitalk-stdblock-fill" style="width: 80%"></div>
+                          </div>
+                        </div>
+                        <div class="lb-minitalk-stdblock-option">
+                          <div class="lb-minitalk-stdblock-option-line">
+                            <span class="lb-minitalk-stdblock-label">치킨 &amp; 감자튀김</span>
+                            <span class="lb-minitalk-stdblock-count">1표 · 20%</span>
+                          </div>
+                          <div class="lb-minitalk-stdblock-track">
+                            <div class="lb-minitalk-stdblock-fill" style="width: 20%"></div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="lb-minitalk-stdblock-footer">총 5표 · 투표 진행 중</div>
+                    </div>
+                  </div>
+                  <div class="lb-minitalk-cocoa-meta">
+                    <span class="lb-minitalk-cocoa-unread">1</span>
+                    <span class="lb-minitalk-cocoa-time">오전 10:58</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- [상대방: 라보미] 오픈블록 3: 오픈그래프 링크 카드 -->
+            <div class="lb-minitalk-cocoa-message" data-group-start="true" data-self="false">
+              <div class="lb-minitalk-cocoa-avatar avatar-target" data-pattern="orbs" data-visible="true" style="--lb-minitalk-avatar-seed: 348921">
+                <span class="lb-minitalk-cocoa-avatar-text">라</span>
+              </div>
+              <div class="lb-minitalk-cocoa-message-body">
+                <div class="lb-minitalk-cocoa-sender" data-visible="true">라보미</div>
+                <div class="lb-minitalk-cocoa-message-row">
+                  <div class="lb-minitalk-cocoa-openblock">
+                    <div class="lb-minitalk-stdblock-card lb-minitalk-stdblock-opengraph">
+                      <div class="lb-minitalk-stdblock-eyebrow">↗ GitHub</div>
+                      <div class="lb-minitalk-stdblock-opengraph-summary">
+                        <div class="lb-minitalk-stdblock-title">risums/lb-minitalk-cocoa</div>
+                        <div class="lb-minitalk-stdblock-description">KakaoTalk renderer module for Risuai MiniTalk with OpenBlock and MiniCon support.</div>
+                      </div>
+                      <div class="lb-minitalk-stdblock-url">https://github.com/risums/lb-minitalk-cocoa</div>
+                    </div>
+                  </div>
+                  <div class="lb-minitalk-cocoa-meta">
+                    <span class="lb-minitalk-cocoa-time">오전 10:59</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- [상대방: 세준] 미지원 오픈블록 폴백 -->
+            <div class="lb-minitalk-cocoa-message" data-group-start="true" data-self="false">
+              <div class="lb-minitalk-cocoa-avatar avatar-target" data-pattern="stripes" data-visible="true" style="--lb-minitalk-avatar-seed: 819203">
+                <span class="lb-minitalk-cocoa-avatar-text">세</span>
+              </div>
+              <div class="lb-minitalk-cocoa-message-body">
+                <div class="lb-minitalk-cocoa-sender" data-visible="true">세준</div>
+                <div class="lb-minitalk-cocoa-message-row">
+                  <div class="lb-minitalk-cocoa-openblock">
+                    <div class="lb-minitalk-openblock-fallback">미지원 블록</div>
+                  </div>
+                  <div class="lb-minitalk-cocoa-meta">
+                    <span class="lb-minitalk-cocoa-time">오전 11:00</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 대화 생략선 -->
+            <div class="lb-minitalk-cocoa-skip">생략됨</div>
+
+            <!-- 시스템 퇴장 알림 -->
+            <div class="lb-minitalk-cocoa-event">세준님이 퇴장했습니다.</div>
+
+            <!-- [본인] 마무리 텍스트 -->
+            <div class="lb-minitalk-cocoa-message" data-group-start="true" data-self="true">
+              <div class="lb-minitalk-cocoa-avatar"></div>
+              <div class="lb-minitalk-cocoa-message-body">
+                <div class="lb-minitalk-cocoa-message-row">
+                  <div class="lb-minitalk-cocoa-content">배경 고정하고 말풍선만 바꾸니까 딱 메신저답다!</div>
+                  <div class="lb-minitalk-cocoa-meta">
+                    <span class="lb-minitalk-cocoa-unread">1</span>
+                    <span class="lb-minitalk-cocoa-time">오전 11:05</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 하단 컴포저 -->
+          <footer class="lb-minitalk-cocoa-composer">
+            <button type="button" class="lb-minitalk-cocoa-input-button" risu-btn="lb-interaction__lb-minitalk__SendMessage" title="메시지 입력">
+              <span>메시지 입력…</span>
+            </button>
+            <button type="button" class="lb-minitalk-cocoa-close-btn" title="대화창 닫기">
+              <span>닫기</span>
+            </button>
+          </footer>
+        </dialog>
+      </div>
+    </main>
+
+    <!-- ========================================================================
+       인터랙티브 데모 제어 스크립트
+       ======================================================================== -->
+    <script>
+      function setColor(color) {
+        const root = document.getElementById('cocoa-root')
+        ;['yellow', 'pink', 'blue', 'green'].forEach((c) => {
+          const btn = document.getElementById('btn-col-' + c)
+          if (btn) btn.classList.remove('active')
+        })
+        const activeBtn = document.getElementById('btn-col-' + color)
+        if (activeBtn) activeBtn.classList.add('active')
+        root.setAttribute('data-color', color)
+      }
+
+      function setTheme(mode) {
+        const root = document.getElementById('cocoa-root')
+        const btnLight = document.getElementById('btn-theme-light')
+        const btnDark = document.getElementById('btn-theme-dark')
+
+        if (mode === 'dark') {
+          root.setAttribute('data-theme', 'dark')
+          btnDark.classList.add('active')
+          btnLight.classList.remove('active')
+        } else {
+          root.setAttribute('data-theme', 'light')
+          btnLight.classList.add('active')
+          btnDark.classList.remove('active')
+        }
+      }
+
+      function setAvatarMode(mode) {
+        const avatars = document.querySelectorAll('.avatar-target')
+        const btnInitial = document.getElementById('btn-avatar-initial')
+        const btnGradient = document.getElementById('btn-avatar-gradient')
+        const btnCombo = document.getElementById('btn-avatar-combo')
+
+        ;[btnInitial, btnGradient, btnCombo].forEach((b) => b.classList.remove('active'))
+
+        if (mode === 'initial') {
+          btnInitial.classList.add('active')
+          avatars.forEach((el) => {
+            el.removeAttribute('data-pattern')
+            const textEl = el.querySelector('.lb-minitalk-cocoa-avatar-text')
+            if (textEl) textEl.style.display = 'block'
+          })
+        } else if (mode === 'gradient') {
+          btnGradient.classList.add('active')
+          avatars.forEach((el) => {
+            const seed = el.style.getPropertyValue('--lb-minitalk-avatar-seed') || '120'
+            const patterns = ['blobs', 'dots', 'orbs', 'stripes']
+            const pat = patterns[Math.floor(parseInt(seed) / 64800) % patterns.length]
+            el.setAttribute('data-pattern', pat)
+            const textEl = el.querySelector('.lb-minitalk-cocoa-avatar-text')
+            if (textEl) textEl.style.display = 'none'
+          })
+        } else {
+          btnCombo.classList.add('active')
+          avatars.forEach((el) => {
+            const seed = el.style.getPropertyValue('--lb-minitalk-avatar-seed') || '120'
+            const patterns = ['blobs', 'dots', 'orbs', 'stripes']
+            const pat = patterns[Math.floor(parseInt(seed) / 64800) % patterns.length]
+            el.setAttribute('data-pattern', pat)
+            const textEl = el.querySelector('.lb-minitalk-cocoa-avatar-text')
+            if (textEl) textEl.style.display = 'block'
+          })
+        }
+      }
+
+      window.addEventListener('DOMContentLoaded', () => {
+        const messagesEl = document.querySelector('.lb-minitalk-cocoa-messages')
+        if (messagesEl) {
+          messagesEl.scrollTop = messagesEl.scrollHeight
+        }
+        setAvatarMode('initial')
+      })
+    </script>
+  </body>
+</html>

@@ -64,6 +64,8 @@ Use the inherited MiniTalk color properties for every OpenBlock color:
 
 Consume the properties directly. Let the renderer provide sender-specific values on the containing message wrapper.
 
+Use `border-radius: var(--lb-minitalk-radius)` on the OpenBlock outer surface. Treat the inherited value as a complete CSS `border-radius` value, including sender-specific corner shapes. Choose internal control and decoration radii independently.
+
 ## Availability
 
 MiniTalk loads an OpenBlock only when all conditions hold:

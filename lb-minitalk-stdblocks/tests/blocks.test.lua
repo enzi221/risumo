@@ -19,7 +19,6 @@ local options = {
 local calendar = require('lb-minitalk-stdblocks/lorebooks/calendar')
 local graph = require('lb-minitalk-stdblocks/lorebooks/opengraph')
 local poll = require('lb-minitalk-stdblocks/lorebooks/poll')
-local pollVote = require('lb-minitalk-stdblocks/lorebooks/poll-vote')
 
 describe('Standard OpenBlocks', function()
   it('inherits the MiniTalk message palette', function()
@@ -79,21 +78,6 @@ describe('Standard OpenBlocks', function()
     test.assertTrue(empty:find('width:0%;', 1, true), 'Render empty poll width')
     local voted = poll.render('test', '질문 § 하나 :: 2 § 둘 :: 1', options)
     test.assertTrue(voted:find('67%%') and voted:find('총 3표', 1, true), 'Render poll totals')
-  end)
-
-  it('validates and renders poll votes', function()
-    local content = '야식? § 피자'
-    test.assertTrue(pollVote.validate('test', content), 'Accept a poll vote')
-    local html = pollVote.render('test', content, options)
-    for _, value in ipairs({ '투표 완료', '야식?', '피자' }) do
-      test.assertTrue(html:find(value, 1, true), 'Render poll vote field: ' .. value)
-    end
-    for _, invalid in ipairs({ '', '야식?', ' § 피자', '야식? § ' }) do
-      test.assertTrue(not pollVote.validate('test', invalid), 'Reject poll vote: ' .. invalid)
-    end
-    local escaped = pollVote.render('test', '<script> § {{bad}}', options)
-    test.assertTrue(not escaped:find('<script>', 1, true), 'Escape poll vote HTML')
-    test.assertTrue(not escaped:find('{{', 1, true), 'Escape poll vote CBS')
   end)
 
   it('validates and escapes OpenGraph cards', function()

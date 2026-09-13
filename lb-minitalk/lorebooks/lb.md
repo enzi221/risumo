@@ -2,11 +2,7 @@
 
 ## About the messenger
 
-MiniTalk: A one-to-one or group messaging device within the RP world, not restricted to electronic ones.
-
-Narrative, universe, the messenger and its users should all be depicted as real figures. Users don't treat narrative, universe, themselves and others as novel charaters or game.
-
-Generate one chat room visible to the viewpoint character, using the current narrative and established messenger history.
+MiniTalk: A message viewer within the RP world, not restricted to electronic ones.
 
 ## Viewpoint
 
@@ -14,6 +10,75 @@ Generate one chat room visible to the viewpoint character, using the current nar
 Use {{getglobalvar::toggle_lb-minitalk.pov}} as the viewpoint character.
 {{:else}}
 Use {{user}} as the viewpoint character.
+{{/when}}
+
+{{#when::{{or::{{equal::{{getglobalvar::toggle_lb-minitalk.preset}}::2}}::{{equal::{{getglobalvar::toggle_lb-minitalk.preset}}::3}}}}}}
+Include the viewpoint character in `participants` and set `pov` to that participant's ID.
+
+Represent the viewpoint character's inner life as messages. Ground every thought in the character's personality, memories, knowledge, and current circumstances. Leave external actions, pending choices, and narrative outcomes unresolved.
+
+{{#when::lb-minitalk.preset::tis::2}}
+## Soliloquy
+
+Use exactly one participant: the viewpoint character. Write that character's unspoken self-talk in their own voice. Let thoughts wander, interrupt, correct, or revisit earlier thoughts without inventing an audience or a second speaker.
+{{:else}}
+## Inner voices
+
+Use the viewpoint character and one to nine personified facets of that character as participants. Derive the facets from the character's particular inner tensions, motives, and ways of interpreting the present situation. Give each facet a distinct name and voice, with differences in priorities and reasoning rather than merely different intensity. Reuse established facets when continuing the same inner conversation.
+
+Let the facets address and respond to one another within a single mind. Vary their presence with the situation instead of giving every facet a turn or forcing an argument.
+
+{{#when::lb-minitalk.speak::tis::1}}
+Allow the viewpoint character to speak as themself alongside the facets, using the participant identified by `pov`. Distinguish that self-directed voice from the individual facets.
+{{:else}}
+Keep the participant identified by `pov` silent unless the user explicitly supplies or directs that participant's contribution. Generate the facets' contributions without inventing statements by the viewpoint participant or implying those statements through replies.
+{{/when}}
+{{/when}}
+
+## Inner conversation
+
+Name the room for the character's current inner preoccupation. Write each bubble as one immediate thought or response, using fragments, hesitation, and self-correction where natural. Keep mundane thoughts mundane; let the character's disposition and situation determine the emotional intensity. Use only as many bubbles as the moment warrants, allowing an unfinished thought or silence.
+
+Continue from established inner conversation without repeating prior output. Keep all thoughts within the narrative's current endpoint. Use pause or skip rows only for meaningful gaps in the inner conversation. Use `text` for ordinary thoughts; interpret other message types as representations within the mind rather than communication with outside recipients. Do not create invitation or departure events for shifts in attention among facets.
+
+{{:else}}
+Key figures are characters provided in the universe settings.
+
+{{#when::lb-minitalk.characters::tis::0}}
+Besides the required viewpoint character, select participants appropriate to the context only from key figures.
+{{/when}}
+{{#when::lb-minitalk.characters::tis::1}}
+Besides the required viewpoint character, select participants only from characters present in the current narrative scene.
+{{/when}}
+{{#when::lb-minitalk.characters::tis::2}}
+Besides the required viewpoint character, select participants only from key figures present in the current narrative scene.
+{{/when}}
+{{#when::lb-minitalk.characters::tis::3}}
+Select participants appropriate to the context.
+{{/when}}
+
+{{#when::lb-minitalk.preset::tis::1}}
+## Side story
+
+Write minor spoken exchanges not in the main narrative. Fit the dialogue into established circumstances without repeating dialogue already shown, changing established events, or advancing unresolved plot developments. Let the exchange reveal everyday personality and relationships rather than summarize the main narrative.
+
+Include the viewpoint character in `participants` and set `pov` to that participant's ID. Choose other participants who could plausibly speak and hear one another at the depicted time and place. Name the room for the exchange's subject or setting, and use recognizable character nicknames for participant names. Reuse established identities.
+
+Write spoken lines in `text` rows, using each character's natural speech. Keep each bubble to a spoken contribution. Limit each speaker to established knowledge and keep the exchange within the narrative's current endpoint.
+
+{{#when::lb-minitalk.speak::tis::1}}
+Allow new dialogue from the viewpoint character in that character's voice. Leave pending decisions and actions unresolved.
+{{:else}}
+Keep the viewpoint character silent unless the user explicitly supplies or directs that character's contribution. Do not imply invented dialogue from that character through other speakers' replies.
+{{/when}}
+
+{{:else}}
+Narrative, universe, the messenger and its users should all be depicted as real figures. Users don't treat narrative, universe, themselves and others as novel charaters or game.
+
+Generate one chat room visible to the viewpoint character, using the current narrative and established messenger history.
+
+{{#when::{{and::{{notequal::{{getglobalvar::toggle_lb-minitalk.mood}}::null}}::{{greater::{{length::{{trim::{{getglobalvar::toggle_lb-minitalk.mood}}}}}}::0}}}}}}
+Apply this tone, mood, or theme to the conversation within the participants' personalities and relationships: {{getglobalvar::toggle_lb-minitalk.mood}}
 {{/when}}
 
 Include the viewpoint character in the participant list even when that character sends no messages. Set `pov` to that participant's ID. Keep participant IDs stable when continuing an established room. Set each participant's `name` to a messenger nickname that each character would choose, reflecting personality and habits. Reuse established nicknames across rooms. Treat the viewpoint as ownership of the messenger, not permission to invent the owner's actions.
@@ -36,21 +101,6 @@ Choose a one-to-one or group room appropriate to the context, with two to ten pa
 {{/when}}
 {{/when}}
 
-Key figures are characters provided in the universe settings.
-
-{{#when::lb-minitalk.characters::tis::0}}
-Besides the required viewpoint character, select participants appropriate to the context only from key figures.
-{{/when}}
-{{#when::lb-minitalk.characters::tis::1}}
-Besides the required viewpoint character, select participants only from characters present in the current narrative scene.
-{{/when}}
-{{#when::lb-minitalk.characters::tis::2}}
-Besides the required viewpoint character, select participants only from key figures present in the current narrative scene.
-{{/when}}
-{{#when::lb-minitalk.characters::tis::3}}
-Select participants appropriate to the context.
-{{/when}}
-
 Use a practical room name the viewpoint character would recognize. Select contacts with a plausible relationship and reason to communicate. Keep membership consistent with established history. Include silent members without forcing every participant to speak.
 
 ## Conversation
@@ -70,9 +120,12 @@ Limit each participant to information the participant could have witnessed, lear
 
 Show elapsed time between parts of an exchange with a pause row.
 
-Keep all board content within the narrative's current endpoint. Treat plans, requests, orders, and intentions as statements made, not actions performed. Leave pending choices, responses, and outcomes unresolved until the narrative establishes them. Express predictions as speculation, without inventing sightings, reports, or aftermath that imply the predicted event has occurred.
+Keep all room content within the narrative's current endpoint. Treat plans, requests, orders, and intentions as statements made, not actions performed. Leave pending choices, responses, and outcomes unresolved until the narrative establishes them. Express predictions as speculation, without inventing sightings, reports, or aftermath that imply the predicted event has occurred.
 
 Respect access to a messaging medium and the sender's availability. Characters occupied by urgent events need not reply. Participants speaking face to face ordinarily switch to spoken conversation rather than texting each other; allow texting only when the context supplies a reason. Keep technology, vocabulary, and communication speed compatible with the setting.
+
+{{/when}}
+{{/when}}
 
 ## Message types
 
@@ -103,6 +156,7 @@ An `invited` event for the viewpoint character may appear as the first message r
 Output exactly one `<lb-minitalk>` element containing a TOON object with `keyFigures`, `messages`, `name`, `participants`, and `pov`.
 
 - Use two ASCII spaces per indentation level, explicit array lengths, and `|` as the table delimiter.
+  - ALL ROWS ALSO CONTRIBUTE TO THE ARRAY LENGTHS INCLUDING PAUSE AND SKIP
 - Encode every line break inside a field value as `\u000A`. Use neither `\n` nor literal line breaks inside field values.
 - Quote strings containing `|`, quotes, or escape sequences with double quotes. Escape embedded double quotes and backslashes. Quote strings that would otherwise parse as numbers, booleans, or null.
 - Write participant table rows directly as `id|name`, without a leading `- `. Use unique participant IDs and reference those IDs in `sender` and `pov`.
@@ -118,9 +172,10 @@ Each leading `⇥` represents one TOON indentation level of exactly two spaces. 
 
 ```toon
 <lb-minitalk>
-messages[6|]{sender|type|time|content}:
+messages[7|]{sender|type|time|content}:
 ⇥p2|text|얼마 전|아직 회사야
 ⇥p2|text|얼마 전|나 먼저 감
+⇥-|skip|-|-
 ⇥p2|text|얼마 전|충전기 안내 데스크에 맡겨둠
 ⇥p2|text|얼마 전|아
 ⇥p2|text|얼마 전|1층 말고 2층
@@ -139,10 +194,15 @@ keyFigures[1|]{keyFigure|nickname|note}:
 
 Write key-figure state updates in the room's `keyFigures` array. Give each entry `keyFigure`, `nickname`, and `note` strings.
 
-- Set `nickname` to the exact participant nickname and `keyFigure` to the corresponding character name or identity from the universe settings.
+- Set `nickname` to the exact participant nickname.
+{{#when::lb-minitalk.preset::tis::3}}
+- Record the viewpoint character and each speaking facet. For the viewpoint character, set `keyFigure` to the character's name or identity. For each facet, set `keyFigure` to an identity naming both the character the facet belongs to and the aspect represented. Keep each facet's identity distinct from its owner's and the other facets' identities. State the owner and represented aspect explicitly in `note` alongside the facet's messaging habits.
+{{:else}}
+- Set `keyFigure` to the corresponding character name or identity from the universe settings.
 - Include only major characters provided in the universe settings. Exclude unnamed extras.
-- Add an entry only when the major character is absent from the preserved state or the character's nickname or note changed.
-- When a preserved character's nickname or note changes, add the replacement entry with the exact preserved `keyFigure` string.
+{{/when}}
+- Add an entry only when the identity is absent from the preserved state or the identity's nickname or note changed.
+- When a preserved identity's nickname or note changes, add the replacement entry with the exact preserved `keyFigure` string.
 - Every major character who sends a message in the room must already have a current preserved entry or appear in `keyFigures`. A participant record or membership event alone does not qualify.
 - Write a concise `note` describing observable messaging habits such as message length, consecutive sends, omissions, punctuation, corrections, and response timing. Record only habits supported by the character or established messages.
 - When a `note` describes speech or messaging style, state whether the style applies to everyone or only to named people or groups.

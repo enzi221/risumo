@@ -61,18 +61,12 @@ local function preserveKeyFigures(triggerId, keyFigures)
   prelude.import(triggerId, 'toon.encode')
   local preserved = getChatVar(triggerId, KEYFIGURES_VARIABLE)
   local entries = {}
-  if type(preserved) == 'string' and prelude.trim(preserved) ~= '' and preserved ~= 'null' then
-    local success, decoded = pcall(prelude.toon.decode, preserved)
-    if success and type(decoded) == 'table' then
-      entries = decoded
-    end
-  end
-
   local indices = {}
-  for index, entry in ipairs(entries) do
-    indices[entry.keyFigure] = index
-  end
-  for _, entry in ipairs(keyFigures) do
+  local function merge(entry)
+    if type(entry) ~= 'table' or type(entry.keyFigure) ~= 'string' or entry.keyFigure == '' then
+      return
+    end
+
     local index = indices[entry.keyFigure]
     if index then
       entries[index] = entry
@@ -80,6 +74,20 @@ local function preserveKeyFigures(triggerId, keyFigures)
       table.insert(entries, entry)
       indices[entry.keyFigure] = #entries
     end
+  end
+
+  if type(preserved) == 'string' and prelude.trim(preserved) ~= '' and preserved ~= 'null' then
+    local success, decoded = pcall(prelude.toon.decode, preserved)
+    if success and type(decoded) == 'table' then
+      local source = type(decoded.keyFigures) == 'table' and decoded.keyFigures or decoded
+      for _, entry in ipairs(source) do
+        merge(entry)
+      end
+    end
+  end
+
+  for _, entry in ipairs(keyFigures) do
+    merge(entry)
   end
 
   local content = prelude.toon.encode(entries, { delimiter = '|' })

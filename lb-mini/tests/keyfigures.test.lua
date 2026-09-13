@@ -103,6 +103,22 @@ describe('Miniboard key-figure state', function()
     })
     test.assertTrue(updated:find('keyFigures', 1, true) == nil, 'Mutation keeps key figures out of board output')
     test.assertEquals(variables['lb-mini.keyfigures'], mergedPreserved, 'Mutation preserves cached key figures')
+
+    variables['lb-mini.keyfigures'] = '[1|]:\n  - nickname: 레거시\n    note: 이전형식'
+    output('test', added)
+    local recovered = prelude.toon.decode(variables['lb-mini.keyfigures'])
+    test.assertEquals(#recovered, 1, 'Malformed or legacy cached key figures are safely ignored')
+    test.assertEquals(recovered[1].keyFigure, 'Vergilius', 'Valid incoming update is preserved')
+
+    local legacyBlock = '<lb-mini name="테스트">\n[1|]:\n  - author: 구버전\n    title: 구제목\n    time: 방금\n    upvotes: 1\n    downvotes: 0\n    content: 구본문\n    comments[0|]:\n</lb-mini>'
+    local legacyPreviousNode = prelude.queryNodes('lb-mini', legacyBlock)[1]
+    legacyPreviousNode.raw = legacyBlock
+    local legacyPatched = mutate('test', 'interaction', patch, {
+      output = patch,
+      previousNode = legacyPreviousNode,
+    })
+    local decodedLegacyPatched = prelude.toon.decode(prelude.queryNodes('lb-mini', legacyPatched)[1].content)
+    test.assertEquals(decodedLegacyPatched.posts[1].upvotes, 2, 'Legacy previous node can be mutated')
   end)
 end)
 

@@ -22,6 +22,12 @@ local function replaceMarker(text, marker, replacement)
 end
 
 local function main(triggerId, instructions)
+  if getGlobalVar(triggerId, 'toggle_lb-minitalk.preset') == '1' then
+    instructions.guideline = replaceMarker(instructions.guideline, CONS_MARKER, '')
+    instructions.guideline = replaceMarker(instructions.guideline, OPENBLOCK_MARKER, '')
+    return instructions
+  end
+
   local cons = ''
   if getGlobalVar(triggerId, 'toggle_lb-minitalk.cons') == '1' then
     cons = collectLorebooks(triggerId, 'lb-mini.cons')
@@ -56,9 +62,11 @@ Use only the identifiers in this catalog:
   if openblocks ~= '' then
     openblockGuideline = [[### OpenBlocks
 
-Treat each OpenBlock as one complete sent message. Set `type` to `openblock:identifier`, replacing `identifier` with an exact identifier from the definitions below. Write `content` as a string in that definition's payload format. Apply TOON string quoting and escaping to the complete payload, including any embedded delimiters, quotes, or line breaks.
+OpenBlocks are messages with various functionalities, and displayed as rich formats.
 
-Use these definitions:
+Set `type` to `openblock:identifier`, replacing `identifier` with an exact identifier from the definitions below. Write `content` as a string in that definition's payload format. Apply TOON string quoting and escaping to the complete payload, including any embedded delimiters, quotes, or line breaks.
+
+Use OpenBlocks freely but within the narrative settings. Use these definitions:
 
 ]] .. openblocks
   end

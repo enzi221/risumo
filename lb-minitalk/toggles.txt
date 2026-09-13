@@ -2,7 +2,9 @@
 lb-minitalk.mode=모　　드=select=끄기,메인,보조
 lb-minitalk.lazy=발　　동=select=즉시,누르면
 =———————📒주　제=divider
-lb-minitalk.pov=시　　점=text
+lb-minitalk.preset=사전설정=select=기본(┗느낌),사이드스토리,혼잣말,혼잣말 다중인격
+lb-minitalk.mood=┗느　낌=text
+lb-minitalk.pov=┗시　점=text
 =기본 {{user}}=caption
 lb-minitalk.speak=┗사칭 허용
 lb-minitalk.characters=등장인물=select=주요 인물,장면 내 인물,장면 내 주요 인물,자율

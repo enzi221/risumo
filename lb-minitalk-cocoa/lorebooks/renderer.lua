@@ -23,6 +23,9 @@ local function summarizeParticipants(participants)
 end
 
 local function render(triggerId, data, options)
+  local colors = { ['0'] = 'pink', ['1'] = 'blue', ['2'] = 'yellow', ['3'] = 'green' }
+  local color = colors[getGlobalVar(triggerId, 'toggle_lb-minitalk.theme')] or 'pink'
+  local theme = getGlobalVar(triggerId, 'toggle_lb-minitalk.darkness') == '1' and 'dark' or 'light'
   local names = {}
   local participants = {}
   for _, participant in ipairs(data.participants) do
@@ -35,53 +38,56 @@ local function render(triggerId, data, options)
     if message.type == 'pause' then
       previousSender = nil
       table.insert(messages, h.div {
-        class = 'lb-minitalk-pause',
+        class = 'lb-minitalk-cocoa-pause',
         hraw(options.escapeText(message.content)),
       })
     elseif message.type == 'skip' then
       previousSender = nil
-      table.insert(messages, h.div { class = 'lb-minitalk-skip', '생략됨' })
+      table.insert(messages, h.div { class = 'lb-minitalk-cocoa-skip', '생략됨' })
     elseif message.type == 'invited' or message.type == 'exit' then
       previousSender = nil
       table.insert(messages, h.div {
-        class = 'lb-minitalk-event',
+        class = 'lb-minitalk-cocoa-event',
         hraw(options.renderContent(message)),
       })
     else
-      local contentClass = 'lb-minitalk-content'
+      local contentClass = 'lb-minitalk-cocoa-content'
       local groupStart = message.sender ~= previousSender
       local avatarPattern, avatarStyle = avatarProperties(names[message.sender])
       if message.type == 'con' then
-        contentClass = 'lb-minitalk-media'
+        contentClass = 'lb-minitalk-cocoa-media'
       elseif message.type:match('^openblock:') then
-        contentClass = 'lb-minitalk-openblock'
+        contentClass = 'lb-minitalk-cocoa-openblock'
       end
       table.insert(messages, h.div {
-        class = 'lb-minitalk-message',
+        class = 'lb-minitalk-cocoa-message',
         data_group_start = groupStart and 'true' or 'false',
         data_self = message.sender == data.pov and 'true' or 'false',
         h.div {
-          class = 'lb-minitalk-avatar lb-minitalk-gradient',
+          class = 'lb-minitalk-cocoa-avatar lb-minitalk-gradient',
           data_pattern = avatarPattern,
           data_visible = groupStart and 'true' or 'false',
           style = avatarStyle,
         },
         h.div {
-          class = 'lb-minitalk-message-body',
+          class = 'lb-minitalk-cocoa-message-body',
           h.div {
-            class = 'lb-minitalk-sender',
+            class = 'lb-minitalk-cocoa-sender',
             data_visible = groupStart and 'true' or 'false',
             hraw(options.escapeText(names[message.sender])),
           },
           h.div {
-            class = 'lb-minitalk-message-row',
+            class = 'lb-minitalk-cocoa-message-row',
             h.div {
               class = contentClass,
               hraw(options.renderContent(message)),
             },
             h.div {
-              class = 'lb-minitalk-time',
-              hraw(options.escapeText(message.time)),
+              class = 'lb-minitalk-cocoa-meta',
+              h.span {
+                class = 'lb-minitalk-cocoa-time',
+                hraw(options.escapeText(message.time)),
+              },
             },
           },
         },
@@ -90,7 +96,7 @@ local function render(triggerId, data, options)
     end
   end
   if #messages == 0 then
-    table.insert(messages, h.p { class = 'lb-minitalk-empty', '메시지 없음' })
+    table.insert(messages, h.p { class = 'lb-minitalk-cocoa-empty', '메시지 없음' })
   end
   return tostring(h.div {
     class = 'lb-module-opener-root',
@@ -102,40 +108,43 @@ local function render(triggerId, data, options)
       '미니톡',
     },
     h.dialog {
-      class = 'lb-dialog lb-minitalk-dialog',
+      class = 'lb-dialog lb-minitalk-cocoa-root lb-minitalk-cocoa-dialog',
+      data_color = color,
+      data_theme = theme,
       id = options.id,
       popover = '',
       h.header {
-        class = 'lb-minitalk-header',
+        class = 'lb-minitalk-cocoa-header',
         h.div {
-          class = 'lb-minitalk-heading',
-          h.strong { hraw(options.escapeText(data.name)) },
+          class = 'lb-minitalk-cocoa-heading',
+          h.div {
+            class = 'lb-minitalk-cocoa-heading-row',
+            h.h2 { class = 'lb-minitalk-cocoa-title', hraw(options.escapeText(data.name)) },
+            h.span { class = 'lb-minitalk-cocoa-count', tostring(#participants) },
+          },
           h.p {
-            class = 'lb-minitalk-participants',
+            class = 'lb-minitalk-cocoa-participants',
             hraw(options.escapeText(summarizeParticipants(participants))),
           },
         },
         h.div {
-          class = 'lb-minitalk-header-actions',
+          class = 'lb-minitalk-cocoa-header-actions',
           h.button {
-            aria_label = '채팅방 변경',
-            class = 'lb-minitalk-room-button',
+            class = 'lb-minitalk-cocoa-room-btn',
             risu_btn = 'lb-interaction__lb-minitalk__ChangeRoom',
             title = '채팅방 변경',
             type = 'button',
             '채팅방 변경',
           },
           h.button {
-            aria_label = '다시 생성',
-            class = 'lb-minitalk-icon-button',
+            class = 'lb-minitalk-cocoa-action-btn',
             risu_btn = 'lb-reroll__lb-minitalk',
             title = '다시 생성',
             type = 'button',
             h.lb_reroll_icon { closed = true },
           },
           h.button {
-            aria_label = '시간 보내기',
-            class = 'lb-minitalk-icon-button',
+            class = 'lb-minitalk-cocoa-action-btn',
             risu_btn = 'lb-interaction__lb-minitalk__immediate#PassTime',
             title = '시간 보내기',
             type = 'button',
@@ -143,19 +152,18 @@ local function render(triggerId, data, options)
           },
         },
       },
-      h.div { class = 'lb-minitalk-messages', messages },
+      h.div { class = 'lb-minitalk-cocoa-messages', messages },
       h.div {
-        class = 'lb-minitalk-composer',
+        class = 'lb-minitalk-cocoa-composer',
         h.button {
-          aria_label = '메시지 입력',
-          class = 'lb-minitalk-input-button',
+          class = 'lb-minitalk-cocoa-input-button',
           risu_btn = 'lb-interaction__lb-minitalk__SendMessage',
           title = '메시지 입력',
           type = 'button',
           '메시지 입력…',
         },
         h.button {
-          class = 'lb-minitalk-close',
+          class = 'lb-minitalk-cocoa-close-btn',
           popovertarget = options.id,
           popovertargetaction = 'hide',
           type = 'button',

@@ -262,9 +262,17 @@ local function main(_, action, fullChat, mutation)
   local patch = json.decode(prelude.trim(patchNode.content))
   local previousNode = mutation.previousNode
   local previous = previousNode and prelude.toon.decode(previousNode.content) or {}
+  local previousPosts = {}
+  if type(previous) == 'table' then
+    if type(previous.posts) == 'table' then
+      previousPosts = previous.posts
+    elseif #previous > 0 or next(previous) == nil then
+      previousPosts = previous
+    end
+  end
   local board = {
     name = previousNode and previousNode.attributes.name or '미니보드',
-    posts = previous.posts or {},
+    posts = previousPosts,
   }
   local patched = prelude.applyJSONPatch(board, patch)
 

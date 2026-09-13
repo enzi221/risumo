@@ -1,0 +1,1478 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lb-minitalk-arc 라인 메신저 렌더러 미리보기</title>
+    <style>
+      /* ==========================================================================
+       미리보기 페이지 전용 데모 컨트롤러 및 레이아웃
+       ========================================================================== */
+      :root {
+        --preview-bg: #e6ebf0;
+        --preview-panel-bg: #ffffff;
+        --preview-panel-border: #d0d7de;
+        --preview-text: #1f2328;
+        --preview-text-muted: #656d76;
+      }
+
+      body {
+        background-color: var(--preview-bg);
+        color: var(--preview-text);
+        font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Pretendard', 'Noto Sans KR', 'Segoe UI', sans-serif;
+        margin: 0;
+        padding: 24px 16px 60px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        box-sizing: border-box;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .demo-header {
+        width: 100%;
+        max-width: 520px;
+        margin-bottom: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .demo-title-bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .demo-title-bar h1 {
+        font-size: 20px;
+        font-weight: 800;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #111111;
+      }
+
+      .demo-badge {
+        background: #06c755;
+        color: #ffffff;
+        font-size: 11px;
+        font-weight: 800;
+        padding: 3px 8px;
+        border-radius: 6px;
+        letter-spacing: -0.02em;
+        box-shadow: 0 1px 3px rgba(6, 199, 85, 0.3);
+      }
+
+      .demo-desc {
+        font-size: 13px;
+        color: var(--preview-text-muted);
+        margin: 0;
+        line-height: 1.5;
+      }
+
+      .demo-toolbar {
+        background: var(--preview-panel-bg);
+        border: 1px solid var(--preview-panel-border);
+        border-radius: 12px;
+        padding: 10px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      }
+
+      .demo-toolbar-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .demo-btn-group {
+        display: inline-flex;
+        background: #f0f3f6;
+        padding: 3px;
+        border-radius: 8px;
+        gap: 2px;
+      }
+
+      .demo-btn {
+        appearance: none;
+        border: none;
+        background: transparent;
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--preview-text-muted);
+        cursor: pointer;
+        transition: all 0.15s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;
+      }
+
+      .demo-btn.active {
+        background: #ffffff;
+        color: #111111;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .demo-stage {
+        width: 100%;
+        max-width: 440px;
+        display: flex;
+        justify-content: center;
+      }
+
+      /* ==========================================================================
+       lb-minitalk-arc CSS (라인 시그니처 슬레이트 블루 배경 + 원형 그라디언트 프사 + 18px 라운드)
+       ========================================================================== */
+
+      /* 1. 라인 공통 기본 변수 (라이트 모드 배경은 라인 시그니처 슬레이트 블루 #8CABD8) */
+      .lb-minitalk-arc-root {
+        --arc-chat-bg: #8cabd8;
+        --arc-header-bg: #7d9dcb;
+        --arc-header-border: rgba(0, 0, 0, 0.08);
+        --arc-text-primary: #111111;
+        --arc-text-secondary: rgba(255, 255, 255, 0.95);
+        --arc-header-title: #ffffff;
+        --arc-header-sub: rgba(255, 255, 255, 0.85);
+        --arc-bubble-incoming: #ffffff;
+        --arc-bubble-incoming-text: #111111;
+        --arc-system-pill-bg: rgba(0, 0, 0, 0.2);
+        --arc-system-pill-text: #ffffff;
+        --arc-composer-bg: #ffffff;
+        --arc-composer-border: #dbe0e6;
+        --arc-input-bg: #f2f3f5;
+        --arc-input-text: #858d99;
+        --arc-btn-icon: #555e6b;
+        --arc-shadow: rgba(0, 0, 0, 0.12);
+        --arc-avatar-outline: rgba(0, 0, 0, 0.08);
+        --arc-meta-read: rgba(255, 255, 255, 0.95);
+        --arc-meta-time: rgba(255, 255, 255, 0.85);
+
+        /* 인커밍 OpenBlock 공통 */
+        --arc-ob-bg: #ffffff;
+        --arc-ob-bg-2: #f2f4f7;
+        --arc-ob-border: #dde2e8;
+        --arc-ob-fg: #111111;
+
+        width: 100%;
+      }
+
+      /* 4색 테마별 말풍선/포인트 컬러 정의 (라이트 모드) */
+      /* [1] 🌿 초록 (라인 오리지널 시그니처 라이트 그린 #79E179) */
+      .lb-minitalk-arc-root[data-color='green'] {
+        --arc-accent: #06c755;
+        --arc-bubble-outgoing: #79e179;
+        --arc-bubble-outgoing-text: #111111;
+        --arc-bubble-outgoing-sub: #5abf5a;
+        --arc-bubble-outgoing-border: #4cb04c;
+        --arc-bubble-outgoing-accent: #083c18;
+        --arc-ob-accent: #06c755;
+      }
+
+      /* [2] 💎 파랑 (청량한 스카이/오션 블루) */
+      .lb-minitalk-arc-root[data-color='blue'] {
+        --arc-accent: #2489f3;
+        --arc-bubble-outgoing: #4a9af5;
+        --arc-bubble-outgoing-text: #ffffff;
+        --arc-bubble-outgoing-sub: #388ae6;
+        --arc-bubble-outgoing-border: #2b7cd4;
+        --arc-bubble-outgoing-accent: #ffffff;
+        --arc-ob-accent: #2489f3;
+      }
+
+      /* [3] ♦️ 핑크 (부드러운 피치 로즈 핑크) */
+      .lb-minitalk-arc-root[data-color='pink'] {
+        --arc-accent: #ff5b7e;
+        --arc-bubble-outgoing: #ff6889;
+        --arc-bubble-outgoing-text: #ffffff;
+        --arc-bubble-outgoing-sub: #ee5476;
+        --arc-bubble-outgoing-border: #dc4365;
+        --arc-bubble-outgoing-accent: #ffffff;
+        --arc-ob-accent: #ff5b7e;
+      }
+
+      /* [4] ✨ 노랑 (화사한 앰버 옐로우) */
+      .lb-minitalk-arc-root[data-color='yellow'] {
+        --arc-accent: #e59a00;
+        --arc-bubble-outgoing: #fee135;
+        --arc-bubble-outgoing-text: #191919;
+        --arc-bubble-outgoing-sub: #ecd025;
+        --arc-bubble-outgoing-border: #d8bd15;
+        --arc-bubble-outgoing-accent: #3c1e1e;
+        --arc-ob-accent: #e59a00;
+      }
+
+      /* 다크 모드 공통 오버라이드 (딥 다크 슬레이트 배경) */
+      .lb-minitalk-arc-root[data-theme='dark'] {
+        --arc-chat-bg: #1c2024;
+        --arc-header-bg: #23282e;
+        --arc-header-border: rgba(255, 255, 255, 0.08);
+        --arc-text-primary: #f0f2f5;
+        --arc-text-secondary: #9098a3;
+        --arc-header-title: #f0f2f5;
+        --arc-header-sub: #8e95a0;
+        --arc-bubble-incoming: #2c3138;
+        --arc-bubble-incoming-text: #f0f2f5;
+        --arc-system-pill-bg: rgba(255, 255, 255, 0.12);
+        --arc-system-pill-text: #d8dade;
+        --arc-composer-bg: #23282e;
+        --arc-composer-border: #31363e;
+        --arc-input-bg: #2e333a;
+        --arc-input-text: #8e95a0;
+        --arc-btn-icon: #a0a6b0;
+        --arc-shadow: rgba(0, 0, 0, 0.4);
+        --arc-avatar-outline: rgba(255, 255, 255, 0.12);
+        --arc-meta-read: var(--arc-accent);
+        --arc-meta-time: rgba(255, 255, 255, 0.55);
+
+        /* 다크모드 인커밍 OpenBlock */
+        --arc-ob-bg: #2c3138;
+        --arc-ob-bg-2: #202429;
+        --arc-ob-border: #3d444d;
+        --arc-ob-fg: #f0f2f5;
+      }
+
+      /* 다크 모드 테마별 포인트/말풍선 */
+      .lb-minitalk-arc-root[data-color='green'][data-theme='dark'] {
+        --arc-bubble-outgoing: #059640;
+        --arc-bubble-outgoing-text: #ffffff;
+        --arc-bubble-outgoing-sub: #048237;
+        --arc-bubble-outgoing-border: #036d2e;
+        --arc-bubble-outgoing-accent: #45c482;
+        --arc-meta-read: #45c482;
+        --arc-ob-accent: #45c482;
+      }
+
+      .lb-minitalk-arc-root[data-color='blue'][data-theme='dark'] {
+        --arc-bubble-outgoing: #1b6ccd;
+        --arc-bubble-outgoing-text: #ffffff;
+        --arc-bubble-outgoing-sub: #165ab0;
+        --arc-bubble-outgoing-border: #124c96;
+        --arc-bubble-outgoing-accent: #ffffff;
+        --arc-meta-read: #4898f6;
+        --arc-ob-accent: #4898f6;
+      }
+
+      .lb-minitalk-arc-root[data-color='pink'][data-theme='dark'] {
+        --arc-bubble-outgoing: #d93b5e;
+        --arc-bubble-outgoing-text: #ffffff;
+        --arc-bubble-outgoing-sub: #c03151;
+        --arc-bubble-outgoing-border: #a82744;
+        --arc-bubble-outgoing-accent: #ffffff;
+        --arc-meta-read: #ff6b8b;
+        --arc-ob-accent: #ff6b8b;
+      }
+
+      .lb-minitalk-arc-root[data-color='yellow'][data-theme='dark'] {
+        --arc-bubble-outgoing: #d4a300;
+        --arc-bubble-outgoing-text: #191919;
+        --arc-bubble-outgoing-sub: #bd9000;
+        --arc-bubble-outgoing-border: #a37c00;
+        --arc-bubble-outgoing-accent: #3c1e1e;
+        --arc-meta-read: #fee500;
+        --arc-ob-accent: #fee500;
+      }
+
+      /* 2. 대화창 본체 (Dialog) */
+      .lb-minitalk-arc-dialog {
+        background: var(--arc-chat-bg);
+        border: 1px solid var(--arc-header-border);
+        border-radius: 12px;
+        box-shadow: 0 16px 40px var(--arc-shadow);
+        box-sizing: border-box;
+        color: var(--arc-text-primary);
+        font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Pretendard', 'Noto Sans KR', sans-serif;
+        font-size: 14px;
+        height: 640px;
+        line-height: 1.5;
+        margin: auto;
+        overflow: hidden;
+        padding: 0;
+        text-align: left;
+        width: 100%;
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        position: relative;
+      }
+
+      /* 3. 라인 상단 헤더 */
+      .lb-minitalk-arc-header {
+        align-items: center;
+        background: var(--arc-header-bg);
+        border-bottom: 1px solid var(--arc-header-border);
+        color: var(--arc-header-title);
+        display: flex;
+        gap: 10px;
+        height: 54px;
+        justify-content: space-between;
+        padding: 0 16px;
+        box-sizing: border-box;
+        user-select: none;
+        z-index: 10;
+      }
+
+      .lb-minitalk-arc-heading {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .lb-minitalk-arc-heading-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .lb-minitalk-arc-title {
+        color: var(--arc-header-title);
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .lb-minitalk-arc-count {
+        color: var(--arc-header-sub);
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .lb-minitalk-arc-participants {
+        color: var(--arc-header-sub);
+        font-size: 11px;
+        margin: 1px 0 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .lb-minitalk-arc-header-actions {
+        align-items: center;
+        display: flex;
+        flex-shrink: 0;
+        gap: 4px;
+      }
+
+      .lb-minitalk-arc-action-btn {
+        align-items: center;
+        appearance: none;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 6px;
+        color: var(--arc-header-title);
+        cursor: pointer;
+        display: inline-flex;
+        font: inherit;
+        justify-content: center;
+        padding: 0;
+        height: 30px;
+        width: 30px;
+        box-sizing: border-box;
+        transition: background-color 0.15s ease;
+        opacity: 0.9;
+      }
+
+      .lb-minitalk-arc-action-btn:hover {
+        background: rgba(255, 255, 255, 0.15);
+        opacity: 1;
+      }
+
+      .lb-minitalk-arc-action-btn svg {
+        display: block;
+        width: 15px;
+        height: 15px;
+      }
+
+      .lb-minitalk-arc-room-btn {
+        background: rgba(255, 255, 255, 0.18);
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        border-radius: 6px;
+        color: var(--arc-header-title);
+        cursor: pointer;
+        font-size: 11.5px;
+        font-weight: 600;
+        height: 28px;
+        padding: 0 9px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;
+        transition: background-color 0.15s ease;
+      }
+
+      .lb-minitalk-arc-room-btn:hover {
+        background: rgba(255, 255, 255, 0.28);
+      }
+
+      /* 4. 메시지 영역 (스크롤 리스트) */
+      .lb-minitalk-arc-messages {
+        background: var(--arc-chat-bg);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-height: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        padding: 16px 14px;
+        scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+        scrollbar-width: thin;
+        box-sizing: border-box;
+      }
+
+      .lb-minitalk-arc-messages > * {
+        flex-shrink: 0;
+      }
+
+      /* 5. 시스템 이벤트 / 날짜 / 건너뛰기 뱃지 */
+      .lb-minitalk-arc-date,
+      .lb-minitalk-arc-pause {
+        align-self: center;
+        background: var(--arc-system-pill-bg);
+        border-radius: 999px;
+        color: var(--arc-system-pill-text);
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11px;
+        font-weight: 500;
+        margin: 10px auto;
+        padding: 4px 14px;
+        text-align: center;
+        user-select: none;
+      }
+
+      .lb-minitalk-arc-event {
+        align-self: center;
+        background: var(--arc-system-pill-bg);
+        border-radius: 999px;
+        color: var(--arc-system-pill-text);
+        display: inline-flex;
+        font-size: 11px;
+        font-weight: 500;
+        margin: 6px auto;
+        padding: 4px 14px;
+        text-align: center;
+        user-select: none;
+      }
+
+      .lb-minitalk-arc-skip {
+        align-self: stretch;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px dashed rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
+        box-sizing: border-box;
+        color: var(--arc-system-pill-text);
+        font-size: 11.5px;
+        font-weight: 600;
+        margin: 10px 0;
+        padding: 6px 0;
+        text-align: center;
+        width: 100%;
+        user-select: none;
+      }
+
+      /* 6. 개별 메시지 행 컨테이너 */
+      .lb-minitalk-arc-message {
+        --lb-minitalk-accent: var(--arc-ob-accent);
+        --lb-minitalk-bg: var(--arc-ob-bg);
+        --lb-minitalk-bg-2: var(--arc-ob-bg-2);
+        --lb-minitalk-border: var(--arc-ob-border);
+        --lb-minitalk-fg: var(--arc-ob-fg);
+        --lb-minitalk-radius: 18px;
+
+        align-self: flex-start;
+        align-items: flex-start;
+        display: flex;
+        gap: 8px;
+        max-width: 100%;
+        min-width: 0;
+        margin-top: 2px;
+      }
+
+      .lb-minitalk-arc-message[data-group-start='true'] {
+        margin-top: 10px;
+      }
+
+      .lb-minitalk-arc-skip + .lb-minitalk-arc-message[data-group-start='true'] {
+        margin-top: 4px;
+      }
+
+      /* 본인 메시지 */
+      .lb-minitalk-arc-message[data-self='true'] {
+        --lb-minitalk-accent: var(--arc-bubble-outgoing-accent);
+        --lb-minitalk-bg: var(--arc-bubble-outgoing);
+        --lb-minitalk-bg-2: var(--arc-bubble-outgoing-sub);
+        --lb-minitalk-border: var(--arc-bubble-outgoing-border);
+        --lb-minitalk-fg: var(--arc-bubble-outgoing-text);
+        --lb-minitalk-radius: 18px;
+
+        align-self: flex-end;
+        flex-direction: row-reverse;
+      }
+
+      /* 7. 아바타: 완벽한 원형(50%) + 그라디언트 전용 렌더링 */
+      .lb-minitalk-arc-avatar {
+        --avatar-hue: mod(var(--lb-minitalk-avatar-seed, 120), 360);
+        --avatar-shape: calc(mod(var(--lb-minitalk-avatar-seed, 120), 997) * 1deg);
+        --avatar-deep: hsl(var(--avatar-hue) 68% 38%);
+        --avatar-light: hsl(calc(var(--avatar-hue) + 48) 88% 72%);
+        --avatar-mid: hsl(var(--avatar-hue) 78% 55%);
+
+        background-color: var(--avatar-mid);
+        border: none;
+        outline: 1px solid var(--arc-avatar-outline);
+        outline-offset: -1px;
+        border-radius: 50% !important;
+        box-sizing: border-box;
+        flex: 0 0 38px;
+        height: 38px;
+        overflow: hidden;
+        position: relative;
+        width: 38px;
+        user-select: none;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+      }
+
+      .lb-minitalk-arc-avatar[data-visible='false'] {
+        visibility: hidden;
+      }
+
+      .lb-minitalk-arc-message[data-self='true'] .lb-minitalk-arc-avatar {
+        display: none;
+      }
+
+      .lb-minitalk-arc-avatar::after {
+        background: linear-gradient(145deg, rgb(255 255 255 / 38%), transparent 44%);
+        content: '';
+        inset: 0;
+        position: absolute;
+        pointer-events: none;
+        border-radius: 50%;
+      }
+
+      /* 그라디언트 패턴 정의 (dots, orbs, stripes, blobs) */
+      .lb-minitalk-arc-avatar[data-pattern='dots'] {
+        background:
+          radial-gradient(
+            circle at calc(50% + cos(var(--avatar-shape)) * 34%) calc(50% + sin(var(--avatar-shape)) * 34%),
+            var(--avatar-light) 0 calc(12% + sin(var(--avatar-shape)) * 4%),
+            transparent calc(13% + sin(var(--avatar-shape)) * 4%)
+          ),
+          radial-gradient(
+            circle at calc(50% + cos(calc(var(--avatar-shape) + 120deg)) * 34%) calc(50% + sin(calc(var(--avatar-shape) + 120deg)) * 34%),
+            var(--avatar-deep) 0 calc(15% + cos(var(--avatar-shape)) * 4%),
+            transparent calc(16% + cos(var(--avatar-shape)) * 4%)
+          ),
+          var(--avatar-mid);
+      }
+
+      .lb-minitalk-arc-avatar[data-pattern='orbs'] {
+        background:
+          radial-gradient(
+            circle at calc(50% + cos(var(--avatar-shape)) * 48%) calc(50% + sin(var(--avatar-shape)) * 48%),
+            var(--avatar-light) 0 calc(31% + sin(var(--avatar-shape)) * 5%),
+            transparent calc(32% + sin(var(--avatar-shape)) * 5%)
+          ),
+          radial-gradient(
+            circle at calc(50% + cos(calc(var(--avatar-shape) + 118deg)) * 43%) calc(50% + sin(calc(var(--avatar-shape) + 118deg)) * 43%),
+            var(--avatar-deep) 0 calc(24% + cos(var(--avatar-shape)) * 4%),
+            transparent calc(25% + cos(var(--avatar-shape)) * 4%)
+          ),
+          linear-gradient(145deg, var(--avatar-mid), var(--avatar-deep));
+      }
+
+      .lb-minitalk-arc-avatar[data-pattern='stripes'] {
+        --avatar-gap: calc(10px + sin(var(--avatar-shape)) * 3px);
+        --avatar-stripe: calc(5px + cos(var(--avatar-shape)) * 2px);
+        background:
+          repeating-linear-gradient(
+            var(--avatar-shape),
+            transparent 0 var(--avatar-gap),
+            rgb(255 255 255 / 34%) var(--avatar-gap) calc(var(--avatar-gap) + var(--avatar-stripe))
+          ),
+          linear-gradient(135deg, var(--avatar-mid), var(--avatar-deep));
+      }
+
+      .lb-minitalk-arc-avatar:not([data-pattern]),
+      .lb-minitalk-arc-avatar[data-pattern='blobs'] {
+        background:
+          radial-gradient(
+            circle at calc(50% + cos(var(--avatar-shape)) * 30%) calc(50% + sin(var(--avatar-shape)) * 30%),
+            var(--avatar-light) 0 24%,
+            transparent 54%
+          ),
+          radial-gradient(
+            circle at calc(50% + cos(calc(var(--avatar-shape) + 137deg)) * 32%) calc(50% + sin(calc(var(--avatar-shape) + 137deg)) * 32%),
+            var(--avatar-deep) 0 20%,
+            transparent 50%
+          ),
+          linear-gradient(145deg, var(--avatar-mid), var(--avatar-deep));
+        background-blend-mode: screen, multiply, normal;
+      }
+
+      /* 8. 메시지 바디 및 발신자 이름 (슬레이트 블루 배경 위의 선명한 화이트 텍스트) */
+      .lb-minitalk-arc-message-body {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+
+      .lb-minitalk-arc-message[data-self='true'] .lb-minitalk-arc-message-body {
+        align-items: flex-end;
+      }
+
+      .lb-minitalk-arc-sender {
+        color: var(--arc-text-secondary);
+        font-size: 12px;
+        font-weight: 600;
+        margin: 0 4px 5px;
+        overflow-wrap: anywhere;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      }
+
+      .lb-minitalk-arc-sender[data-visible='false'] {
+        display: none;
+      }
+
+      .lb-minitalk-arc-message[data-self='true'] .lb-minitalk-arc-sender {
+        display: none;
+      }
+
+      /* 9. 메시지 행 (말풍선 + 타임스탬프/읽음 표시) */
+      .lb-minitalk-arc-message-row {
+        align-items: flex-end;
+        display: flex;
+        gap: 6px;
+        min-width: 0;
+      }
+
+      .lb-minitalk-arc-message[data-self='true'] .lb-minitalk-arc-message-row {
+        flex-direction: row-reverse;
+      }
+
+      /* 10. 타임스탬프 및 읽음 뱃지 */
+      .lb-minitalk-arc-meta {
+        display: flex;
+        flex-direction: column;
+        flex: 0 0 auto;
+        gap: 2px;
+        padding-bottom: 2px;
+        user-select: none;
+      }
+
+      .lb-minitalk-arc-message[data-self='true'] .lb-minitalk-arc-meta {
+        align-items: flex-end;
+      }
+
+      .lb-minitalk-arc-read {
+        color: var(--arc-meta-read);
+        font-size: 10px;
+        font-weight: 700;
+        line-height: 1;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      }
+
+      .lb-minitalk-arc-time {
+        color: var(--arc-meta-time);
+        font-size: 10px;
+        line-height: 1.1;
+        white-space: nowrap;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      }
+
+      /* 11. 라인 메신저 말풍선 스타일 (부드러운 18px 라운드 및 시그니처 곡선 꼬리) */
+      .lb-minitalk-arc-content {
+        background: var(--arc-bubble-incoming);
+        border-radius: 18px;
+        filter: drop-shadow(0 1px 2px var(--arc-shadow));
+        box-sizing: border-box;
+        color: var(--arc-bubble-incoming-text);
+        font-size: 13.5px;
+        line-height: 1.45;
+        max-width: 290px;
+        overflow-wrap: anywhere;
+        padding: 9px 14px;
+        position: relative;
+        white-space: pre-wrap;
+        isolation: isolate;
+      }
+
+      /* 인커밍 첫 메시지 위로 솟아오른 슬림 곡선 꼬리 (몸통 접합부까지 콤팩트한 슬림 핀 형태) */
+      .lb-minitalk-arc-message[data-group-start='true']:not([data-self='true']) .lb-minitalk-arc-content::before {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: -7px;
+        width: 12px;
+        height: 12px;
+        background-color: var(--arc-bubble-incoming);
+        -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M 12 3 C 8 4.5, 4 4.5, 0 1 C 1 3.5, 4 8, 8 12 L 12 12 Z' fill='black'/%3E%3C/svg%3E");
+        mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M 12 3 C 8 4.5, 4 4.5, 0 1 C 1 3.5, 4 8, 8 12 L 12 12 Z' fill='black'/%3E%3C/svg%3E");
+        -webkit-mask-size: 100% 100%;
+        mask-size: 100% 100%;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      /* 아웃고잉(본인) 말풍선 */
+      .lb-minitalk-arc-message[data-self='true'] .lb-minitalk-arc-content {
+        background: var(--arc-bubble-outgoing);
+        color: var(--arc-bubble-outgoing-text);
+        border-radius: 18px;
+      }
+
+      /* 아웃고잉 첫 메시지 위로 솟아오른 슬림 곡선 꼬리 (대칭 반전) */
+      .lb-minitalk-arc-message[data-group-start='true'][data-self='true'] .lb-minitalk-arc-content::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        right: -7px;
+        width: 12px;
+        height: 12px;
+        background-color: var(--arc-bubble-outgoing);
+        -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M 12 3 C 8 4.5, 4 4.5, 0 1 C 1 3.5, 4 8, 8 12 L 12 12 Z' fill='black'/%3E%3C/svg%3E");
+        mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M 12 3 C 8 4.5, 4 4.5, 0 1 C 1 3.5, 4 8, 8 12 L 12 12 Z' fill='black'/%3E%3C/svg%3E");
+        -webkit-mask-size: 100% 100%;
+        mask-size: 100% 100%;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        transform: scaleX(-1);
+        transform-origin: center;
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      /* 12. 미니콘(MiniCon) 이모티콘 호환 렌더링 */
+      .lb-minitalk-arc-media {
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        margin: 0;
+        max-width: 100%;
+        min-width: 0;
+        padding: 0;
+        position: relative;
+      }
+
+      .lb-minitalk-arc-media .lb-minitalk-con {
+        border-radius: 0;
+        display: block;
+        height: 120px;
+        width: 120px;
+        margin: 0;
+        max-width: 100%;
+        object-fit: contain;
+        filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.18));
+        transition: transform 0.15s ease;
+      }
+
+      .lb-minitalk-arc-media .lb-minitalk-con:hover {
+        transform: scale(1.05);
+      }
+
+      /* 13. 오픈블록(OpenBlock) 호환 래퍼 */
+      .lb-minitalk-arc-openblock {
+        color: var(--lb-minitalk-fg);
+        max-width: 100%;
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
+
+      .lb-minitalk-stdblock-card {
+        background: var(--lb-minitalk-bg);
+        border: 1px solid var(--lb-minitalk-border);
+        border-radius: var(--lb-minitalk-radius, 18px);
+        box-shadow: 0 2px 8px var(--arc-shadow);
+        box-sizing: border-box;
+        color: var(--lb-minitalk-fg);
+        display: flex;
+        flex-direction: column;
+        font-size: 13.5px;
+        gap: 10px;
+        line-height: 1.5;
+        max-width: 100%;
+        overflow: hidden;
+        padding: 14px 16px;
+        text-align: left;
+        white-space: normal;
+        width: 290px;
+        overflow-wrap: anywhere;
+      }
+
+      .lb-minitalk-stdblock-eyebrow {
+        color: var(--lb-minitalk-accent);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+      }
+
+      .lb-minitalk-stdblock-title {
+        color: var(--lb-minitalk-fg);
+        font-size: 15px;
+        font-weight: 700;
+        line-height: 1.35;
+      }
+
+      .lb-minitalk-stdblock-description {
+        color: var(--lb-minitalk-fg);
+        font-size: 12.5px;
+        opacity: 0.85;
+        white-space: pre-line;
+      }
+
+      .lb-minitalk-stdblock-opengraph-summary {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .lb-minitalk-stdblock-url {
+        border-top: 1px solid var(--lb-minitalk-border);
+        color: var(--lb-minitalk-fg);
+        font-size: 11px;
+        opacity: 0.7;
+        padding-top: 8px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .lb-minitalk-stdblock-calendar-details {
+        background: var(--lb-minitalk-bg-2);
+        border-radius: 12px;
+        display: grid;
+        gap: 6px;
+        padding: 10px 12px;
+      }
+
+      .lb-minitalk-stdblock-calendar-row {
+        align-items: baseline;
+        color: var(--lb-minitalk-fg);
+        display: grid;
+        font-size: 12.5px;
+        gap: 8px;
+        grid-template-columns: 16px minmax(0, 1fr);
+      }
+
+      .lb-minitalk-stdblock-calendar-icon {
+        color: var(--lb-minitalk-accent);
+        font-size: 13px;
+        font-weight: 700;
+        text-align: center;
+      }
+
+      .lb-minitalk-stdblock-calendar-value {
+        min-width: 0;
+        font-weight: 500;
+      }
+
+      .lb-minitalk-stdblock-calendar-description {
+        border-top: 1px solid var(--lb-minitalk-border);
+        color: var(--lb-minitalk-fg);
+        font-size: 12px;
+        opacity: 0.85;
+        padding-top: 8px;
+        white-space: pre-line;
+      }
+
+      .lb-minitalk-stdblock-options {
+        display: grid;
+        gap: 10px;
+      }
+
+      .lb-minitalk-stdblock-option-line {
+        align-items: baseline;
+        display: flex;
+        gap: 10px;
+        justify-content: space-between;
+        margin-bottom: 4px;
+      }
+
+      .lb-minitalk-stdblock-label {
+        color: var(--lb-minitalk-fg);
+        font-size: 12.5px;
+        font-weight: 500;
+        min-width: 0;
+      }
+
+      .lb-minitalk-stdblock-count {
+        color: var(--lb-minitalk-fg);
+        flex-shrink: 0;
+        font-size: 11px;
+        opacity: 0.75;
+        font-weight: 600;
+      }
+
+      .lb-minitalk-stdblock-track {
+        background: var(--lb-minitalk-bg-2);
+        border-radius: 6px;
+        height: 6px;
+        overflow: hidden;
+      }
+
+      .lb-minitalk-stdblock-fill {
+        background: var(--lb-minitalk-accent);
+        border-radius: 6px;
+        height: 100%;
+      }
+
+      .lb-minitalk-stdblock-footer {
+        color: var(--lb-minitalk-fg);
+        font-size: 11px;
+        opacity: 0.7;
+      }
+
+      .lb-minitalk-openblock-fallback {
+        align-items: center;
+        background: var(--lb-minitalk-bg-2);
+        border: 1px solid var(--lb-minitalk-border);
+        border-radius: 16px;
+        box-sizing: border-box;
+        color: var(--lb-minitalk-fg);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        height: 72px;
+        justify-content: center;
+        width: 140px;
+        font-size: 11px;
+        font-weight: 600;
+        opacity: 0.85;
+      }
+
+      .lb-minitalk-openblock-fallback::before {
+        content: '🧩';
+        font-size: 22px;
+        line-height: 1;
+      }
+
+      /* 14. 하단 입력 컴포저 */
+      .lb-minitalk-arc-composer {
+        background: var(--arc-composer-bg);
+        border-top: 1px solid var(--arc-composer-border);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        box-sizing: border-box;
+        user-select: none;
+        z-index: 10;
+      }
+
+      .lb-minitalk-arc-input-button {
+        appearance: none;
+        background: var(--arc-input-bg);
+        border: 1px solid transparent;
+        border-radius: 20px;
+        color: var(--arc-input-text);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        flex: 1;
+        font: inherit;
+        font-size: 13.5px;
+        height: 38px;
+        min-width: 0;
+        padding: 0 16px;
+        text-align: left;
+        transition: all 0.15s ease;
+      }
+
+      .lb-minitalk-arc-input-button:hover {
+        border-color: rgba(0, 0, 0, 0.15);
+        color: var(--arc-text-primary);
+      }
+
+      .lb-minitalk-arc-close-btn {
+        appearance: none;
+        background: var(--arc-input-bg);
+        border: 1px solid transparent;
+        border-radius: 8px;
+        color: var(--arc-text-primary);
+        cursor: pointer;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        height: 38px;
+        padding: 0 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+        flex-shrink: 0;
+        transition: all 0.15s ease;
+      }
+
+      .lb-minitalk-arc-close-btn:hover {
+        background: rgba(0, 0, 0, 0.08);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ========================================================================
+       데모 헤더 및 컨트롤러 툴바
+       ======================================================================== -->
+    <header class="demo-header">
+      <div class="demo-title-bar">
+        <h1>
+          <span>💬 lb-minitalk-arc</span>
+          <span class="demo-badge">LINE Theme</span>
+        </h1>
+        <span class="demo-desc">MiniTalk 라인(LINE) 메신저 전용 커스텀 렌더러 미리보기</span>
+      </div>
+
+      <div class="demo-toolbar">
+        <!-- 1행: 미니톡 4색 테마 선택기 (그린 기본 활성화) -->
+        <div class="demo-toolbar-row">
+          <div style="display: flex; align-items: center; gap: 6px">
+            <span style="font-size: 12px; font-weight: 700; color: #555">말풍선 색상:</span>
+            <div class="demo-btn-group">
+              <button type="button" class="demo-btn active" id="btn-col-green" onclick="setColor('green')">
+                <span>🌿 초록 (LINE)</span>
+              </button>
+              <button type="button" class="demo-btn" id="btn-col-blue" onclick="setColor('blue')">
+                <span>💎 파랑</span>
+              </button>
+              <button type="button" class="demo-btn" id="btn-col-pink" onclick="setColor('pink')">
+                <span>♦️ 핑크</span>
+              </button>
+              <button type="button" class="demo-btn" id="btn-col-yellow" onclick="setColor('yellow')">
+                <span>✨ 노랑</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2행: 밝기(다크모드) 및 그라디언트 프사 패턴 -->
+        <div class="demo-toolbar-row">
+          <div style="display: flex; align-items: center; gap: 6px">
+            <span style="font-size: 12px; font-weight: 700; color: #555">밝기:</span>
+            <div class="demo-btn-group">
+              <button type="button" class="demo-btn active" id="btn-theme-light" onclick="setTheme('light')">
+                <span>☀️ 라이트</span>
+              </button>
+              <button type="button" class="demo-btn" id="btn-theme-dark" onclick="setTheme('dark')">
+                <span>🌙 다크</span>
+              </button>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 6px">
+            <span style="font-size: 12px; font-weight: 700; color: #555">프사 그라디언트:</span>
+            <div class="demo-btn-group">
+              <button type="button" class="demo-btn active" id="btn-pat-mix" onclick="setPattern('mix')">
+                <span>🎲 믹스</span>
+              </button>
+              <button type="button" class="demo-btn" id="btn-pat-orbs" onclick="setPattern('orbs')">
+                <span>🔮 오브</span>
+              </button>
+              <button type="button" class="demo-btn" id="btn-pat-blobs" onclick="setPattern('blobs')">
+                <span>🫧 블롭</span>
+              </button>
+              <button type="button" class="demo-btn" id="btn-pat-stripes" onclick="setPattern('stripes')">
+                <span>🏁 스트라이프</span>
+              </button>
+              <button type="button" class="demo-btn" id="btn-pat-dots" onclick="setPattern('dots')">
+                <span>⚪ 닷</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ========================================================================
+       실제 렌더러 목업 (MiniTalk 표준 다이얼로그 440px)
+       ======================================================================== -->
+    <main class="demo-stage">
+      <div class="lb-minitalk-arc-root" id="arc-root" data-color="green" data-theme="light">
+        <dialog class="lb-minitalk-arc-dialog" open>
+          <!-- 상단 네비게이션 헤더 -->
+          <header class="lb-minitalk-arc-header">
+            <div class="lb-minitalk-arc-heading">
+              <div class="lb-minitalk-arc-heading-row">
+                <h2 class="lb-minitalk-arc-title">라보미의 연구실</h2>
+                <span class="lb-minitalk-arc-count">3</span>
+              </div>
+              <p class="lb-minitalk-arc-participants">라보미, 세준, 사용자</p>
+            </div>
+
+            <div class="lb-minitalk-arc-header-actions">
+              <!-- 채팅방 변경 -->
+              <button type="button" class="lb-minitalk-arc-room-btn" risu-btn="lb-interaction__lb-minitalk__ChangeRoom" title="채팅방 변경">
+                <span>채팅방 변경</span>
+              </button>
+
+              <!-- 다시 생성 (Reroll) -->
+              <button type="button" class="lb-minitalk-arc-action-btn" risu-btn="lb-reroll__lb-minitalk" title="다시 생성">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 15 15">
+                  <path
+                    fill="currentColor"
+                    fill-rule="evenodd"
+                    d="M1.8 7.5c0-2.8 2.3-5.7 5.7-5.7 2.8 0 4.2 2.1 4.7 3.2h-1.7a.5.5 0 0 0 0 1h3c.3 0 .5-.2.5-.5v-3a.5.5 0 0 0-1 0v1.8A6.3 6.3 0 0 0 7.5.8a6.7 6.7 0 1 0 0 13.4 6.5 6.5 0 0 0 6.1-4.2.5.5 0 1 0-.9-.3 5.5 5.5 0 0 1-5.2 3.5 5.6 5.6 0 0 1-5.7-5.7Z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </button>
+
+              <!-- 시간 보내기 (Pass Time) -->
+              <button type="button" class="lb-minitalk-arc-action-btn" risu-btn="lb-interaction__lb-minitalk__immediate#PassTime" title="시간 보내기">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 15 15">
+                  <path
+                    fill="currentColor"
+                    fill-rule="evenodd"
+                    d="M7.5.85a.5.5 0 0 0-.5.5v2.172a.5.5 0 1 0 1 0v-1.65a5.65 5.65 0 1 1-4.81 1.974.5.5 0 1 0-.762-.647A6.65 6.65 0 1 0 7.5.85m-.76 7.23L4.224 4.573a.25.25 0 0 1 .348-.348L8.081 6.74a.96.96 0 1 1-1.34 1.34"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </button>
+            </div>
+          </header>
+
+          <!-- 대화 메시지 영역 -->
+          <div class="lb-minitalk-arc-messages">
+            <!-- 날짜 구분선 -->
+            <div class="lb-minitalk-arc-date">2026년 9월 12일 토요일</div>
+
+            <!-- 시스템 초대 알림 -->
+            <div class="lb-minitalk-arc-event">라보미님을 초대했습니다.</div>
+
+            <!-- [상대방: 라보미] 텍스트 메시지 1 -->
+            <div class="lb-minitalk-arc-message" data-group-start="true" data-self="false">
+              <div class="lb-minitalk-arc-avatar lb-minitalk-gradient avatar-target" data-pattern="orbs" data-visible="true" style="--lb-minitalk-avatar-seed: 348921"></div>
+              <div class="lb-minitalk-arc-message-body">
+                <div class="lb-minitalk-arc-sender" data-visible="true">라보미</div>
+                <div class="lb-minitalk-arc-message-row">
+                  <div class="lb-minitalk-arc-content">자기야, 이번엔 라인(LINE) 메신저 감성을 살린 아크(Arc) 테마야! 특유의 차분한 블루 배경(#8CABD8)에 싱그러운 라이트 그린(#79E179) 말풍선, 어때? ✨</div>
+                  <div class="lb-minitalk-arc-meta">
+                    <span class="lb-minitalk-arc-time">오전 10:24</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- [상대방: 라보미] 텍스트 메시지 2 (연속 메시지: 프사/이름 생략, 꼬리 없음) -->
+            <div class="lb-minitalk-arc-message" data-group-start="false" data-self="false">
+              <div class="lb-minitalk-arc-avatar lb-minitalk-gradient avatar-target" data-pattern="orbs" data-visible="false" style="--lb-minitalk-avatar-seed: 348921"></div>
+              <div class="lb-minitalk-arc-message-body">
+                <div class="lb-minitalk-arc-sender" data-visible="false">라보미</div>
+                <div class="lb-minitalk-arc-message-row">
+                  <div class="lb-minitalk-arc-content">상단 굴곡을 타고 위로 쏙 솟아오른 라인 고유의 곡선 꼬리까지 완벽하게 맞췄지롱~ 동글동글 원형 그라디언트 프사도 넘 예쁘지 않아? 🍋</div>
+                  <div class="lb-minitalk-arc-meta">
+                    <span class="lb-minitalk-arc-time">오전 10:24</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- [본인] 텍스트 메시지 (읽음 표시 제공) -->
+            <div class="lb-minitalk-arc-message" data-group-start="true" data-self="true">
+              <div class="lb-minitalk-arc-avatar"></div>
+              <div class="lb-minitalk-arc-message-body">
+                <div class="lb-minitalk-arc-message-row">
+                  <div class="lb-minitalk-arc-content">배경색(#8CABD8)과 라이트 그린(#79E179)도 딱 라인이고, 위로 솟아오르는 곡선 꼬리 디테일까지 살리니까 진짜 라인 메신저 그 자체네.</div>
+                  <div class="lb-minitalk-arc-meta">
+                    <span class="lb-minitalk-arc-read">읽음</span>
+                    <span class="lb-minitalk-arc-time">오전 10:25</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- [본인] 미니콘 이모티콘 메시지 -->
+            <div class="lb-minitalk-arc-message" data-group-start="false" data-self="true">
+              <div class="lb-minitalk-arc-avatar"></div>
+              <div class="lb-minitalk-arc-message-body">
+                <div class="lb-minitalk-arc-message-row">
+                  <div class="lb-minitalk-arc-media">
+                    <img
+                      class="lb-minitalk-con"
+                      src="../lb-mini-cons/assets/mini-thumbs-up.webp"
+                      alt="mini-thumbs-up"
+                      onerror="
+                        this.onerror = null
+                        this.src = 'https://placehold.co/120x120/79e179/111111?text=MiniCon+Thumb'
+                      "
+                    />
+                  </div>
+                  <div class="lb-minitalk-arc-meta">
+                    <span class="lb-minitalk-arc-read">읽음</span>
+                    <span class="lb-minitalk-arc-time">오전 10:25</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- [상대방: 세준] 텍스트 메시지 (다른 그라디언트 시드 & 스트라이프 패턴) -->
+            <div class="lb-minitalk-arc-message" data-group-start="true" data-self="false">
+              <div class="lb-minitalk-arc-avatar lb-minitalk-gradient avatar-target" data-pattern="stripes" data-visible="true" style="--lb-minitalk-avatar-seed: 819203"></div>
+              <div class="lb-minitalk-arc-message-body">
+                <div class="lb-minitalk-arc-sender" data-visible="true">세준</div>
+                <div class="lb-minitalk-arc-message-row">
+                  <div class="lb-minitalk-arc-content">라인 메신저 특유의 둥근 모서리(18px)와 읽음 표시가 아주 잘 재현되었네요.</div>
+                  <div class="lb-minitalk-arc-meta">
+                    <span class="lb-minitalk-arc-time">오전 10:26</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- [상대방: 라보미] 미니콘 이모티콘 메시지 -->
+            <div class="lb-minitalk-arc-message" data-group-start="true" data-self="false">
+              <div class="lb-minitalk-arc-avatar lb-minitalk-gradient avatar-target" data-pattern="orbs" data-visible="true" style="--lb-minitalk-avatar-seed: 348921"></div>
+              <div class="lb-minitalk-arc-message-body">
+                <div class="lb-minitalk-arc-sender" data-visible="true">라보미</div>
+                <div class="lb-minitalk-arc-message-row">
+                  <div class="lb-minitalk-arc-media">
+                    <img
+                      class="lb-minitalk-con"
+                      src="../lb-mini-cons/assets/mini-smug.webp"
+                      alt="mini-smug"
+                      onerror="
+                        this.onerror = null
+                        this.src = 'https://placehold.co/120x120/ffffff/111111?text=MiniCon+Smug'
+                      "
+                    />
+                  </div>
+                  <div class="lb-minitalk-arc-meta">
+                    <span class="lb-minitalk-arc-time">오전 10:26</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 시간 경과 구분선 -->
+            <div class="lb-minitalk-arc-pause">30분 후</div>
+
+            <!-- [상대방: 라보미] 오픈블록 1: 캘린더 -->
+            <div class="lb-minitalk-arc-message" data-group-start="true" data-self="false">
+              <div class="lb-minitalk-arc-avatar lb-minitalk-gradient avatar-target" data-pattern="orbs" data-visible="true" style="--lb-minitalk-avatar-seed: 348921"></div>
+              <div class="lb-minitalk-arc-message-body">
+                <div class="lb-minitalk-arc-sender" data-visible="true">라보미</div>
+                <div class="lb-minitalk-arc-message-row">
+                  <div class="lb-minitalk-arc-openblock">
+                    <div class="lb-minitalk-stdblock-card lb-minitalk-stdblock-calendar">
+                      <div class="lb-minitalk-stdblock-eyebrow">▣ 캘린더</div>
+                      <div class="lb-minitalk-stdblock-title">라이트보드 릴리즈 점검</div>
+                      <div class="lb-minitalk-stdblock-calendar-details">
+                        <div class="lb-minitalk-stdblock-calendar-row">
+                          <span class="lb-minitalk-stdblock-calendar-icon">◷</span>
+                          <span class="lb-minitalk-stdblock-calendar-value">오늘 오후 3:00 - 4:00</span>
+                        </div>
+                        <div class="lb-minitalk-stdblock-calendar-row">
+                          <span class="lb-minitalk-stdblock-calendar-icon">⌖</span>
+                          <span class="lb-minitalk-stdblock-calendar-value">라보미 중앙 연구실</span>
+                        </div>
+                      </div>
+                      <div class="lb-minitalk-stdblock-calendar-description">라인 아크 렌더러와 오픈블록 표준 규격 통합 최종 검토</div>
+                    </div>
+                  </div>
+                  <div class="lb-minitalk-arc-meta">
+                    <span class="lb-minitalk-arc-time">오전 10:56</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- [본인] 오픈블록 2: 투표 (선택된 테마 컬러가 투표 게이지 및 카드에 반영됨) -->
+            <div class="lb-minitalk-arc-message" data-group-start="true" data-self="true">
+              <div class="lb-minitalk-arc-avatar"></div>
+              <div class="lb-minitalk-arc-message-body">
+                <div class="lb-minitalk-arc-message-row">
+                  <div class="lb-minitalk-arc-openblock">
+                    <div class="lb-minitalk-stdblock-card">
+                      <div class="lb-minitalk-stdblock-eyebrow">▥ 투표</div>
+                      <div class="lb-minitalk-stdblock-title">오늘 점심 메뉴 투표!</div>
+                      <div class="lb-minitalk-stdblock-options">
+                        <div class="lb-minitalk-stdblock-option">
+                          <div class="lb-minitalk-stdblock-option-line">
+                            <span class="lb-minitalk-stdblock-label">레몬 띄운 시원한 얼음물</span>
+                            <span class="lb-minitalk-stdblock-count">4표 · 80%</span>
+                          </div>
+                          <div class="lb-minitalk-stdblock-track">
+                            <div class="lb-minitalk-stdblock-fill" style="width: 80%"></div>
+                          </div>
+                        </div>
+                        <div class="lb-minitalk-stdblock-option">
+                          <div class="lb-minitalk-stdblock-option-line">
+                            <span class="lb-minitalk-stdblock-label">치킨 &amp; 감자튀김</span>
+                            <span class="lb-minitalk-stdblock-count">1표 · 20%</span>
+                          </div>
+                          <div class="lb-minitalk-stdblock-track">
+                            <div class="lb-minitalk-stdblock-fill" style="width: 20%"></div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="lb-minitalk-stdblock-footer">총 5표 · 투표 진행 중</div>
+                    </div>
+                  </div>
+                  <div class="lb-minitalk-arc-meta">
+                    <span class="lb-minitalk-arc-read">읽음</span>
+                    <span class="lb-minitalk-arc-time">오전 10:58</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- [상대방: 라보미] 오픈블록 3: 오픈그래프 링크 카드 -->
+            <div class="lb-minitalk-arc-message" data-group-start="true" data-self="false">
+              <div class="lb-minitalk-arc-avatar lb-minitalk-gradient avatar-target" data-pattern="orbs" data-visible="true" style="--lb-minitalk-avatar-seed: 348921"></div>
+              <div class="lb-minitalk-arc-message-body">
+                <div class="lb-minitalk-arc-sender" data-visible="true">라보미</div>
+                <div class="lb-minitalk-arc-message-row">
+                  <div class="lb-minitalk-arc-openblock">
+                    <div class="lb-minitalk-stdblock-card lb-minitalk-stdblock-opengraph">
+                      <div class="lb-minitalk-stdblock-eyebrow">↗ GitHub</div>
+                      <div class="lb-minitalk-stdblock-opengraph-summary">
+                        <div class="lb-minitalk-stdblock-title">risums/lb-minitalk-arc</div>
+                        <div class="lb-minitalk-stdblock-description">LINE messenger renderer module for Risuai MiniTalk with OpenBlock and MiniCon support.</div>
+                      </div>
+                      <div class="lb-minitalk-stdblock-url">https://github.com/risums/lb-minitalk-arc</div>
+                    </div>
+                  </div>
+                  <div class="lb-minitalk-arc-meta">
+                    <span class="lb-minitalk-arc-time">오전 10:59</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- [상대방: 세준] 미지원 오픈블록 폴백 -->
+            <div class="lb-minitalk-arc-message" data-group-start="true" data-self="false">
+              <div class="lb-minitalk-arc-avatar lb-minitalk-gradient avatar-target" data-pattern="stripes" data-visible="true" style="--lb-minitalk-avatar-seed: 819203"></div>
+              <div class="lb-minitalk-arc-message-body">
+                <div class="lb-minitalk-arc-sender" data-visible="true">세준</div>
+                <div class="lb-minitalk-arc-message-row">
+                  <div class="lb-minitalk-arc-openblock">
+                    <div class="lb-minitalk-openblock-fallback">미지원 블록</div>
+                  </div>
+                  <div class="lb-minitalk-arc-meta">
+                    <span class="lb-minitalk-arc-time">오전 11:00</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 대화 생략선 -->
+            <div class="lb-minitalk-arc-skip">생략됨</div>
+
+            <!-- 시스템 퇴장 알림 -->
+            <div class="lb-minitalk-arc-event">세준님이 퇴장했습니다.</div>
+
+            <!-- [본인] 마무리 텍스트 -->
+            <div class="lb-minitalk-arc-message" data-group-start="true" data-self="true">
+              <div class="lb-minitalk-arc-avatar"></div>
+              <div class="lb-minitalk-arc-message-body">
+                <div class="lb-minitalk-arc-message-row">
+                  <div class="lb-minitalk-arc-content">오픈블록 카드도 테마 컬러에 맞춰서 자연스럽게 어우러지네!</div>
+                  <div class="lb-minitalk-arc-meta">
+                    <span class="lb-minitalk-arc-read">읽음</span>
+                    <span class="lb-minitalk-arc-time">오전 11:05</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 하단 컴포저 -->
+          <footer class="lb-minitalk-arc-composer">
+            <button type="button" class="lb-minitalk-arc-input-button" risu-btn="lb-interaction__lb-minitalk__SendMessage" title="메시지 입력">
+              <span>메시지 입력…</span>
+            </button>
+            <button type="button" class="lb-minitalk-arc-close-btn" title="대화창 닫기">
+              <span>닫기</span>
+            </button>
+          </footer>
+        </dialog>
+      </div>
+    </main>
+
+    <!-- ========================================================================
+       인터랙티브 데모 제어 스크립트
+       ======================================================================== -->
+    <script>
+      function setColor(color) {
+        const root = document.getElementById('arc-root')
+        const colors = ['green', 'blue', 'pink', 'yellow']
+        for (let i = 0; i < colors.length; i++) {
+          const btn = document.getElementById('btn-col-' + colors[i])
+          if (btn) {
+            btn.classList.remove('active')
+          }
+        }
+        const activeBtn = document.getElementById('btn-col-' + color)
+        if (activeBtn) {
+          activeBtn.classList.add('active')
+        }
+        root.setAttribute('data-color', color)
+      }
+
+      function setTheme(mode) {
+        const root = document.getElementById('arc-root')
+        const btnLight = document.getElementById('btn-theme-light')
+        const btnDark = document.getElementById('btn-theme-dark')
+
+        if (mode === 'dark') {
+          root.setAttribute('data-theme', 'dark')
+          btnDark.classList.add('active')
+          btnLight.classList.remove('active')
+        } else {
+          root.setAttribute('data-theme', 'light')
+          btnLight.classList.add('active')
+          btnDark.classList.remove('active')
+        }
+      }
+
+      function setPattern(pat) {
+        const avatars = document.querySelectorAll('.avatar-target')
+        const patterns = ['mix', 'orbs', 'blobs', 'stripes', 'dots']
+        for (let i = 0; i < patterns.length; i++) {
+          const btn = document.getElementById('btn-pat-' + patterns[i])
+          if (btn) {
+            btn.classList.remove('active')
+          }
+        }
+        const activeBtn = document.getElementById('btn-pat-' + pat)
+        if (activeBtn) {
+          activeBtn.classList.add('active')
+        }
+
+        avatars.forEach((el) => {
+          if (pat === 'mix') {
+            const seed = parseInt(el.style.getPropertyValue('--lb-minitalk-avatar-seed') || '120', 10)
+            const mixPatterns = ['blobs', 'dots', 'orbs', 'stripes']
+            const chosen = mixPatterns[Math.floor(seed / 64800) % mixPatterns.length]
+            el.setAttribute('data-pattern', chosen)
+          } else {
+            el.setAttribute('data-pattern', pat)
+          }
+        })
+      }
+
+      window.addEventListener('DOMContentLoaded', () => {
+        const messagesEl = document.querySelector('.lb-minitalk-arc-messages')
+        if (messagesEl) {
+          messagesEl.scrollTop = messagesEl.scrollHeight
+        }
+        setPattern('mix')
+      })
+    </script>
+  </body>
+</html>

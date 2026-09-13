@@ -146,15 +146,27 @@ end
 ---@param content string
 ---@return table
 local function decodeBoard(content)
-  local board = prelude.toon.decode(content)
-  local posts = board.posts
+  local decoded = prelude.toon.decode(content)
+  local board = type(decoded) == 'table' and decoded or {}
+  local posts = {}
+
+  if type(board.posts) == 'table' then
+    posts = board.posts
+  elseif type(board) == 'table' and (#board > 0 or next(board) == nil) then
+    posts = board
+    board = { posts = posts }
+  end
+
+  board.posts = posts
 
   for _, post in ipairs(posts) do
-    for _, comment in ipairs(post.comments or {}) do
-      local cons = parseConReferences(comment.content)
-      if cons then
-        comment.cons = cons
-        comment.content = nil
+    if type(post) == 'table' then
+      for _, comment in ipairs(post.comments or {}) do
+        local cons = parseConReferences(comment.content)
+        if cons then
+          comment.cons = cons
+          comment.content = nil
+        end
       end
     end
   end

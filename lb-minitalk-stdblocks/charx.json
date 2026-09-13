@@ -1,6 +1,6 @@
 {
   "CSS": "style.html",
-  "description": "♦️미니챗, 투표 + 공유 + 캘린더 블록, for 미니챗",
+  "description": "미니톡 투표, 공유, 캘린더 블록 for 미니챗 4.3.0+",
   "lorebook": [
     {
       "alwaysActive": false,
@@ -22,12 +22,6 @@
     },
     {
       "alwaysActive": false,
-      "comment": "lb-minitalk.openblock",
-      "file": "lorebooks/poll-vote.md",
-      "insertOrder": 200
-    },
-    {
-      "alwaysActive": false,
       "comment": "lb-minitalk.openblock.calendar",
       "file": "lorebooks/calendar.lua",
       "insertOrder": 200
@@ -43,15 +37,9 @@
       "comment": "lb-minitalk.openblock.poll",
       "file": "lorebooks/poll.lua",
       "insertOrder": 200
-    },
-    {
-      "alwaysActive": false,
-      "comment": "lb-minitalk.openblock.poll-vote",
-      "file": "lorebooks/poll-vote.lua",
-      "insertOrder": 200
     }
   ],
-  "name": "♦️미니톡 오픈블록 · 표준블록 1.0.0",
+  "name": "♦️미니톡 오픈블록 · 기본블록 1.0.0",
   "namespace": "lb-minitalk-stdblock",
   "version": "1.0.0"
 }
