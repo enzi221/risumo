@@ -37,7 +37,7 @@ local function validate(_, content)
   return data ~= nil, reason
 end
 
-local function render(_, content, options)
+local function render(_, content)
   local data = assert(parse(content))
   local rows = {}
   for _, option in ipairs(data.options) do
@@ -49,7 +49,7 @@ local function render(_, content, options)
       class = 'lb-minitalk-stdblock-option',
       h.div {
         class = 'lb-minitalk-stdblock-option-line',
-        h.span { class = 'lb-minitalk-stdblock-label', hraw(options.escapeText(option.label)) },
+        h.span { class = 'lb-minitalk-stdblock-label', option.label },
         h.span {
           class = 'lb-minitalk-stdblock-count',
           hraw(string.format('%.0f표 · %d%%', option.votes, percent)),
@@ -64,7 +64,7 @@ local function render(_, content, options)
   return tostring(h.div {
     class = 'lb-minitalk-stdblock-card',
     h.div { class = 'lb-minitalk-stdblock-eyebrow', '▥ 투표' },
-    h.div { class = 'lb-minitalk-stdblock-title', hraw(options.escapeText(data.question)) },
+    h.div { class = 'lb-minitalk-stdblock-title', data.question },
     h.div { class = 'lb-minitalk-stdblock-options', rows },
     h.div {
       class = 'lb-minitalk-stdblock-footer',

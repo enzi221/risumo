@@ -226,7 +226,7 @@ local function generateImageFromPrompts(triggerId, prompts, errors)
   end
 
   local inlay = generateImage(triggerId, prompts.positive, prompts.negative or ''):await()
-  if not inlay or inlay == '' then
+  if type(inlay) ~= 'string' or inlay:sub(1, 7) ~= '{{inlay' then
     error(errors.requestFailed or '이미지 생성 API 호출에 실패했습니다.')
   end
 

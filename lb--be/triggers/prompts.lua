@@ -76,6 +76,14 @@ local function cleanInput(triggerId, text, identifier)
   return prelude.removeAllNodes(text, { identifier, "output" })
 end
 
+local function getInstructionLore(triggerId, name)
+  local lore = prelude.getPriorityLoreBook(triggerId, name)
+  if not lore then
+    return nil
+  end
+  return lore
+end
+
 local function resolvePromptContent(lore, fallback)
   local content = prelude.trim((lore and lore.content) or '')
   if content == '' then
@@ -90,15 +98,15 @@ local function makeIntro(triggerId, man)
   local identifier = man.identifier
 
   -- Optional jail break override
-  local jailBreakExternal = prelude.getPriorityLoreBook(triggerId, identifier .. ".lb.jailbreak")
+  local jailBreakExternal = getInstructionLore(triggerId, identifier .. ".lb.jailbreak")
   local jailBreak = resolvePromptContent(jailBreakExternal, JAIL_BREAK)
 
   -- Optional role assumption override
-  local jobInstructionExternal = prelude.getPriorityLoreBook(triggerId, identifier .. ".lb.job")
+  local jobInstructionExternal = getInstructionLore(triggerId, identifier .. ".lb.job")
   local jobInstruction = resolvePromptContent(jobInstructionExternal, JOB_INSTRUCTION)
 
   -- Optional universe introduction
-  local beforeUniverseExternal = prelude.getPriorityLoreBook(triggerId, identifier .. ".lb.universe")
+  local beforeUniverseExternal = getInstructionLore(triggerId, identifier .. ".lb.universe")
   local beforeUniverse = resolvePromptContent(beforeUniverseExternal, '')
 
   local personaName = getPersonaName(triggerId)
@@ -128,11 +136,11 @@ local function makeOutro(triggerId, man, requestType)
   local identifier = man.identifier
 
   -- What to generate
-  local guidelineExternal = prelude.getPriorityLoreBook(triggerId, identifier .. ".lb")
+  local guidelineExternal = getInstructionLore(triggerId, identifier .. ".lb")
   local guideline = (guidelineExternal and guidelineExternal.content) or ""
 
   -- Data schema
-  local dataFormatExternal = prelude.getPriorityLoreBook(triggerId, identifier .. ".lb.format")
+  local dataFormatExternal = getInstructionLore(triggerId, identifier .. ".lb.format")
   local dataFormat = (dataFormatExternal and dataFormatExternal.content) or ""
 
   -- Thoughts schema
@@ -140,9 +148,9 @@ local function makeOutro(triggerId, man, requestType)
   local thoughtsFlag = man.thoughts or '0'
   if thoughtsFlag ~= '2' then
     if requestType == 'generation' or requestType == 'reroll' then
-      thoughtsFormatExternal = prelude.getPriorityLoreBook(triggerId, identifier .. ".lb.thoughts")
+      thoughtsFormatExternal = getInstructionLore(triggerId, identifier .. ".lb.thoughts")
     elseif requestType == 'interaction' then
-      thoughtsFormatExternal = prelude.getPriorityLoreBook(triggerId, identifier .. ".lb.thoughts-interaction")
+      thoughtsFormatExternal = getInstructionLore(triggerId, identifier .. ".lb.thoughts-interaction")
     end
   end
   local thoughtsFormat = (thoughtsFormatExternal and thoughtsFormatExternal.content) or nil
@@ -200,9 +208,9 @@ local function makePrompt(triggerId, man, fullChat, type, extras, chatOffset)
   local outro = makeOutro(triggerId, man, type)
 
   -- Optional prefill
-  local prefillExternal = prelude.getPriorityLoreBook(triggerId, man.identifier .. ".lb.prefill")
+  local prefillExternal = getInstructionLore(triggerId, man.identifier .. ".lb.prefill")
   local prefill = prelude.trim((prefillExternal and prefillExternal.content) or '')
-  local prefillUserExternal = prelude.getPriorityLoreBook(triggerId, man.identifier .. ".lb.prefill-user")
+  local prefillUserExternal = getInstructionLore(triggerId, man.identifier .. ".lb.prefill-user")
   local prefillUser = prelude.trim((prefillUserExternal and prefillUserExternal.content) or '')
 
   -- Add 'No preambles' if without prefill
@@ -211,7 +219,7 @@ local function makePrompt(triggerId, man, fullChat, type, extras, chatOffset)
     outro = outro .. ' No preambles/explanations.'
   end
 
-  local externalLores = getLoreBooks(triggerId, identifier .. '.lb.extra')
+  local externalLores = prelude.getLoreBooks(triggerId, identifier .. '.lb.extra')
   local externalLoresBuf = {}
   for _, lore in ipairs(externalLores) do
     if lore.content and lore.content ~= '' then

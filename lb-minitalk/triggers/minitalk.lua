@@ -10,7 +10,7 @@ local function setup(triggerId)
 end
 
 local function escapeText(value)
-  return prelude.escEntities(value):gsub('{', '&#123;'):gsub('}', '&#125;')
+  return value
 end
 
 local function render(triggerId, text, meta)
@@ -22,7 +22,7 @@ local function render(triggerId, text, meta)
   local nodes = prelude.queryNodes('lb-minitalk', text)
   for index = #nodes, 1, -1 do
     local node = nodes[index]
-    local data, extensions = runtime.decode(triggerId, node.content, false)
+    local data = runtime.decode(triggerId, node.content, false)
     local renderData = {
       messages = data.messages,
       name = data.name,
@@ -39,12 +39,12 @@ local function render(triggerId, text, meta)
         for _, participant in ipairs(data.participants) do
           if participant.id == message.content then
             local suffix = message.type == 'invited' and '님을 초대했습니다.' or '님이 퇴장했습니다.'
-            return escapeText(participant.name .. suffix)
+            return prelude.escEntities(participant.name .. suffix)
           end
         end
       end
       if message.type == 'text' then
-        return escapeText(message.content)
+        return prelude.escEntities(message.content)
       end
       if message.type == 'con' then
         local identifier = runtime.conIdentifier(message.content)
@@ -56,9 +56,16 @@ local function render(triggerId, text, meta)
         })
       end
       local identifier = message.type:match('^openblock:(.+)$')
-      local extension = extensions[identifier]
+      local extension = runtime.openblock(triggerId, identifier)
       if extension then
+        for messageIndex, candidate in ipairs(data.messages) do
+          if candidate == message then
+            options.messageIndex = messageIndex
+            break
+          end
+        end
         local success, html = pcall(extension.render, triggerId, message.content, options)
+        options.messageIndex = nil
         if success and type(html) == 'string' and html ~= '' then
           return html
         end

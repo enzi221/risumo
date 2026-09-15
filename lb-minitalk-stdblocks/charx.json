@@ -1,6 +1,6 @@
 {
   "CSS": "style.html",
-  "description": "미니톡 투표, 공유, 캘린더 블록 for 미니챗 4.3.0+",
+  "description": "미니톡 투표, 공유, 캘린더 블록 for 미니톡 4.3.0+",
   "lorebook": [
     {
       "alwaysActive": false,

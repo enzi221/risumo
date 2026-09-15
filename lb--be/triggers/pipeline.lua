@@ -4,7 +4,7 @@ local C = require('./constants')
 
 local M = {}
 
-local VALIDATION_ERROR_PREFIX = "InvalidOutput:"
+local VALIDATION_ERROR_PREFIX = 'InvalidOutput:'
 
 --- @param triggerId string
 --- @param man Manifest
@@ -12,11 +12,12 @@ local VALIDATION_ERROR_PREFIX = "InvalidOutput:"
 --- @param modeOverride '1'|'2'?
 local function runLLM(triggerId, man, prom, modeOverride)
   local mode = modeOverride or man.mode
+  local options = { streaming = getGlobalVar(triggerId, 'toggle_lightboard.streaming') == '1' }
 
   if mode == '1' then
-    return LLM(triggerId, prom)
+    return LLM(triggerId, prom, false, options)
   else
-    return axLLM(triggerId, prom)
+    return axLLM(triggerId, prom, false, options)
   end
 end
 

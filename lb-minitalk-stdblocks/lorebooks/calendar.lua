@@ -29,31 +29,28 @@ local function validate(_, content)
   return data ~= nil, reason
 end
 
-local function render(_, content, options)
+local function render(_, content)
   local data = assert(parse(content))
-  local function escaped(value)
-    return hraw(options.escapeText(value))
-  end
   local details = {
     h.div {
       class = 'lb-minitalk-stdblock-calendar-row',
       h.span { class = 'lb-minitalk-stdblock-calendar-icon', '◷' },
-      h.span { class = 'lb-minitalk-stdblock-calendar-value', escaped(data.schedule) },
+      h.span { class = 'lb-minitalk-stdblock-calendar-value', data.schedule },
     },
   }
   if data.location ~= '' then
     details[#details + 1] = h.div {
       class = 'lb-minitalk-stdblock-calendar-row',
       h.span { class = 'lb-minitalk-stdblock-calendar-icon', '⌖' },
-      h.span { class = 'lb-minitalk-stdblock-calendar-value', escaped(data.location) },
+      h.span { class = 'lb-minitalk-stdblock-calendar-value', data.location },
     }
   end
   return tostring(h.div {
     class = 'lb-minitalk-stdblock-card lb-minitalk-stdblock-calendar',
     h.div { class = 'lb-minitalk-stdblock-eyebrow', '▣ 캘린더' },
-    h.div { class = 'lb-minitalk-stdblock-title', escaped(data.title) },
+    h.div { class = 'lb-minitalk-stdblock-title', data.title },
     h.div { class = 'lb-minitalk-stdblock-calendar-details', details },
-    h.div { class = 'lb-minitalk-stdblock-calendar-description', escaped(data.description) },
+    h.div { class = 'lb-minitalk-stdblock-calendar-description', data.description },
   })
 end
 

@@ -1,12 +1,19 @@
 {
-  "Lua.workspace.library": [
-    "${workspaceFolder}/lib/?.lua"
+  "Lua.workspace.ignoreDir": [
+    ".vscode",
+    "**/tests",
+    "**/*.test.lua",
+    "scripts/test-bootstrap.lua",
+    "test.lua"
   ],
-  "prettier.printWidth": 160,
+  "Lua.workspace.library": [
+    "${workspaceFolder}/lib"
+  ],
   "[html]": {
     "editor.formatOnSave": false
   },
+  "git.ignoreLimitWarning": true,
   "prettier.bracketSameLine": false,
   "prettier.htmlWhitespaceSensitivity": "strict",
-  "git.ignoreLimitWarning": true
+  "prettier.printWidth": 160
 }

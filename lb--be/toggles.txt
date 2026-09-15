@@ -4,6 +4,8 @@ lightboard.language=언어　명시=select=한국어,영어,일본어,명시 안
 =——————⚙️요　　청=divider
 lightboard.routing=라우팅 식별자
 =지원하는 프로바이더 플러그인에서 모듈별 요청 분리 가능=caption
+lightboard.streaming=응답 스트리밍
+=524 오류가 발생할 때 도움이 될 수 있음=caption
 lightboard.maxCtx=최대　컨텍=text
 =↑ 기억력 향상, 비용 증가. 커뮤니티 모듈 사용 시 높게 설정=caption
 =최소 8,000, 기본 8,000, 최대 리스 설정=caption
@@ -31,5 +33,5 @@ lightboard.skipUpdateCheck=업데이트 알림 끄기
 lightboard.logLevel=로그　수준=select=VERBOSE,INFO,NONE
 =브라우저 콘솔 로그=caption
 ==divider
-=라이트보드 백엔드 4.3.1 · amonamona=caption
+=라이트보드 백엔드 4.4.0 · amonamona=caption
 ==groupEnd

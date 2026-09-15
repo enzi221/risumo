@@ -19,6 +19,11 @@
     },
     {
       "alwaysActive": false,
+      "comment": "lb-minitalk.lb.onInput",
+      "file": "lorebooks/lb-minitalk.onInput.lua"
+    },
+    {
+      "alwaysActive": false,
       "comment": "lb-minitalk.lb.onInstructions",
       "file": "lorebooks/lb-minitalk.onInstructions.lua"
     },
@@ -69,7 +74,7 @@
       "insertOrder": 4567
     }
   ],
-  "name": "🔦라이트보드 ♦️미니톡 4.3.2",
+  "name": "🔦라이트보드 ♦️미니톡 4.4.0",
   "namespace": "lb-minitalk",
   "regex": [
     "regex/display-timer-icon.md",
@@ -86,5 +91,5 @@
       "type": "start"
     }
   ],
-  "version": "4.3.2"
+  "version": "4.4.0"
 }

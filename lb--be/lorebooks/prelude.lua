@@ -392,21 +392,73 @@ local function removeAllNodes(text, tagsToKeep)
   return table.concat(parts)
 end
 
----Get a lore book with the highest insert order.
----@param triggerId string
----@param name string
----@return LoreBook?
-local function getPriorityLoreBook(triggerId, name)
+local function getRawPriorityLoreBook(triggerId, name)
   local books = getLoreBooks(triggerId, name)
   if not books or #books == 0 then
     return nil
   end
 
-  table.sort(books, function(a, b)
-    return (a.insertorder or 0) > (b.insertorder or 0)
+  local priority
+  for _, book in ipairs(books) do
+    if not priority or (book.insertorder or 0) > (priority.insertorder or 0) then
+      priority = book
+    end
+  end
+
+  return priority
+end
+
+local function resolveLoreBook(triggerId, book)
+  local resolved = {}
+  for key, value in pairs(book) do
+    resolved[key] = value
+  end
+
+  resolved.content = (book.content or ''):gsub('<!%-%-%s*lb:require:(.-)%s*%-%->', function(name)
+    local loreName = trim(name)
+    local allName = loreName:match('^all:(.*)$')
+    if allName ~= nil then
+      local contents = {}
+      for _, required in ipairs(getLoreBooks(triggerId, trim(allName)) or {}) do
+        if required.content and required.content ~= '' then
+          t_insert(contents, required.content)
+        end
+      end
+      return table.concat(contents, '\n\n')
+    end
+
+    local required = getRawPriorityLoreBook(triggerId, loreName)
+    if not required or not required.content then
+      return ''
+    end
+    return required.content
   end)
 
-  return books[1]
+  return resolved
+end
+
+---@param triggerId string
+---@param name string
+---@return LoreBook[]
+local function getResolvedLoreBooks(triggerId, name)
+  local resolved = {}
+  for _, book in ipairs(getLoreBooks(triggerId, name) or {}) do
+    t_insert(resolved, resolveLoreBook(triggerId, book))
+  end
+  return resolved
+end
+
+---Get a resolved lore book with the highest insert order.
+---@param triggerId string
+---@param name string
+---@return LoreBook?
+local function getPriorityLoreBook(triggerId, name)
+  local book = getRawPriorityLoreBook(triggerId, name)
+  if not book then
+    return nil
+  end
+
+  return resolveLoreBook(triggerId, book)
 end
 
 ---Locates the target chat index for sideEffect operations.
@@ -552,6 +604,7 @@ _ENV.prelude = {
   extractTagName = extractTagName,
   extractNodes = queryNodes,
   getFlagToggle = getFlagToggle,
+  getLoreBooks = getResolvedLoreBooks,
   getPriorityLoreBook = getPriorityLoreBook,
   info = info,
   import = import,

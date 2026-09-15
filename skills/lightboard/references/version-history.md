@@ -2,8 +2,11 @@
 
 ## Unreleased
 
-- Added the MiniTalk `skip` message type for an unknown amount of omitted conversation over an unknown duration.
-- Moved MiniTalk key-figure state into the room's `keyFigures` field. Interaction patches update the same field, and missing generated data uses the preserved state.
+- Added nested field groups to TOON tabular arrays and keyed tabular objects to `prelude.toon.encode()` and `prelude.toon.decode()`.
+
+## 4.4.0
+
+- Added `prelude.getLoreBooks()` and single-level `<!-- lb:require:NAME -->` and `<!-- lb:require:all:NAME -->` expansion to both Prelude lorebook getters.
 
 ## 4.3.0
 

@@ -1,0 +1,44 @@
+{
+  "CSS": "style.html",
+  "description": "미니톡 첨부사진 for 미니톡, 삽화 4.4.0+",
+  "hideIcon": false,
+  "lorebook": [
+    {
+      "alwaysActive": false,
+      "comment": "lb-minitalk.openblock",
+      "file": "lorebooks/picture.md",
+      "insertOrder": 200
+    },
+    {
+      "alwaysActive": false,
+      "comment": "lb-minitalk.openblock.picture",
+      "file": "lorebooks/picture.lua",
+      "insertOrder": 200
+    },
+    {
+      "alwaysActive": false,
+      "comment": "lb-minitalk.openblock.picture-generated",
+      "file": "lorebooks/picture-generated.lua",
+      "insertOrder": 200
+    },
+    {
+      "alwaysActive": false,
+      "comment": "lb-minitalk-picture.lib",
+      "file": "lorebooks/picture.lib.lua",
+      "insertOrder": 200
+    }
+  ],
+  "lowLevelAccess": true,
+  "name": "♦️미니톡 오픈블록 · 첨부사진 1.0.0",
+  "namespace": "lb-minitalk-picture",
+  "toggles": "toggles.txt",
+  "triggers": [
+    {
+      "bundle": true,
+      "lowLevelAccess": true,
+      "lua": "triggers/picture.lua",
+      "type": "start"
+    }
+  ],
+  "version": "1.0.0"
+}

@@ -28,6 +28,7 @@ local lbdata = require('./lbdata')
 local manifest = require('./manifest')
 local moduleopener = require('./moduleopener')
 local pipeline = require('./pipeline')
+local prompts = require('./prompts')
 local sideeffect = require('./sideeffect')
 local update = require('./update')
 

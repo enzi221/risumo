@@ -27,6 +27,11 @@
     },
     {
       "extension": "webp",
+      "file": "assets/mini-patted.webp",
+      "name": "mini-patted"
+    },
+    {
+      "extension": "webp",
       "file": "assets/mini-praise.webp",
       "name": "mini-praise"
     },
@@ -34,6 +39,11 @@
       "extension": "webp",
       "file": "assets/mini-punched.webp",
       "name": "mini-punched"
+    },
+    {
+      "extension": "webp",
+      "file": "assets/mini-punching.webp",
+      "name": "mini-punching"
     },
     {
       "extension": "webp",
@@ -102,7 +112,7 @@
     }
   ],
   "lowLevelAccess": false,
-  "name": "♦️미니보드 미니 미니콘 1.0.1",
+  "name": "♦️미니보드 미니 미니콘 1.1.0",
   "namespace": "lb-mini-cons",
-  "version": "1.0.1"
+  "version": "1.1.0"
 }

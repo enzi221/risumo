@@ -48,7 +48,6 @@ The renderer receives:
 - `data.participants`: Decoded list of room participants.
 - `data.pov`: Participant ID representing the speaker viewpoint.
 - `options.chatIndex`: Zero-based chat index.
-- `options.escapeText(value)`: Escape text for HTML and prevent CBS evaluation of message text.
 - `options.id`: Unique popover ID for the rendered room.
 - `options.renderContent(message)`: Return escaped text, membership-event text, MiniCon image HTML, validated OpenBlock HTML, or the default unavailable-OpenBlock fallback HTML.
 
@@ -71,7 +70,7 @@ Return a non-empty HTML string. Throw an error when rendering cannot continue.
 
 Create the HTML structure required by the user's renderer specification. Do not assume any preexisting DOM structure or CSS. Use `h` for dynamic HTML so text content is escaped. Use a module-specific root class and prefix every owned class with the module namespace.
 
-Call `options.renderContent(message)` for every message except `pause` and `skip`. Insert its result with `hraw()`. Call `options.escapeText(message.content)` for pause text and insert its result with `hraw()`. Render a skip directly as a visual separator without displaying its placeholder content.
+Call `options.renderContent(message)` for every message except `pause` and `skip`. Insert its result with `hraw()`. Insert pause text as a regular `h` child. Render a skip directly as a visual separator without displaying its placeholder content.
 
 Respecting other visual preferences is not a requirement. It should depend on the user requested design.
 

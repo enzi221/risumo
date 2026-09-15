@@ -11,9 +11,9 @@ The following template is your internal guide. Reason through it thoroughly, eve
 2. Slot Context: `[Exact Insertion Slot, Complete Depicted Moment Before Slot, Closest Prose After Slot for Continuity, Narrative State at Slot]`
 3. Eligible Featured Cast: `[Character, Eligibility Basis, Established Appearance or Generic Nondescript Design][]`
 4. Selected Scene: `[Event Completed Before Insertion Slot, Eligible Visual Cast, Omitted Ineligible Participants, Featured Cast, Cast, Anonymous Background, Focal Information]`
-{{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.characters}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.characters}} != null }}}}}}{{#when::keep::lb-xnai.scene.comic::tis::0}}   - Limit the Scene to {{getglobalvar::toggle_lb-xnai.characters}} completely visible featured characters.
+{{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.characters}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.characters}} != null }}}}}}{{#when::keep::lb-xnai.scene.comic::tis::0}}   - Limit the Scene to {{getglobalvar::toggle_lb-xnai.characters}} substantially visible featured characters.
 {{/when}}{{/when}}
-{{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.characters}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.characters}} != null }}}}}}{{#when::keep::lb-xnai.scene.comic::tisnot::0}}   - Limit the Scene to {{getglobalvar::toggle_lb-xnai.characters}} distinct completely visible featured characters across all panels.
+{{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.characters}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.characters}} != null }}}}}}{{#when::keep::lb-xnai.scene.comic::tisnot::0}}   - Limit the Scene to {{getglobalvar::toggle_lb-xnai.characters}} distinct substantially visible featured characters across all panels.
 {{/when}}{{/when}}
 {{#when::lb-xnai.scene.comic::tisnot::0}}5. Panels: `[Panel Number, Event Beat, Composition, Environment, Character Depictions, Required Appearance Groups, Character Descriptions][]`, with two to four panels in reading order.
    - Derive the Scene-wide `cast` from the union of featured character identities across all panels. Count a recurring character once.

@@ -39,7 +39,7 @@ local function render(triggerId, data, options)
       previousSender = nil
       table.insert(messages, h.div {
         class = 'lb-minitalk-arc-pause',
-        hraw(options.escapeText(message.content)),
+        message.content,
       })
     elseif message.type == 'skip' then
       previousSender = nil
@@ -74,7 +74,7 @@ local function render(triggerId, data, options)
           h.div {
             class = 'lb-minitalk-arc-sender',
             data_visible = groupStart and 'true' or 'false',
-            hraw(options.escapeText(names[message.sender])),
+            names[message.sender],
           },
           h.div {
             class = 'lb-minitalk-arc-message-row',
@@ -86,7 +86,7 @@ local function render(triggerId, data, options)
               class = 'lb-minitalk-arc-meta',
               h.span {
                 class = 'lb-minitalk-arc-time',
-                hraw(options.escapeText(message.time)),
+                message.time,
               },
             },
           },
@@ -119,12 +119,12 @@ local function render(triggerId, data, options)
           class = 'lb-minitalk-arc-heading',
           h.div {
             class = 'lb-minitalk-arc-heading-row',
-            h.h2 { class = 'lb-minitalk-arc-title', hraw(options.escapeText(data.name)) },
+            h.h2 { class = 'lb-minitalk-arc-title', data.name },
             h.span { class = 'lb-minitalk-arc-count', tostring(#participants) },
           },
           h.p {
             class = 'lb-minitalk-arc-participants',
-            hraw(options.escapeText(summarizeParticipants(participants))),
+            summarizeParticipants(participants),
           },
         },
         h.div {

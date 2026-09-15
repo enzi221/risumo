@@ -3,7 +3,7 @@ local OPENBLOCK_MARKER = '<!-- lb-minitalk-openblock-guideline -->'
 
 local function collectLorebooks(triggerId, name)
   local contents = {}
-  local lorebooks = getLoreBooks(triggerId, name) or {}
+  local lorebooks = prelude.getLoreBooks(triggerId, name)
 
   for _, lorebook in ipairs(lorebooks) do
     local content = prelude.trim(lorebook.content or '')
@@ -57,7 +57,10 @@ Use only the identifiers in this catalog:
   for _, identifier in ipairs(identifiers) do
     table.insert(definitions, 'identifier=' .. identifier .. '\n' .. extensions[identifier].description)
   end
-  local openblocks = table.concat(definitions, '\n\n')
+  local openblocks = table.concat(definitions, '\n\n---\n\n')
+  if openblocks ~= '' then
+    openblocks = openblocks .. '\n\n---'
+  end
   local openblockGuideline = ''
   if openblocks ~= '' then
     openblockGuideline = [[### OpenBlocks

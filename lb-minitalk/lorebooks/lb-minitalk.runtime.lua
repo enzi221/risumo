@@ -14,17 +14,31 @@ local function loadValue(triggerId, name)
   return chunk()
 end
 
+local function openblock(triggerId, identifier)
+  if getGlobalVar(triggerId, 'toggle_lb-minitalk.openblock') ~= '1'
+      or type(identifier) ~= 'string' or not identifier:match('^[%w_-]+$') then
+    return nil
+  end
+
+  local success, extension = pcall(loadValue, triggerId, 'lb-minitalk.openblock.' .. identifier)
+  if success and type(extension) == 'table'
+      and type(extension.render) == 'function' and type(extension.validate) == 'function' then
+    return extension
+  end
+
+  return nil
+end
+
 local function openblocks(triggerId)
   local result = {}
   if getGlobalVar(triggerId, 'toggle_lb-minitalk.openblock') ~= '1' then
     return result
   end
-  for _, book in ipairs(getLoreBooks(triggerId, 'lb-minitalk.openblock') or {}) do
+  for _, book in ipairs(prelude.getLoreBooks(triggerId, 'lb-minitalk.openblock')) do
     local identifier, description = prelude.trim(book.content or ''):match('^identifier=([%w_-]+)%s*\n(.+)$')
     if identifier and not result[identifier] then
-      local success, extension = pcall(loadValue, triggerId, 'lb-minitalk.openblock.' .. identifier)
-      if success and type(extension) == 'table'
-          and type(extension.render) == 'function' and type(extension.validate) == 'function' then
+      local extension = openblock(triggerId, identifier)
+      if extension then
         result[identifier] = {
           description = description,
           render = extension.render,
@@ -189,7 +203,7 @@ local function validateData(triggerId, data, generation)
   if not participants[data.pov] then
     fail('pov must reference a participant.')
   end
-  local extensions = openblocks(triggerId)
+  local available = generation and openblocks(triggerId) or nil
   for _, message in ipairs(data.messages) do
     object(message, { content = 'string', sender = 'string', time = 'string', type = 'string' })
     if message.type == 'pause' then
@@ -219,19 +233,22 @@ local function validateData(triggerId, data, generation)
       if not identifier then
         fail('Unknown message type: ' .. message.type)
       end
-      local extension = extensions[identifier]
-      if generation and not extension then
-        fail('OpenBlock is disabled or unavailable: ' .. identifier)
-      end
-      if extension then
-        local valid, reason = pcall(extension.validate, triggerId, message.content)
-        if not valid or reason == false then
+      if generation then
+        local extension = available[identifier]
+        if not extension then
+          fail('OpenBlock is disabled or unavailable: ' .. identifier)
+        end
+        local success, valid, reason = pcall(extension.validate, triggerId, message.content)
+        if not success then
+          fail('Invalid OpenBlock ' .. identifier .. ': ' .. tostring(valid))
+        end
+        if not valid then
           fail('Invalid OpenBlock ' .. identifier .. ': ' .. tostring(reason))
         end
       end
     end
   end
-  return data, extensions
+  return data
 end
 
 local function decode(triggerId, content, generation)
@@ -397,6 +414,7 @@ return {
   encode = encode,
   extract = extract,
   loadValue = loadValue,
+  openblock = openblock,
   openblocks = openblocks,
   patch = patch,
   preserveKeyFigures = preserveKeyFigures,

@@ -25,12 +25,12 @@ local function replaceSceneNode(tid, text, slot, replacement, gen)
   end
 
   local _, slotted, restoreNodes = gen.buildContextSlotMap(tid, text)
-  local _, availableSlots = slotted:gsub('%[Slot%s+%d+%]', '')
+  local _, availableSlots = slotted:gsub('<slot num="%d+"/>', '')
   local replacementCount
-  slotted, replacementCount = slotted:gsub('%[Slot%s+' .. slot .. '%]', function()
+  slotted, replacementCount = slotted:gsub('<slot num="' .. slot .. '"/>', function()
     return replacement
   end, 1)
-  slotted = slotted:gsub('%[Slot%s+%d+%]\n\n', '')
+  slotted = slotted:gsub('<slot num="%d+"/>\n\n', '')
   return restoreNodes(slotted), replacementCount > 0, availableSlots
 end
 
@@ -66,10 +66,9 @@ local function applyInteraction(tid, response, fullChatContent, index, gen)
     return nil, '<lb-lazy id="lb-xnai" />'
   end
 
-  local _, replaceable, availableSlots = replaceSceneNode(tid, fullChatContent, slot, '', gen)
+  local _, replaceable = replaceSceneNode(tid, fullChatContent, slot, '', gen)
   if not replaceable then
-    error('Interaction scene insertion unavailable. slot=' .. tostring(slot) ..
-      ', availableSlots=' .. tostring(availableSlots))
+    error('대상 삽화 ' .. tostring(slot) .. '번의 위치를 찾지 못했습니다. 다시 시도해 주세요.')
   end
 
   local operationID = stackItem.operationID or tid
@@ -147,11 +146,11 @@ local function main(tid, output, fullChatContent, index)
     end
 
     local _, slotted, restoreNodes = gen.buildContextSlotMap(tid, fullChatContent)
-    local _, availableSlots = slotted:gsub('%[Slot%s+%d+%]', '')
+    local _, availableSlots = slotted:gsub('<slot num="%d+"/>', '')
     verbose(tid, 'Slot map built. availableSlots=' .. tostring(availableSlots))
     local slotErrors = gen.validateSceneSlots(tid, response.scenes, slotted)
     if #slotErrors > 0 then
-      error('Scene insertion unavailable. ' .. table.concat(slotErrors, '\n'))
+      error('삽화 삽입 실패. ' .. table.concat(slotErrors, '\n'))
     end
 
     ---@type XNAIStackItem[]
@@ -222,7 +221,7 @@ local function main(tid, output, fullChatContent, index)
       end
 
       local replacementCount
-      slotted, replacementCount = slotted:gsub('%[Slot%s+' .. slot .. '%]', function()
+      slotted, replacementCount = slotted:gsub('<slot num="' .. slot .. '"/>', function()
         return replacement
       end, 1)
       if replacementCount == 0 then
@@ -232,8 +231,7 @@ local function main(tid, output, fullChatContent, index)
       end
     end
 
-    -- remove unreplaced [Slot #] tags
-    slotted = slotted:gsub('%[Slot%s+%d+%]\n\n', '')
+    slotted = slotted:gsub('<slot num="%d+"/>\n\n', '')
     slotted = restoreNodes(slotted)
 
     local finalOutput

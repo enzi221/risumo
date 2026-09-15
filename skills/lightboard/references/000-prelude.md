@@ -54,6 +54,11 @@ function prelude.queryNodes(tagNameRaw, text) end
 --- @return string
 function prelude.removeAllNodes(text, tagsToKeep) end
 
+---@param triggerId string
+---@param name string
+---@return LoreBook[]
+function prelude.getLoreBooks(triggerId, name) end
+
 ---Get a lorebook with the highest insert order.
 ---@param triggerId string
 ---@param name string
@@ -69,6 +74,8 @@ function prelude.split(str, sep) end
 `prelude.applyJSONPatch()` returns a patched copy without modifying `document`. It supports the JSON Patch `add`, `remove`, and `replace` operations. Paths use JSON Pointer syntax, including `~0`, `~1`, zero-based array indexes, `-` for array appends, and an empty path for root replacement. Operations apply sequentially against the current patched state.
 
 `prelude.verbose()` and `prelude.info()` follow the backend `lightboard.logLevel` toggle. Its levels are `VERBOSE`, `INFO`, and `NONE`, with `VERBOSE` as the default. Use `prelude.logEnabled()` before constructing an expensive log value. Errors are not controlled by this diagnostic log level.
+
+`prelude.getLoreBooks()` and `prelude.getPriorityLoreBook()` return copied lorebooks with single-level `<!-- lb:require:NAME -->` and `<!-- lb:require:all:NAME -->` references resolved in `content`. Require comments inside inserted content remain unchanged.
 
 For example, `prelude.split('a,b,c', ',')` returns `{ 'a', 'b', 'c' }`.
 

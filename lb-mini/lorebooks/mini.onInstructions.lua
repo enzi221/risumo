@@ -42,7 +42,7 @@ local function main(triggerId, instructions, meta)
   local guideline = ''
 
   if cons ~= '' then
-    guideline = [[## MiniCons
+    guideline = [[### MiniCons
 
 MiniCons are small square reaction images that comment authors can post, similar to 디씨콘 or 아카콘. Authors may use MiniCons as a relevant reaction or as a context-free 뻘댓글. Some posts may only has con comments, some only texts, some mixed. Other authors may react to the cons as well. In short, emulate how real 디씨콘 or 아카콘 are used.
 

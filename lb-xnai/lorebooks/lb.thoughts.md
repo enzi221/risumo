@@ -14,15 +14,15 @@ The following template is your internal guide. Reason through it thoroughly, eve
    - Recall applicable appearance, identifying features, fashion guidance, and tag lists from Client Instructions when present; Narrative Universe Settings; and the current situation and prior-record tags. Name the applicable sources without reproducing their contents.
    - Check whether Client appearance instructions are present. If present, classify each specification as reference, locked, or closed, applying the defaults for unspecified handling and completion. Record the instruction presence, resolved classification, and whether uncovered attributes may be composed; otherwise record no Client appearance instructions.
 5. Slot Filter:
-   - Parse each candidate as `preceding -> [Slot N] -> following`. `[Slot N]` is the INSERTION POSITION between the two blocks, NOT THE BLOCKS THEMSELVES.
+   - Parse each candidate as `preceding -> <slot num="N"/> -> following`. The tag is the insertion position between the two blocks, not a content block.
    - Reject each candidate when either adjacent text is non-prose or non-paragraph. Dialogs{{#when::toggle::lb-xnai.scene.quantityexact}}, image tags{{/when}} and sound effects, with or without markups, ARE prose content paragraphs.
 6. Selected Scenes:
    {{#when::keep::lb-xnai.scene.comic::tis::0}}   - For each Scene: `[Scene Number, Distinct Event Moment, Exact Following Insertion Slot, Featured Cast]`
    {{/when}}{{#when::keep::lb-xnai.scene.comic::tisnot::0}}   - For each Scene: `[Scene Number, Distinct Event Moment, Exact Following Insertion Slot, Distinct Featured Cast Across All Panels]`
    {{/when}}
-   {{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.characters}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.characters}} != null }}}}}}{{#when::keep::lb-xnai.scene.comic::tis::0}}   - Limit each Scene to {{getglobalvar::toggle_lb-xnai.characters}} completely visible featured characters.
+   {{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.characters}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.characters}} != null }}}}}}{{#when::keep::lb-xnai.scene.comic::tis::0}}   - Limit each Scene to {{getglobalvar::toggle_lb-xnai.characters}} substantially visible featured characters.
    {{/when}}{{/when}}
-   {{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.characters}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.characters}} != null }}}}}}{{#when::keep::lb-xnai.scene.comic::tisnot::0}}   - Limit each Scene to {{getglobalvar::toggle_lb-xnai.characters}} distinct completely visible featured characters across all panels, not separately per panel.
+   {{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.characters}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.characters}} != null }}}}}}{{#when::keep::lb-xnai.scene.comic::tisnot::0}}   - Limit each Scene to {{getglobalvar::toggle_lb-xnai.characters}} distinct substantially visible featured characters across all panels, not separately per panel.
    {{/when}}{{/when}}
    {{#when::lb-xnai.scene.comic::tisnot::0}}   - Panels for each Scene: `[Panel Number, Event Beat, Featured Cast][]`, with two to four panels in reading order.
    - Derive the Scene-wide `cast` from the union of featured character identities across all panels. Count a recurring character once.

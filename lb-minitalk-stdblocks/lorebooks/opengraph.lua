@@ -20,10 +20,10 @@ local function validate(_, content)
   return data ~= nil, reason
 end
 
-local function render(_, content, options)
+local function render(_, content)
   local data = assert(parse(content))
   local function text(tag, class, value)
-    return h[tag] { class = 'lb-minitalk-stdblock-' .. class, hraw(options.escapeText(value)) }
+    return h[tag] { class = 'lb-minitalk-stdblock-' .. class, value }
   end
   return tostring(h.div {
     class = 'lb-minitalk-stdblock-card lb-minitalk-stdblock-opengraph',

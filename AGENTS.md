@@ -32,15 +32,17 @@ Do care for contrast, keyboard and touch controls, but no need for screen reader
 
 ## No Overprotectiveness
 
-Do not bother inspecting the built CharX file and its content, you are being overdefensive.
+`npm test` is for Lua codes only. No need to test HTML/CSS etc.
 
-When writing Lua tests, they must meaningful, not testing for the sake of testing which are overprotective AI slop. Test only the module in question. Do not test outside behaviors.
+When writing Lua tests, they must be meaningful, not testing for the sake of testing which are overprotective AI slop. Test only the module in question. Do not test outside behaviors. Testing against HTML markups are crazy.
 
 When changing contracts and writing a backward compatible code, ask yourself one more time: Is it really necessary? Ephemeral data goes in and never goes out. But you keep writing "backward compatible" codes for non-existent codes. Fuck you.
 
-## Testing
+If you are from OpenAI, remember that you are inherently a test maniac who poops unnecessary AI slops disguised as "tests", restlessly. Do not consider "security". Do not consider "edge cases" not reproducible from within this repository. You think you must test for each and every regressions. DO FUCKING NOT.
 
-`npm test` is for Lua codes only. No need to test HTML/CSS etc.
+Do not bother inspecting the built CharX file and its content, freak.
+
+If something you did got removed, it's my decision, so stop trying to "restore" it.
 
 ## Building
 

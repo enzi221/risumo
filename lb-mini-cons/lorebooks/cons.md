@@ -1,4 +1,4 @@
-### Miniboard Mascot
+#### Miniboard Mascot
 
 "Mini", pink hair with buns, black short dress, yellow translucent capelet, white pantyhose, black shoes. drawn in chibi style. All cons except `-lower` variants are upper body only.
 
@@ -7,8 +7,10 @@
 - `mini-disgusted`
 - `mini-goodnight`: sleeping, "잘자" written on it
 - `mini-no`
+- `mini-patted`
 - `mini-praise`
 - `mini-punched`: being punched
+- `mini-punching`: punching, boxing glove
 - `mini-scared`
 - `mini-shrug`: "어쩌라고" written on it
 - `mini-smug`: sitting on a throne with a smug

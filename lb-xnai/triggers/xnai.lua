@@ -62,6 +62,30 @@ local function createGenerationCode(chatIndex, operationID, slot)
   return code
 end
 
+---@param inputID string
+---@param code string
+---@param text string
+---@return any
+local function Placeholder(inputID, code, text)
+  return h.div['lb-xnai-placeholder-wrapper'] {
+    h.input['lb-xnai-placeholder-state'] {
+      id = inputID,
+      type = 'radio',
+      void = true,
+    },
+    h.label['lb-xnai-placeholder'] {
+      htmlFor = inputID,
+      risu_btn = code,
+      title = text,
+      h.span['lb-xnai-placeholder-idle'] { '✦ ' .. text },
+      h.span['lb-xnai-placeholder-loading'] {
+        h.span['lb-xnai-placeholder-spinner'] { closed = true },
+        '생성 중',
+      },
+    },
+  }
+end
+
 ---@param desc XNAIDescriptor
 ---@return XNAIPromptSet
 local function buildRawPrompt(desc)
@@ -167,14 +191,10 @@ local function renderInline(data, chatIndex, stackItem)
       -- not generated yet and has data in the stack: can generate new
       if inlay == '' and stackItem and stackItem.data.scenes[slot] then
         local placeholderText = t_concat({ '씬 #', nodeIndex, ' 생성' })
-        local placeholder = h.button['lb-xnai-placeholder'] {
-          risu_btn = createGenerationCode(chatIndex, operationID, slot),
-          type = 'button',
-          t_concat({ '✦ ', placeholderText }),
-        }
+        local inputID = t_concat({ 'lb-xnai-placeholder-', chatIndex, '-', nodeIndex })
         out = t_concat({
           out:sub(1, imageNode.rangeStart - 1),
-          tostring(h.div['lb-xnai-placeholder-wrapper'] { placeholder }),
+          tostring(Placeholder(inputID, createGenerationCode(chatIndex, operationID, slot), placeholderText)),
           out:sub(imageNode.rangeEnd + 1),
         })
       elseif inlay ~= '' then
@@ -260,15 +280,9 @@ local function renderInline(data, chatIndex, stackItem)
       local inStack = stackItem and stackItem.data.keyvis
 
       if inlay == '' and inStack then
-        local placeholder = h.button['lb-xnai-placeholder'] {
-          risu_btn = createGenerationCode(chatIndex, operationID, '-1'),
-          type = 'button',
-          '✦ 키 비주얼 생성',
-        }
-
-        kv = tostring(h.div['lb-xnai-placeholder-wrapper'] {
-          placeholder
-        })
+        local inputID = t_concat({ 'lb-xnai-placeholder-', chatIndex, '-', nodeIndex })
+        kv = tostring(Placeholder(inputID, createGenerationCode(chatIndex, operationID, '-1'),
+          '키 비주얼 생성'))
 
         out = t_concat({
           out:sub(1, imageNode.rangeStart - 1),

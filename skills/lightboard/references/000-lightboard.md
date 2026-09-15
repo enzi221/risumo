@@ -187,6 +187,15 @@ Follow this template to produce the output:
 - .lb.universe: Additional text to insert right before character lorebooks.
 - .lb.extra: Store these lorebooks in other modules or characters instead of the frontend module itself. They inject additional prompts into the corresponding frontend module and provide a user customization point.
 
+#### Shared instruction content
+
+- Use `<!-- lb:require:NAME -->` in frontend prompt fragments (`{identifier}.lb` and `{identifier}.lb.*`, including interaction and extra instructions) to insert another lorebook's content.
+- Set `NAME` to the target lorebook's name. The backend inserts the matching lorebook with the highest insert order.
+- Use `<!-- lb:require:all:NAME -->` to insert every lorebook named `NAME`. The backend preserves lookup order, skips empty content, and separates inserted content with two line feeds.
+- Place each require in the source fragment. Expansion runs once; require comments inside inserted content remain unchanged.
+- Allow for missing targets: the backend replaces their require comments with empty strings.
+- Use requires only in prompt fragments, not ordinary context lorebooks or Lua callback sources.
+
 ### Lazy button rendering
 
 When either the manifest's `lazy` field is true or a user enables the `.lazy` toggle, the backend appends `<lb-lazy id="{identifier}" />` instead of sending an LLM request.

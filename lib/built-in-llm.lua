@@ -12,13 +12,17 @@ local LLMResult = {}
 
 --- @param triggerId string
 --- @param prompt Prompt[]
+--- @param multimedia? boolean
+--- @param options? { streaming?: boolean }
 --- @return LLMResult
-function LLM(triggerId, prompt) end
+function LLM(triggerId, prompt, multimedia, options) end
 
 --- @param triggerId string
 --- @param prompt Prompt[]
+--- @param multimedia? boolean
+--- @param options? { streaming?: boolean }
 --- @return LLMResult
-function axLLM(triggerId, prompt) end
+function axLLM(triggerId, prompt, multimedia, options) end
 
 --- @param triggerId string
 --- @param prompt string

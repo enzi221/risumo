@@ -27,6 +27,7 @@ for (const file of files) {
   const result = spawnSync('lua', ['-l', 'scripts.test-bootstrap', file], {
     cwd: root,
     stdio: 'inherit',
+    timeout: 30_000,
   });
   if (result.error) {
     console.error(result.error.message);

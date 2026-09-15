@@ -237,8 +237,8 @@ local function generate(triggerId, desc)
   ---@type LightboardImage
   local image = prelude.import(triggerId, 'lightboard.image')
   local inlay = image.generateImageFromPrompts(triggerId, prompts, {
-    emptyPositive = '삽화 모듈 프리셋에 긍정 프롬프트가 없습니다.',
-    requestFailed = 'API 호출 실패. 삽화 모듈의 저수준 접근을 꺼버렸나요?',
+    emptyPositive = '긍정 프롬프트가 비어있어요.',
+    requestFailed = '이미지 생성 API 호출 실패. 설정을 다시 점검하세요.',
   })
 
   prelude.info(triggerId, 'lb-xnai.gen', 'Image generation completed. result=' .. tostring(inlay ~= nil))
@@ -278,7 +278,11 @@ local function insertSlots(text)
   local slotIndex = 0
   local trimmed = text:match('^%s*(.-)%s*$') or text
   trimmed = trimmed:gsub('(\n+)', function(lineBreaks)
-    local out = lineBreaks .. '[Slot ' .. slotIndex .. ']\n\n'
+    local collapsed = lineBreaks
+    if #lineBreaks > 2 then
+      collapsed = '\n\n'
+    end
+    local out = collapsed .. '<slot num="' .. slotIndex .. '"/>\n\n'
     slotIndex = slotIndex + 1
     return out
   end)
@@ -375,8 +379,10 @@ local function buildSlotMap(text)
       spanIndex = spanIndex + 1
     end
     local originalEnd = endNL + spans[spanIndex].offset
-    output[#output + 1] = text:sub(originalPos, originalEnd)
-    output[#output + 1] = '[Slot ' .. slotIndex .. ']\n\n'
+    local chunk = text:sub(originalPos, originalEnd)
+    chunk = chunk:gsub('\n\n\n+$', '\n\n')
+    output[#output + 1] = chunk
+    output[#output + 1] = '<slot num="' .. slotIndex .. '"/>\n\n'
     originalPos = originalEnd + 1
     slotIndex = slotIndex + 1
     searchPos = endNL + 1
@@ -462,16 +468,13 @@ end
 local function validateSceneSlots(tid, scenes, slotted)
   local source = slotted or inputSlots[tid] or ''
   local available = {}
-  local labels = {}
-  for slot in source:gmatch('%[Slot (%d+)%]') do
+  for slot in source:gmatch('<slot num="(%d+)"/>') do
     available[tonumber(slot)] = true
-    labels[#labels + 1] = slot
   end
   for _, node in ipairs(prelude.queryNodes('lb-xnai', source)) do
     local slot = tonumber(node.attributes.scene)
-    if slot and not available[slot] then
+    if slot then
       available[slot] = true
-      labels[#labels + 1] = tostring(slot)
     end
   end
 
@@ -480,12 +483,12 @@ local function validateSceneSlots(tid, scenes, slotted)
   for index, scene in ipairs(scenes or {}) do
     if type(scene) == 'table' then
       local slot = scene.slot
-      if type(slot) ~= 'number' or not available[slot] then
-        errors[#errors + 1] = 'Scene ' .. (index - 1) .. ' has unavailable slot ' .. tostring(slot) ..
-          '. Select an existing slot from: [' .. table.concat(labels, ', ') .. '].'
+      if slot == nil then
+        errors[#errors + 1] = '모델이 장면 ' .. index .. '번의 삽입 위치를 응답하지 않았습니다. 검열 또는 프로바이더 오류일 수 있습니다. 다시 시도해 주세요.'
+      elseif not available[slot] then
+        errors[#errors + 1] = '현재 채팅에 장면 ' .. index .. '번을 넣을 위치가 없습니다. 다시 생성해 주세요.'
       elseif used[slot] then
-        errors[#errors + 1] = 'Scene ' .. (index - 1) .. ' repeats slot ' .. tostring(slot) ..
-          '. Select a different existing slot for each Scene.'
+        errors[#errors + 1] = '장면 두 개가 같은 위치에 들어가려고 시도했습니다. 다시 생성해 주세요.'
       else
         used[slot] = true
         scene.slot = math.floor(slot)

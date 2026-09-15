@@ -37,6 +37,10 @@ function alertInput(triggerId, msg) end
 --- @param msg string
 function alertNormal(triggerId, msg) end
 
+--- @param value string
+--- @return string
+function cbs(value) end
+
 --- @param triggerId string
 --- @return string
 function getAuthorsNote(triggerId) end

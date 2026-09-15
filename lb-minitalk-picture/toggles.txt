@@ -1,0 +1,11 @@
+=♦️미니톡 / 첨부사진=group
+lb-minitalk-picture.active=활성화
+lb-minitalk-picture.nsfw=NSFW 프롬프트
+lb-minitalk-picture.forcedinsertion=┗태그 칼질
+=출력 필터 격파 시도. 무거움, 검열에 당한 게 아니라면 체크 해제=caption
+=⚠️반드시 생각 보조를 "생각만"으로 변경 후 사용할 것=caption
+==divider
+lb-minitalk-picture.preset=프리셋=text
+="프리셋 X" 로어북 사용. "X" 부분만 입력=caption
+=비워두면 삽화 설정과 같음=caption
+==groupEnd
