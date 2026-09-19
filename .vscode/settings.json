@@ -12,6 +12,9 @@
   "[html]": {
     "editor.formatOnSave": false
   },
+  "[markdown]": {
+    "editor.formatOnSave": false
+  },
   "git.ignoreLimitWarning": true,
   "prettier.bracketSameLine": false,
   "prettier.htmlWhitespaceSensitivity": "strict",
