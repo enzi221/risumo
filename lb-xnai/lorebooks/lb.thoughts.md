@@ -27,15 +27,6 @@ The following template is your internal guide. Reason through it thoroughly, eve
      - `[Panel Number, Event Beat, Framing]`
      - `[Visible Body Span, List of Cropped-Out Attire, Featured Cast][]`, with two to four panels in reading order.
      - Derive the Scene-wide `cast` from the union of featured character identities across all panels. Count a recurring character once.{{/when}}{{#when::keep::lb-xnai.kv.off::tis::0}}
-7. Key Visual: `[Theme, Framing, Visible Body Span, List of Cropped-Out Attire]`
-8. Validation:{{/when}}{{#when::keep::lb-xnai.kv.off::tis::1}}
-9. Validation:{{/when}}
-   - Client Instruction: `[pass or corrected]`
-   - Scene Count, Distinct Event Moments, Following Insertion Slots, and Slot Separation: `[pass or corrected]`
-   - Selected Slot Eligibility: `[pass or corrected]`
-   - Featured Cast Eligibility and Character Limit: `[pass or corrected]`
-   - Required Output Fields, Cast Counts, and Character Arrays: `[pass or corrected]`
-   - Visible Appearance Groups, Character Descriptions, Actions, and Visibility: `[pass or corrected]`{{#when::keep::lb-xnai.scene.comic::tisnot::0}}
-   - Panel Count, Panel Objects, and Panel-Scoped Character Depictions: `[pass or corrected]`{{/when}}
+7. Key Visual: `[Theme, Framing, Visible Body Span, List of Cropped-Out Attire]`{{/when}}
 
-Fix every failed check before producing the final data.
+Lastly, verify the steps. Fix invalid items.

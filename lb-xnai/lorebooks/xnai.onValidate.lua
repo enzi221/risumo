@@ -146,17 +146,108 @@ local function validateNode(errors, tid, node, label, gen, comic)
   end
 end
 
-local function main(tid, output)
-  local nodes = prelude.queryNodes('lb-xnai', output)
-  verbose(tid, 'Validation started. nodes=' .. tostring(#nodes))
-  if #nodes == 0 then
-    error('InvalidOutput: Missing <lb-xnai> node.')
+---@param errors string[]
+---@param tid string
+---@param patch any
+---@param gen XNAIGen
+---@param comic boolean
+local function validatePatch(errors, tid, patch, gen, comic)
+  if type(patch) ~= 'table' then
+    table.insert(errors, '<lb-xnai-patch> must contain a JSON array.')
+    return
   end
 
+  local operationCount = 0
+  for key in pairs(patch) do
+    if type(key) ~= 'number' or key < 1 or key % 1 ~= 0 then
+      table.insert(errors, '<lb-xnai-patch> must contain a JSON array.')
+      return
+    end
+    operationCount = operationCount + 1
+  end
+
+  if operationCount ~= #patch then
+    table.insert(errors, 'JSON Patch array must not contain gaps.')
+    return
+  end
+  if operationCount == 0 then
+    table.insert(errors, 'JSON Patch array must contain at least one operation.')
+    return
+  end
+
+  for operationIndex, operation in ipairs(patch) do
+    local label = 'Patch operation ' .. (operationIndex - 1)
+    if type(operation) ~= 'table' then
+      table.insert(errors, label .. ' must be an object.')
+    else
+      if operation.op ~= 'add' and operation.op ~= 'remove' and operation.op ~= 'replace' then
+        table.insert(errors, label .. ' op must be add, remove, or replace.')
+      end
+      if type(operation.path) ~= 'string' then
+        table.insert(errors, label .. ' requires a string path.')
+      else
+        if operation.path ~= '' and operation.path:sub(1, 1) ~= '/' then
+          table.insert(errors, label .. ' path must be empty or begin with /.')
+        end
+        if operation.path:find('~[^01]') or operation.path:sub(-1) == '~' then
+          table.insert(errors, label .. ' path contains an invalid escape.')
+        end
+      end
+      if operation.op ~= 'remove' and rawget(operation, 'value') == nil then
+        table.insert(errors, label .. ' add and replace operations require value.')
+      end
+
+      if operation.op ~= 'remove' and type(operation.path) == 'string' then
+        if operation.path:match('^/scenes/%d+$') or operation.path == '/scenes/-' then
+          if type(operation.value) == 'table' then
+            validateDescriptor(errors, operation.value, label .. ' scene', comic, true)
+            for _, slotError in ipairs(gen.validateSceneSlots(tid, { operation.value })) do
+              table.insert(errors, slotError)
+            end
+          else
+            table.insert(errors, label .. ' scene value must be an object.')
+          end
+        elseif operation.path == '/keyvis' then
+          if type(operation.value) == 'table' then
+            validateDescriptor(errors, operation.value, label .. ' keyvis', false, false)
+          else
+            table.insert(errors, label .. ' keyvis value must be an object.')
+          end
+        end
+      end
+    end
+  end
+end
+
+local function main(tid, output)
   ---@type XNAIGen
   local gen = prelude.import(tid, 'lb-xnai.gen')
   local comicMode = getGlobalVar(tid, 'toggle_lb-xnai.scene.comic')
   local comic = comicMode == '1' or comicMode == '2'
+
+  local patchNodes = prelude.queryNodes('lb-xnai-patch', output)
+  if #patchNodes > 0 then
+    verbose(tid, 'Patch validation started.')
+    local success, patch = pcall(json.decode, prelude.trim(patchNodes[#patchNodes].content))
+    if not success then
+      error('InvalidOutput: Invalid JSON Patch. ' .. tostring(patch))
+    end
+
+    local errors = {}
+    validatePatch(errors, tid, patch, gen, comic)
+    if #errors > 0 then
+      verbose(tid, 'Patch validation failed. errors=' .. tostring(#errors))
+      error('InvalidOutput: Malformed patch. Aggregated errors:\n\n' .. table.concat(errors, '\n'))
+    end
+    verbose(tid, 'Patch validation completed.')
+    return
+  end
+
+  local nodes = prelude.queryNodes('lb-xnai', output)
+  verbose(tid, 'Validation started. nodes=' .. tostring(#nodes))
+  if #nodes == 0 then
+    error('InvalidOutput: Missing <lb-xnai> or <lb-xnai-patch> node.')
+  end
 
   local errors = {}
   validateNode(errors, tid, nodes[#nodes], 'Output', gen, comic)

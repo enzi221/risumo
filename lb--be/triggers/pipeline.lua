@@ -106,9 +106,9 @@ Reiteration phase (%d/%d)
 
 Now, read the instruction and your previous output carefully. Is it format-adhering? Did it follow all the instructions without any omission?
 
-Carefully think, then if it is OK, output %s node without any changes. If it needs changes, apply the changes and output the node.
+Carefully think, then if it is OK, output the required node without any changes. If it needs changes, apply the changes and output the node.
 </system>]=],
-          ri, man.reiteration, man.identifier)
+          ri, man.reiteration)
 
         table.insert(prom, {
           role = 'user',
@@ -188,14 +188,11 @@ Carefully think, then if it is OK, output %s node without any changes. If it nee
     })
 
     local thoughtsFlag = man.thoughts or '0'
-    local printInstruction = string.format(
-      'Only print the corrected full data wrapped in %s, without apologies, explanations, or any preambles.',
-      man.identifier)
+    local printInstruction =
+      'Only print the corrected data wrapped in the required node, without apologies, explanations, or any preambles.'
     if thoughtsFlag == '0' then
       printInstruction =
-          string.format(
-            'Only print the %s node and corrected full data in it, without any apologies, explanations, or preambles. Analyze the error sources step-by-step in <lb-process> block. (Ignore previous lb-process usage instruction; only use it for correcting the data.)',
-            man.identifier)
+        'Only print the required node and corrected data in it, without any apologies, explanations, or preambles. Analyze the error sources step-by-step in <lb-process> block. (Ignore previous lb-process usage instruction; only use it for correcting the data.)'
     end
 
     local retryInstruction = string.format([[<system>

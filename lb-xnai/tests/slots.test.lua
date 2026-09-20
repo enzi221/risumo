@@ -20,6 +20,15 @@ local xmlFixture = 'A\n<other>\nhidden\n</other>\nB\nC'
 local fixtures = { sampleText, illustrationFixture, xmlFixture }
 
 local response
+local patchResponse
+json = {
+  decode = function()
+    return patchResponse
+  end,
+  encode = function(value)
+    return tostring(value)
+  end,
+}
 local generated = 0
 local persisted = 0
 local globalVars = {}
@@ -181,24 +190,29 @@ describe('XNAI slot mapping', function()
       if key == 'lb-xnai-interaction-target' then
         return target
       end
-      return { { chatIndex = 22, data = { scenes = {} }, operationID = 'previous' } }
+      return { { chatIndex = 22, data = { scenes = { ['47'] = descriptor(47) } }, operationID = 'previous' } }
     end
     local interactionText = 'A\n<lb-xnai scene="47">image</lb-xnai>\nB'
     gen.setInputSlots('test', interactionText)
-    response = { interaction = true, scenes = { descriptor(47) } }
-    test.assertTrue(pcall(onValidate, 'test', '<lb-xnai>data</lb-xnai>'), 'Existing interaction node remains eligible')
+    patchResponse = { { op = 'replace', path = '/scenes/0', value = descriptor(47) } }
+    test.assertTrue(pcall(onValidate, 'test', '<lb-xnai-patch>data</lb-xnai-patch>'), 'Existing interaction node remains eligible')
     getChat = function()
       return { data = 'A\nB' }
     end
     gen.setInputSlots('test', 'A\nB')
-    test.assertTrue(not pcall(onValidate, 'test', '<lb-xnai>data</lb-xnai>'), 'Missing interaction location fails validation')
-    test.assertTrue(not pcall(onOutput, 'test', '<lb-xnai>data</lb-xnai>', 'A\nB', 22),
+    test.assertTrue(not pcall(onValidate, 'test', '<lb-xnai-patch>data</lb-xnai-patch>'), 'Missing interaction location fails validation')
+    test.assertTrue(not pcall(onOutput, 'test', '<lb-xnai-patch>data</lb-xnai-patch>', 'A\nB', 22),
       'Missing interaction location fails before generation')
     test.assertTrue(generated == beforeGeneration and persisted == beforePersistence,
       'Invalid interaction causes no image generation or persistence')
     setState = function() end
-    response = { interaction = true, scenes = { descriptor(18) } }
-    local interactionOutput = onOutput('test', '<lb-xnai>data</lb-xnai>',
+    getState = function()
+      return { { chatIndex = 22, data = { scenes = { ['18'] = descriptor(18) } }, operationID = 'previous' } }
+    end
+    local newDesc = descriptor(18)
+    newDesc.scene = 'changed scene'
+    patchResponse = { { op = 'replace', path = '/scenes/0', value = newDesc } }
+    local interactionOutput = onOutput('test', '<lb-xnai-patch>data</lb-xnai-patch>',
       'A\n<lb-xnai scene="18">image</lb-xnai>\nB', 22)
     test.assertTrue(interactionOutput:find('scene="18">{{inlay::test}}', 1, true) ~= nil,
       'Response slot replaces its existing interaction location')

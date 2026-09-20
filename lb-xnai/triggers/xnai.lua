@@ -166,6 +166,13 @@ local function createModuleMenu(chatIndex, operationID)
         h.lb_reroll_icon { closed = true },
         '다시 만들기',
       },
+      h.button {
+        popovertarget = menuID,
+        risu_btn = 'lb-interaction__lb-xnai__DirectScene',
+        type = 'button',
+        h.lb_comment_icon { closed = true },
+        '요청하기',
+      },
     },
   }
 end

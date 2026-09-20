@@ -76,8 +76,11 @@ function M.handleSideEffectResult(triggerId, params)
   ---@cast targetIdx number
   ---@cast lbdataIdx number
 
-  local cleanedContent = lbdata.removeNode(originalContent, params.identifier,
-    params.blockID and { id = params.blockID } or nil)
+  local cleanedContent = originalContent
+  if params.action == 'reroll' then
+    cleanedContent = lbdata.removeNode(originalContent, params.identifier,
+      params.blockID and { id = params.blockID } or nil)
+  end
 
   local onOutputSuccess, modifiedContent, lbdataContent = pcall(
     runSideEffectOnOutput,

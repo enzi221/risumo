@@ -184,12 +184,12 @@ local function buildRawPrompt(triggerId, desc)
     table.insert(charsPositive, character.positive or '')
   end
   if #charsPositive > 0 then
-    table.insert(positiveParts, table.concat(charsPositive, ' |\n'))
+    table.insert(positiveParts, table.concat(charsPositive, '\n'))
   end
 
-  local negative = table.concat(charsNegative, ' |\n')
+  local negative = table.concat(charsNegative, '\n')
   if compiled.comic then
-    negative = negative ~= '' and COMIC_NEGATIVE_PROMPT .. ' |\n' .. negative or COMIC_NEGATIVE_PROMPT
+    negative = negative ~= '' and COMIC_NEGATIVE_PROMPT .. '\n' .. negative or COMIC_NEGATIVE_PROMPT
   end
 
   return {

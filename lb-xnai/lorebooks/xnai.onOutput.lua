@@ -8,48 +8,87 @@ end
 
 ---@param text string
 ---@param slot string
----@param replacement string
----@param gen XNAIGen
 ---@return string
----@return boolean replaced
----@return number availableSlots
-local function replaceSceneNode(tid, text, slot, replacement, gen)
+local function removeSceneNode(text, slot)
   local nodes = prelude.queryNodes('lb-xnai', text, { scene = slot })
-  if #nodes > 0 then
-    local node = nodes[1]
-    return table.concat({
-      text:sub(1, node.rangeStart - 1),
-      replacement,
-      text:sub(node.rangeEnd + 1),
-    }), true, 0
+  if #nodes == 0 then
+    return text
   end
 
-  local _, slotted, restoreNodes = gen.buildContextSlotMap(tid, text)
-  local _, availableSlots = slotted:gsub('<slot num="%d+"/>', '')
-  local replacementCount
-  slotted, replacementCount = slotted:gsub('<slot num="' .. slot .. '"/>', function()
-    return replacement
-  end, 1)
-  slotted = slotted:gsub('<slot num="%d+"/>\n\n', '')
-  return restoreNodes(slotted), replacementCount > 0, availableSlots
+  for i = #nodes, 1, -1 do
+    local node = nodes[i]
+    local startPos = node.rangeStart
+    local endPos = node.rangeEnd
+    local after = text:sub(endPos + 1)
+    local nlLen = 0
+    if after:match('^\r?\n\r?\n') then
+      nlLen = after:find('\r?\n\r?\n') == 1 and #(after:match('^\r?\n\r?\n')) or 0
+    elseif after:match('^\r?\n') then
+      nlLen = after:find('\r?\n') == 1 and #(after:match('^\r?\n')) or 0
+    end
+    text = text:sub(1, startPos - 1) .. text:sub(endPos + 1 + nlLen)
+  end
+
+  return text
+end
+
+---@param text string
+---@return string
+local function removeKeyvisNode(text)
+  local nodes = prelude.queryNodes('lb-xnai', text, { kv = true })
+  if #nodes == 0 then
+    nodes = prelude.queryNodes('lb-xnai', text, { id = 'keyvis' })
+  end
+  if #nodes == 0 then
+    return text
+  end
+
+  for i = #nodes, 1, -1 do
+    local node = nodes[i]
+    local startPos = node.rangeStart
+    local endPos = node.rangeEnd
+    local before = text:sub(1, startPos - 1)
+    local trailingNl = before:match('\r?\n\r?\n$') and 2 or (before:match('\r?\n$') and 1 or 0)
+    startPos = startPos - trailingNl
+    text = text:sub(1, startPos - 1) .. text:sub(endPos + 1)
+  end
+
+  return text
+end
+
+---@param a any
+---@param b any
+---@return boolean
+local function isSameDescriptor(a, b)
+  if type(a) ~= 'table' or type(b) ~= 'table' then
+    return false
+  end
+  if type(json) == 'table' and type(json.encode) == 'function' then
+    return json.encode(a) == json.encode(b)
+  end
+  if type(prelude.toon) == 'table' and type(prelude.toon.encode) == 'function' then
+    return prelude.toon.encode(a) == prelude.toon.encode(b)
+  end
+  return false
 end
 
 ---@param tid string
----@param response XNAIResponse
+---@param patchNode Node
 ---@param fullChatContent string
 ---@param index number
 ---@param gen XNAIGen
 ---@return string?, string?
-local function applyInteraction(tid, response, fullChatContent, index, gen)
-  local scene = response.scenes and response.scenes[1]
-  if not scene then
-    verbose(tid, 'Interaction ignored because no scene was returned.')
+local function applyPatchInteraction(tid, patchNode, fullChatContent, index, gen)
+  local patchContent = prelude.trim(patchNode.content)
+  local success, patch = pcall(json.decode, patchContent)
+  if not success or type(patch) ~= 'table' then
+    info(tid, 'Patch decoding failed. error=' .. tostring(patch))
     return nil, '<lb-lazy id="lb-xnai" />'
   end
 
-  local slot = tostring(scene.slot)
-  info(tid, 'Applying interaction. chatIndex=' .. tostring(index) .. ', slot=' .. tostring(slot))
-  scene.slot = tonumber(slot)
+  info(tid, 'Applying patch interaction. chatIndex=' .. tostring(index) .. ', ops=' .. tostring(#patch))
+
+  ---@type XNAIStackItem[]
   local xnaiState = getState(tid, 'lb-xnai-stack') or {}
   if type(xnaiState) ~= 'table' then
     return nil, '<lb-lazy id="lb-xnai" />'
@@ -66,44 +105,200 @@ local function applyInteraction(tid, response, fullChatContent, index, gen)
     return nil, '<lb-lazy id="lb-xnai" />'
   end
 
-  local _, replaceable = replaceSceneNode(tid, fullChatContent, slot, '', gen)
-  if not replaceable then
-    error('대상 삽화 ' .. tostring(slot) .. '번의 위치를 찾지 못했습니다. 다시 시도해 주세요.')
+  local sortedSlots = {}
+  for slotStr in pairs(stackItem.data.scenes or {}) do
+    table.insert(sortedSlots, tonumber(slotStr) or slotStr)
   end
+  table.sort(sortedSlots, function(a, b)
+    return (tonumber(a) or 0) < (tonumber(b) or 0)
+  end)
 
-  local operationID = stackItem.operationID or tid
-  stackItem.data.scenes[slot] = scene
-  gen.persistStateAndHistory(tid, xnaiState)
-
-  local inlay = nil
-  if getGlobalVar(tid, 'toggle_lb-xnai.generation') == '0' then
-    local success, generated = pcall(gen.generate, tid, scene)
-    if success then
-      inlay = generated
-    else
-      info(tid, 'Interaction image generation failed. error=' .. tostring(generated))
+  local originalScenes = {}
+  for _, s in ipairs(sortedSlots) do
+    local sceneDesc = stackItem.data.scenes[tostring(s)]
+    if sceneDesc then
+      table.insert(originalScenes, sceneDesc)
     end
   end
 
-  local replacement
-  if inlay then
-    replacement = table.concat({
-      '<lb-xnai id="scene-', slot, '" operation="', operationID, '" scene="', slot, '">',
-      inlay,
-      '</lb-xnai>',
-    })
-  else
-    replacement = table.concat({
-      '<lb-xnai id="scene-', slot, '" operation="', operationID, '" scene="', slot, '" />',
+  local targetDocument = {
+    keyvis = stackItem.data.keyvis,
+    scenes = originalScenes,
+  }
+
+  local patchSuccess, patched = pcall(prelude.applyJSONPatch, targetDocument, patch)
+  if not patchSuccess then
+    error('JSON Patch 적용 실패: ' .. tostring(patched))
+  end
+
+  local _, slottedContext, restoreNodes = gen.buildContextSlotMap(tid, fullChatContent)
+  local slottedText = restoreNodes(slottedContext)
+  local slotErrors = gen.validateSceneSlots(tid, patched.scenes, slottedText)
+  if #slotErrors > 0 then
+    error('삽화 삽입 실패. ' .. table.concat(slotErrors, '\n'))
+  end
+
+  local operationID = stackItem.operationID or tid
+  local shouldGenerateNow = getGlobalVar(tid, 'toggle_lb-xnai.generation') ~= '1'
+
+  local oldScenes = stackItem.data.scenes or {}
+  local newScenes = {}
+  for _, scene in ipairs(patched.scenes or {}) do
+    if type(scene) == 'table' and scene.slot ~= nil then
+      newScenes[tostring(scene.slot)] = scene
+    end
+  end
+
+  local inlays = {}
+
+  for slot, scene in pairs(newScenes) do
+    local existingNodes = prelude.queryNodes('lb-xnai', fullChatContent, { scene = slot })
+    local existingInlay = #existingNodes > 0 and prelude.trim(existingNodes[1].content) or ''
+    local unchanged = oldScenes[slot] and isSameDescriptor(oldScenes[slot], scene)
+
+    if unchanged and existingInlay ~= '' then
+      inlays[slot] = existingInlay
+    elseif shouldGenerateNow then
+      local ok, inlay = pcall(gen.generate, tid, scene)
+      if ok and inlay then
+        inlays[slot] = inlay
+      else
+        info(tid, 'Interaction scene generation failed. slot=' .. slot .. ', error=' .. tostring(inlay))
+        if existingInlay ~= '' then
+          inlays[slot] = existingInlay
+        end
+      end
+    elseif existingInlay ~= '' then
+      inlays[slot] = existingInlay
+    end
+  end
+
+  if patched.keyvis then
+    local kvNodes = prelude.queryNodes('lb-xnai', fullChatContent, { kv = true })
+    if #kvNodes == 0 then
+      kvNodes = prelude.queryNodes('lb-xnai', fullChatContent, { id = 'keyvis' })
+    end
+    local existingKvInlay = #kvNodes > 0 and prelude.trim(kvNodes[1].content) or ''
+    local unchangedKv = stackItem.data.keyvis and isSameDescriptor(stackItem.data.keyvis, patched.keyvis)
+
+    if unchangedKv and existingKvInlay ~= '' then
+      inlays['-1'] = existingKvInlay
+    elseif shouldGenerateNow then
+      local ok, inlay = pcall(gen.generate, tid, patched.keyvis)
+      if ok and inlay then
+        inlays['-1'] = inlay
+      else
+        info(tid, 'Interaction key visual generation failed. error=' .. tostring(inlay))
+        if existingKvInlay ~= '' then
+          inlays['-1'] = existingKvInlay
+        end
+      end
+    elseif existingKvInlay ~= '' then
+      inlays['-1'] = existingKvInlay
+    end
+  end
+
+  for slot in pairs(oldScenes) do
+    if not newScenes[slot] then
+      fullChatContent = removeSceneNode(fullChatContent, slot)
+      verbose(tid, 'Removed scene node. slot=' .. slot)
+    end
+  end
+
+  local nodesToReplace = {}
+  for slot in pairs(newScenes) do
+    local nodes = prelude.queryNodes('lb-xnai', fullChatContent, { scene = slot })
+    if #nodes > 0 then
+      table.insert(nodesToReplace, {
+        node = nodes[1],
+        slot = slot,
+      })
+    end
+  end
+  table.sort(nodesToReplace, function(a, b)
+    return a.node.rangeStart > b.node.rangeStart
+  end)
+
+  for _, item in ipairs(nodesToReplace) do
+    local slot = item.slot
+    local node = item.node
+    local replacement
+    if inlays[slot] then
+      replacement = '<lb-xnai id="scene-' .. slot .. '" operation="' .. operationID .. '" scene="' .. slot .. '">' ..
+          inlays[slot] .. '</lb-xnai>'
+    else
+      replacement = '<lb-xnai id="scene-' .. slot .. '" operation="' .. operationID .. '" scene="' .. slot .. '" />'
+    end
+
+    fullChatContent = table.concat({
+      fullChatContent:sub(1, node.rangeStart - 1),
+      replacement,
+      fullChatContent:sub(node.rangeEnd + 1),
     })
   end
 
-  local replacedText, replaced, availableSlots = replaceSceneNode(tid, fullChatContent, slot, replacement, gen)
-  if not replaced then
-    info(tid, 'Interaction scene insertion failed. slot=' .. tostring(slot) ..
-      ', availableSlots=' .. tostring(availableSlots))
+  local slotsToInsert = {}
+  for slot in pairs(newScenes) do
+    local nodes = prelude.queryNodes('lb-xnai', fullChatContent, { scene = slot })
+    if #nodes == 0 then
+      table.insert(slotsToInsert, slot)
+    end
   end
-  return replacedText, nil
+
+  if #slotsToInsert > 0 then
+    local _, slotted, restoreNodes = gen.buildContextSlotMap(tid, fullChatContent)
+    for _, slot in ipairs(slotsToInsert) do
+      local replacement
+      if inlays[slot] then
+        replacement = '<lb-xnai id="scene-' .. slot .. '" operation="' .. operationID .. '" scene="' .. slot .. '">' ..
+            inlays[slot] .. '</lb-xnai>'
+      else
+        replacement = '<lb-xnai id="scene-' .. slot .. '" operation="' .. operationID .. '" scene="' .. slot .. '" />'
+      end
+
+      slotted = slotted:gsub('<slot num="' .. slot .. '"/>', function()
+        return replacement
+      end, 1)
+    end
+
+    slotted = slotted:gsub('<slot num="%d+"/>\n\n', '')
+    fullChatContent = restoreNodes(slotted)
+  end
+
+  local existingKvNodes = prelude.queryNodes('lb-xnai', fullChatContent, { kv = true })
+  if #existingKvNodes == 0 then
+    existingKvNodes = prelude.queryNodes('lb-xnai', fullChatContent, { id = 'keyvis' })
+  end
+
+  if not patched.keyvis then
+    if #existingKvNodes > 0 then
+      fullChatContent = removeKeyvisNode(fullChatContent)
+    end
+  else
+    local kvReplacement
+    if inlays['-1'] then
+      kvReplacement = '<lb-xnai id="keyvis" kv operation="' .. operationID .. '">' .. inlays['-1'] .. '</lb-xnai>'
+    else
+      kvReplacement = '<lb-xnai id="keyvis" kv operation="' .. operationID .. '" />'
+    end
+
+    if #existingKvNodes > 0 then
+      local kvNode = existingKvNodes[1]
+      fullChatContent = table.concat({
+        fullChatContent:sub(1, kvNode.rangeStart - 1),
+        kvReplacement,
+        fullChatContent:sub(kvNode.rangeEnd + 1),
+      })
+    else
+      fullChatContent = fullChatContent .. '\n\n' .. kvReplacement
+    end
+  end
+
+  stackItem.data.keyvis = patched.keyvis
+  stackItem.data.scenes = newScenes
+  gen.persistStateAndHistory(tid, xnaiState)
+
+  return fullChatContent, nil
 end
 
 ---@param tid string
@@ -117,6 +312,13 @@ local function main(tid, output, fullChatContent, index)
   output = output:gsub('wfsn', 'nsfw')
   if forcedInsertion then
     output = output:gsub('%%', '')
+  end
+
+  local patchNodes = prelude.queryNodes('lb-xnai-patch', output)
+  if #patchNodes > 0 then
+    ---@type XNAIGen
+    local gen = prelude.import(tid, 'lb-xnai.gen')
+    return applyPatchInteraction(tid, patchNodes[#patchNodes], fullChatContent, index, gen)
   end
 
   if not string.find(output, '<lb%-xnai') then
@@ -142,9 +344,6 @@ local function main(tid, output, fullChatContent, index)
     local response = xnaiData
     info(tid, 'Output decoded. keyvis=' .. tostring(response.keyvis ~= nil) ..
       ', scenes=' .. tostring(#(response.scenes or {})))
-    if response.interaction == true then
-      return applyInteraction(tid, response, fullChatContent, index, gen)
-    end
 
     local _, slotted, restoreNodes = gen.buildContextSlotMap(tid, fullChatContent)
     local _, availableSlots = slotted:gsub('<slot num="%d+"/>', '')
@@ -178,7 +377,7 @@ local function main(tid, output, fullChatContent, index)
       operationID = tid,
     }
 
-    local shouldGenerateNow = getGlobalVar(tid, 'toggle_lb-xnai.generation') == '0'
+    local shouldGenerateNow = getGlobalVar(tid, 'toggle_lb-xnai.generation') ~= '1'
     verbose(tid, 'Automatic image generation=' .. tostring(shouldGenerateNow))
 
     ---@type table<string, string>
