@@ -60,16 +60,23 @@ end
 ---@param b any
 ---@return boolean
 local function isSameDescriptor(a, b)
+  if a == b then
+    return true
+  end
   if type(a) ~= 'table' or type(b) ~= 'table' then
     return false
   end
-  if type(json) == 'table' and type(json.encode) == 'function' then
-    return json.encode(a) == json.encode(b)
+  for k, v in pairs(a) do
+    if not isSameDescriptor(v, b[k]) then
+      return false
+    end
   end
-  if type(prelude.toon) == 'table' and type(prelude.toon.encode) == 'function' then
-    return prelude.toon.encode(a) == prelude.toon.encode(b)
+  for k in pairs(b) do
+    if a[k] == nil then
+      return false
+    end
   end
-  return false
+  return true
 end
 
 ---@param tid string
@@ -168,8 +175,6 @@ local function applyPatchInteraction(tid, patchNode, fullChatContent, index, gen
           inlays[slot] = existingInlay
         end
       end
-    elseif existingInlay ~= '' then
-      inlays[slot] = existingInlay
     end
   end
 
@@ -193,8 +198,6 @@ local function applyPatchInteraction(tid, patchNode, fullChatContent, index, gen
           inlays['-1'] = existingKvInlay
         end
       end
-    elseif existingKvInlay ~= '' then
-      inlays['-1'] = existingKvInlay
     end
   end
 

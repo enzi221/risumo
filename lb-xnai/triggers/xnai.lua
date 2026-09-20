@@ -185,6 +185,20 @@ local function renderInline(data, chatIndex, stackItem)
   local imageNodes = prelude.queryNodes('lb-xnai', data)
   local out = data
 
+  local sceneIndexBySlot = {}
+  if stackItem and stackItem.data and stackItem.data.scenes then
+    local sortedSlots = {}
+    for slotStr in pairs(stackItem.data.scenes) do
+      table.insert(sortedSlots, tonumber(slotStr) or slotStr)
+    end
+    table.sort(sortedSlots, function(a, b)
+      return (tonumber(a) or 0) < (tonumber(b) or 0)
+    end)
+    for idx, s in ipairs(sortedSlots) do
+      sceneIndexBySlot[tostring(s)] = idx - 1
+    end
+  end
+
   -- kv should be appended/prepended after the loop to not mess up ranges
   ---@type string
   local kv = nil
@@ -214,6 +228,7 @@ local function renderInline(data, chatIndex, stackItem)
       elseif inlay ~= '' then
         local inStack = stackItem and stackItem.data.scenes[slot]
         local editable = inStack and type(stackItem.data.scenes[slot].panels) ~= 'table'
+        local sceneIdx = sceneIndexBySlot[tostring(slot)]
 
         local function createToolbar(fullsizePop)
           return {
@@ -222,6 +237,7 @@ local function renderInline(data, chatIndex, stackItem)
               risu_btn = t_concat({
                 'lb-interaction__lb-xnai__id=scene-', slot, ';immediate',
                 '#RegenerateScene/ChatIndex:', chatIndex, '/Slot:', slot,
+                sceneIdx and ('/Index:' .. sceneIdx) or '',
               }),
               title = '프롬프트 재생성',
               type = 'button',

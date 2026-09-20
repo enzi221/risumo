@@ -6,11 +6,11 @@ Action specifies what to do and which data to interact with. Other data are out 
 
 ### RegenerateScene
 
-How to regenerate a scene: Locate the scene with the slot matching `Slot:N` in `RegenerateScene/ChatIndex:I/Slot:N`. Depict a complete moment established before `<slot num="N"/>`. Use prose after the slot only to preserve continuity, not to introduce an action, interaction, or reaction that has not occurred before the slot.
+How to regenerate a scene: Read `Slot:N` and `Index:K` from `RegenerateScene/ChatIndex:I/Slot:N/Index:K`. Depict a complete moment established before `<slot num="N"/>`. Use prose after the slot only to preserve continuity, not to introduce an action, interaction, or reaction that has not occurred before the slot.
 
 Rebuild the complete descriptor for the moment at `<slot num="N"/>` from the narrative context. Preserve established character identity, appearance, attire, and environment continuity. Ignore the requested Scene count and Key Visual instructions. Follow every active Scene, composition, character, comic-mode, client-comment, and output-language rule from the main guideline.
 
-Replace the scene at `/scenes/{index}` with the newly generated scene descriptor. Keep `slot` set to N.
+Replace the scene at `/scenes/{K}` with the newly generated scene descriptor, using `Index:K` from the action. Keep `slot` set to N.
 
 ### DirectScene
 

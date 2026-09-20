@@ -9,7 +9,7 @@ The following templates are your internal guide. Reason through one thoroughly, 
 
 For RegenerateScene:
 
-1. Interaction Target: `[Action, Target Slot]`
+1. Interaction Target: `[Action, Target Slot, Target Scene Index]`
 2. Slot Context: `[Insertion Slot, Preceding Depicted Moment, Following Continuity Prose]`
 3. Selected Scene:{{#when::keep::lb-xnai.scene.comic::tis::0}}
    `[Distinct Event Moment, Framing, Visible Body Span, Cropped-Out Attire, Featured Cast]`{{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.characters}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.characters}} != null }}}}}}

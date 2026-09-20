@@ -217,6 +217,31 @@ describe('XNAI slot mapping', function()
     test.assertTrue(interactionOutput:find('scene="18">{{inlay::test}}', 1, true) ~= nil,
       'Response slot replaces its existing interaction location')
     test.assertEquals(generated, beforeGeneration + 1, 'Valid interaction generates one image')
+    globalVars['toggle_lb-xnai.generation'] = '1'
+    local manualOutput = onOutput('test', '<lb-xnai-patch>data</lb-xnai-patch>',
+      'A\n<lb-xnai scene="18">image</lb-xnai>\nB', 22)
+    test.assertTrue(manualOutput:find('<lb%-xnai id="scene%-18" operation="previous" scene="18" />') ~= nil,
+      'Modified prompt in manual mode clears existing inlay')
+
+    getState = function()
+      return { {
+        chatIndex = 22,
+        data = {
+          keyvis = descriptor(-1),
+          scenes = { ['18'] = descriptor(18), ['20'] = descriptor(20) },
+        },
+        operationID = 'previous',
+      } }
+    end
+    local multiSceneOutput = onOutput('test', '<lb-xnai-patch>data</lb-xnai-patch>',
+      'A\n<lb-xnai scene="18">image18</lb-xnai>\n<lb-xnai scene="20">image20</lb-xnai>\n<lb-xnai id="keyvis" kv>imageKV</lb-xnai>\nB', 22)
+    test.assertTrue(multiSceneOutput:find('<lb%-xnai id="scene%-18" operation="previous" scene="18" />') ~= nil,
+      'Modified scene clears inlay in manual mode')
+    test.assertTrue(multiSceneOutput:find('scene="20">image20</lb-xnai>', 1, true) ~= nil,
+      'Unchanged scene retains existing inlay')
+    test.assertTrue(multiSceneOutput:find('id="keyvis" kv operation="previous">imageKV</lb-xnai>', 1, true) ~= nil,
+      'Unchanged keyvis retains existing inlay')
+    globalVars['toggle_lb-xnai.generation'] = nil
   end)
 end)
 
