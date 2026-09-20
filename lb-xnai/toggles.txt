@@ -1,12 +1,14 @@
 =🌠삽화=group
 lb-xnai.mode=모　　　드=select=끄기,메인,보조
-=프롬프트 생성 후 이미지까지 즉시 생성?=caption
+=권장 모델: Gemini 3.7/8 Flash, GLM 5.3, DeepSeek V4.1 Flash=caption
 lb-xnai.lazy=발　　　동=select=즉시,누르면
 lb-xnai.generation=이미지발동=select=즉시,누르면
 =프롬프트 생성 후 이미지까지 즉시 생성?=caption
 lb-xnai.nsfw=NSFW 프롬프트
-lb-xnai.jb=┗탈옥 (프레이야)
-=모델 거부 완화. 무거움, 검열에 당한 게 아니라면 체크 해제=caption
+lb-xnai.jb=┗탈　　옥=select=없음,비망록,권위
+=모델 거부 완화, 검열에 당한 게 아니라면 해제=caption
+=비망록: 무거움, 프리필 불가 모델 (Gemini)=caption
+=권위: 가벼움, 프리필 가능 모델 (GLM)=caption
 lb-xnai.forcedinsertion=┗태그 칼질
 =출력 필터 격파 시도. 무거움, 검열에 당한 게 아니라면 체크 해제=caption
 =⚠️반드시 생각 보조를 "생각만"으로 변경 후 사용할 것=caption
@@ -15,6 +17,8 @@ lb-xnai.japanese=┗일본어 출력
 =———————📒스타일=divider
 lb-xnai.preset=프　리　셋=text
 ="프리셋 X" 로어북 사용. "X" 부분만 입력. 기본 "1"=caption
+lb-xnai.preset.attenuate=┗프롬프트 가중치 약화
+=태그와 자연어 가중치를 낮춰 프리셋 강조 (NAI 전용)=caption
 lb-xnai.focus=포　커　스=text
 =대상의 이름 입력=caption
 lb-xnai.characters=최대캐릭터=text
@@ -35,8 +39,8 @@ lb-xnai.kv.width=최대　너비=text
 lb-xnai.kv.position=위　　　치=select=위,아래
 lb-xnai.kv.align=정　　　렬=select=중앙,왼쪽
 lb-xnai.kv.font=글　　　꼴=select=Gloock (세리프),Kalnia (세리프),HS봄바람체 2.1 (명조),Inter (샌즈),Asta Sans (고딕),평창평화체 (고딕)
-lb-xnai.kv.fx=특수효과
-=노이즈, 텍스트=caption
+lb-xnai.kv.title=타이틀 추가
+=캐릭터 이름을 텍스트 프롬프트로 추가=caption
 =———————🖼️씬=divider
 lb-xnai.scene.quantity=분　　　량=text
 =기본 1-3=caption

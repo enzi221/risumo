@@ -1,6 +1,6 @@
 # Image Prompt Details
 
-Build each image prompt as structured {{#when::toggle::lb-xnai.jb}}storyboard{{:else}}image prompt{{/when}} data. Write detailed natural language across the fixed fields so that their combined values form a coherent image prompt.
+Build each image prompt as structured {{#when::lb-xnai.jb::tis::1}}storyboard{{:else}}image prompt{{/when}} data. Write detailed natural language across the fixed fields so that their combined values form a coherent image prompt.
 
 ## Prompt Construction
 
@@ -118,7 +118,7 @@ Treat the Key Visual like a magazine cover, album cover, or other deliberately a
 
 ### Scene
 
-{{#when::lb-xnai.scene.comic::tisnot::0}}Create a structured-text {{#when::toggle::lb-xnai.jb}}storyboard{{:else}}comic layout{{/when}} of two to four connected panels within the log entry. Panels may move across places and moments when the sequence clarifies the event.{{:else}}Create a structured-text {{#when::toggle::lb-xnai.jb}}storyboard{{:else}}image prompt{{/when}} for one event in a specific place and moment within the log entry.{{/when}}
+{{#when::lb-xnai.scene.comic::tisnot::0}}Create a structured-text {{#when::lb-xnai.jb::tis::1}}storyboard{{:else}}comic layout{{/when}} of two to four connected panels within the log entry. Panels may move across places and moments when the sequence clarifies the event.{{:else}}Create a structured-text {{#when::lb-xnai.jb::tis::1}}storyboard{{:else}}image prompt{{/when}} for one event in a specific place and moment within the log entry.{{/when}}
 
 {{#when::toggle::lb-xnai.scene.quantityexact}}Prefer a moment with a visible change, interaction, reaction, movement, or consequential spatial relationship.{{:else}}Select a moment with a visible change, interaction, reaction, movement, or consequential spatial relationship.{{/when}} Preserve the event's visible cause and effect through every eligible participant and relevant object available to the image.
 

@@ -41,41 +41,6 @@ local function locateOperationChat(triggerId, preferredIndex, operationID)
 end
 
 ---@param triggerId string
----@param operationID string
----@return boolean
-local function removePending(triggerId, operationID)
-  local fullChat = getFullChat(triggerId)
-  for i = #fullChat, 1, -1 do
-    local chat = fullChat[i]
-    if type(chat.data) == 'string' then
-      local nodes = prelude.queryNodes('lb-rerolling', chat.data, { operation = operationID })
-      if #nodes > 0 then
-        removeChat(triggerId, i - 1)
-        return true
-      end
-    end
-  end
-
-  return false
-end
-
----@param operationID string
----@return string
-local function createPendingMessage(operationID)
-  return table.concat({
-    '---\n',
-    '[LBDATA START]\n',
-    '<lb-rerolling operation="', operationID, '">',
-    '<div class="lb-pending lb-rerolling">',
-    '<span class="lb-pending-note">이미지 생성 중, 채팅을 보내거나 다른 작업을 하지 마세요...</span>',
-    '</div>',
-    '</lb-rerolling>\n',
-    '[LBDATA END]\n',
-    '---',
-  })
-end
-
----@param triggerId string
 ---@param chatIndex number
 ---@param operationID string?
 ---@param slot string?
@@ -103,6 +68,7 @@ local function regenerate(triggerId, chatIndex, operationID, slot)
   end
 
   if not stackItem or (slot ~= nil and slot ~= '' and not selectedDescriptor) then
+    pcall(reloadChat, triggerId, chatIndex)
     alertNormal(triggerId, '이미지 생성 데이터가 사라졌어요. 오래된 이미지의 데이터는 유지하지 않습니다. 저장 개수 토글을 늘리세요.')
     return
   end
@@ -125,10 +91,9 @@ local function regenerate(triggerId, chatIndex, operationID, slot)
   end
 
   if requestedCount == 0 then
+    pcall(reloadChat, triggerId, chatIndex)
     return
   end
-
-  addChat(triggerId, 'user', createPendingMessage(triggerId))
 
   local success, result = pcall(function()
     ---@type table<string, string>
@@ -205,11 +170,9 @@ local function regenerate(triggerId, chatIndex, operationID, slot)
     }
   end)
 
-  if not removePending(triggerId, triggerId) then
-    prelude.info(triggerId, 'lb-xnai.regenerate', 'Pending message was not found during cleanup.')
-  end
-
   if not success then
+    local targetIndex = locateOperationChat(triggerId, chatIndex, operationID) or chatIndex
+    pcall(reloadChat, triggerId, targetIndex)
     prelude.info(triggerId, 'lb-xnai.regenerate', 'Regeneration failed. error=' .. tostring(result))
     alertNormal(triggerId, '이미지 삽입 중 오류가 발생했습니다.\n' .. tostring(result))
     return

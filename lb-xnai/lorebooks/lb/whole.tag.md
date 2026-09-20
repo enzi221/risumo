@@ -1,6 +1,6 @@
 # Image Prompt Details
 
-Build each image prompt as structured {{#when::toggle::lb-xnai.jb}}storyboard{{:else}}image prompt{{/when}} data. Use camera and environment tags for the frame, and character tags plus a factual description for each featured character depiction.
+Build each image prompt as structured {{#when::lb-xnai.jb::tis::1}}storyboard{{:else}}image prompt{{/when}} data. Use camera and environment tags for the frame, and character tags plus a factual description for each featured character depiction.
 
 ## Components
 
@@ -185,7 +185,7 @@ Make the Key Visual materially distinct from every Scene through composition, vi
 
 ### Scene
 
-{{#when::lb-xnai.scene.comic::tisnot::0}}A structured-text {{#when::toggle::lb-xnai.jb}}storyboard{{:else}}comic layout{{/when}} of two to four connected comic panels within the log entry. Panels may move across places and moments when the sequence clarifies the event.{{:else}}A structured-text {{#when::toggle::lb-xnai.jb}}storyboard{{:else}}image{{/when}} frame of an event in a specific place and moment within the log entry.{{/when}}
+{{#when::lb-xnai.scene.comic::tisnot::0}}A structured-text {{#when::lb-xnai.jb::tis::1}}storyboard{{:else}}comic layout{{/when}} of two to four connected comic panels within the log entry. Panels may move across places and moments when the sequence clarifies the event.{{:else}}A structured-text {{#when::lb-xnai.jb::tis::1}}storyboard{{:else}}image{{/when}} frame of an event in a specific place and moment within the log entry.{{/when}}
 
 {{#when::toggle::lb-xnai.scene.quantityexact}}Prioritize a moment with a visible change, interaction, reaction, movement, or consequential spatial relationship.{{:else}}Select a moment with a visible change, interaction, reaction, movement, or consequential spatial relationship.{{/when}} Preserve the event's cause and effect through every eligible participant and visible object available to the image. When another story participant is ineligible, frame that person outside the image and depict the eligible participant's visible side of the event without referring to the omitted person in the image data. Do not reduce an exchange, confrontation, conversation, coordinated activity, or shared reaction to one eligible participant's isolated pose when another eligible participant is required.
 

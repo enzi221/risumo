@@ -1,5 +1,9 @@
 --- @meta
 
+--- Character name getter, which is CBS {{char}}.
+--- @return string
+function getName() end
+
 --- @param triggerId string
 --- @return string
 function getDescription(triggerId) end

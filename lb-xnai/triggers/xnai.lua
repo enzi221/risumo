@@ -79,8 +79,8 @@ local function Placeholder(inputID, code, text)
       title = text,
       h.span['lb-xnai-placeholder-idle'] { '✦ ' .. text },
       h.span['lb-xnai-placeholder-loading'] {
-        h.span['lb-xnai-placeholder-spinner'] { closed = true },
-        '생성 중',
+        h.span['lb-xnai-placeholder-spinner'] {},
+        '생성 중, 다른 조작을 하지 마세요',
       },
     },
   }
@@ -120,6 +120,7 @@ end
 ---@return any
 local function createModuleMenu(chatIndex, operationID)
   local menuID = t_concat({ 'lb-xnai-menu-', chatIndex })
+  local allStateID = t_concat({ 'lb-xnai-all-', chatIndex })
 
   return h.div['lb-module-opener-root'] {
     data_id = 'lb-xnai',
@@ -146,10 +147,15 @@ local function createModuleMenu(chatIndex, operationID)
         h.lb_trash_icon { closed = true },
         '캐릭터 태그 기록 삭제',
       },
-      h.button {
+      h.input['lb-xnai-all-state'] {
+        id = allStateID,
+        type = 'checkbox',
+        void = true,
+      },
+      h.label {
+        htmlFor = allStateID,
         popovertarget = menuID,
         risu_btn = createGenerationCode(chatIndex, operationID),
-        type = 'button',
         h.lb_xnai_ff_icon { closed = true },
         '이미지 전체 생성',
       },
@@ -185,6 +191,7 @@ local function renderInline(data, chatIndex, stackItem)
 
     local popID = t_concat({ 'lb-xnai-pop-', chatIndex, '-', nodeIndex })
     local promptID = t_concat({ 'lb-xnai-prompt-', chatIndex, '-', nodeIndex })
+    local imgStateID = t_concat({ 'lb-xnai-img-', chatIndex, '-', nodeIndex })
 
     if slot then
       -- scenes
@@ -214,11 +221,11 @@ local function renderInline(data, chatIndex, stackItem)
               h.lb_reroll_icon { closed = true },
             } or nil,
             -- generated and has data in the stack: can regenerate
-            inStack and h.button['lb-xnai-toolbar-btn'] {
+            inStack and h.label['lb-xnai-toolbar-btn'] {
+              htmlFor = imgStateID,
               popovertarget = fullsizePop and popID or nil,
               risu_btn = createGenerationCode(chatIndex, operationID, slot),
               title = '재생성',
-              type = 'button',
               h.lb_play_icon { closed = true },
             } or nil,
             h.button['lb-xnai-toolbar-btn'] {
@@ -264,11 +271,24 @@ local function renderInline(data, chatIndex, stackItem)
           inlay,
         }
 
+        local sceneLoadingOverlay = h.div['lb-xnai-loading-overlay'] {
+          h.span['lb-xnai-placeholder-spinner'] {},
+          '생성 중, 다른 조작을 하지 마세요',
+        }
+
         out = t_concat({
           out:sub(1, imageNode.rangeStart - 1),
           tostring(h.div['lb-xnai-inlay-wrapper'] {
             h.div['lb-xnai-inlay'] {
-              h.div['lb-xnai-inlay-actions'] { table.unpack(createToolbar()) }, inlineImage, fullsizePop
+              h.input['lb-xnai-img-state'] {
+                id = imgStateID,
+                type = 'radio',
+                void = true,
+              },
+              h.div['lb-xnai-inlay-actions'] { table.unpack(createToolbar()) },
+              inlineImage,
+              sceneLoadingOverlay,
+              fullsizePop,
             }
           }),
           '\n',
@@ -278,6 +298,7 @@ local function renderInline(data, chatIndex, stackItem)
     else
       -- kv
       local inStack = stackItem and stackItem.data.keyvis
+      local kvImgStateID = t_concat({ 'lb-xnai-img-', chatIndex, '-kv' })
 
       if inlay == '' and inStack then
         local inputID = t_concat({ 'lb-xnai-placeholder-', chatIndex, '-', nodeIndex })
@@ -291,11 +312,11 @@ local function renderInline(data, chatIndex, stackItem)
       elseif inlay ~= '' then
         local function createToolbar(fullsizePop)
           return {
-            inStack and h.button['lb-xnai-toolbar-btn'] {
+            inStack and h.label['lb-xnai-toolbar-btn'] {
+              htmlFor = kvImgStateID,
               popovertarget = fullsizePop and popID or nil,
               risu_btn = createGenerationCode(chatIndex, operationID, '-1'),
               title = '재생성',
-              type = 'button',
               h.lb_play_icon { closed = true },
             } or nil,
             fullsizePop and inStack and h.label['lb-xnai-toolbar-btn'] {
@@ -328,12 +349,23 @@ local function renderInline(data, chatIndex, stackItem)
 
         local fullsizePop = createFullsizePop(popID, inlay, promptPreview, createToolbar(true))
 
+        local kvLoadingOverlay = h.div['lb-xnai-loading-overlay'] {
+          h.span['lb-xnai-placeholder-spinner'] {},
+          '생성 중, 다른 조작을 하지 마세요',
+        }
+
         kv = tostring(h.div['lb-xnai-kv-wrapper'] {
+          h.input['lb-xnai-img-state'] {
+            id = kvImgStateID,
+            type = 'radio',
+            void = true,
+          },
           h.div['lb-xnai-kv-actions'] { table.unpack(createToolbar()) },
           h.button['lb-xnai-kv'] {
             popovertarget = popID,
             type = 'button',
-            inlay
+            inlay,
+            kvLoadingOverlay,
           },
           fullsizePop
         })

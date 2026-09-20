@@ -64,7 +64,9 @@
     position: relative;
   }
 
-  .lb-xnai-placeholder-state {
+  .lb-xnai-placeholder-state,
+  .lb-xnai-all-state,
+  .lb-xnai-img-state {
     opacity: 0;
     pointer-events: none;
     position: absolute;
@@ -155,6 +157,7 @@
     {{:else}}
       max-width: min(100%, 1200px);
     {{/when}}
+    overflow: hidden;
     position: relative;
     transition: background-color 0.5s var(--ease-out-quart);
     width: 100%;
@@ -163,8 +166,10 @@
   .lb-xnai-kv {
     aspect-ratio: {{dictelement::{"0": "3/1", "1": "2.35/1", "2": "16/9", "3": "1/1", "4": "2/3", "5": "auto"}::{{getglobalvar::toggle_lb-xnai.kv.ar}}}};
     background: #000;
+    border: none;
     border-radius: 0.5em;
     box-sizing: content-box;
+    cursor: pointer;
     display: block;
     margin: 0 auto;
     {{#when {{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.kv.width}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.kv.width}} != null }}}}}}
@@ -177,65 +182,6 @@
     position: relative;
     transition: max-width 0.5s var(--ease-out-quart), aspect-ratio 0.5s var(--ease-out-quart);
   }
-
-  .lb-xnai-kv::before {
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 700 700' width='700' height='700'%3E%3Cdefs%3E%3Cfilter id='n' x='-20%25' y='-20%25' width='140%25' height='140%25' filterUnits='objectBoundingBox' primitiveUnits='userSpaceOnUse' color-interpolation-filters='linearRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.15' numOctaves='2' seed='15' stitchTiles='stitch' result='t'/%3E%3CfeSpecularLighting surfaceScale='8' specularConstant='0.7' specularExponent='25' lighting-color='%23fff' in='t' result='s'%3E%3CfeDistantLight azimuth='3' elevation='88'/%3E%3C/feSpecularLighting%3E%3CfeColorMatrix type='saturate' values='0' in='s'/%3E%3C/filter%3E%3C/defs%3E%3Crect width='700' height='700' fill='%23000'/%3E%3Crect width='700' height='700' fill='%23fff' filter='url(%23n)'/%3E%3C/svg%3E") top repeat;
-    background-size: 100px;
-    content: '';
-    inset: 0;
-    mix-blend-mode: overlay;
-    opacity: 0;
-    pointer-events: none;
-    position: absolute;
-    transition: opacity 0.3s var(--ease-out-quart);
-    z-index: 1;
-  }
-  {{#when::keep::toggle::lb-xnai.kv.fx}}
-  .lb-xnai-kv::before {
-    opacity: 0.15;
-  }
-  @media (hover: hover) {
-    .lb-xnai-kv-wrapper:hover .lb-xnai-kv::before {
-      opacity: 0;
-    }
-  }
-  {{/when}}
-  .lb-xnai-kv::after {
-    bottom: 1.5cqw;
-    color: oklch(from var(--accent) calc(l - 0.2) c h);
-    content: '{{replace::{{char}}::'::\'}}';
-    font-family: var(--kv-font);
-    font-size: 11rem;
-    font-weight: 500;
-    letter-spacing: -0.03em;
-    line-height: 1;
-    mix-blend-mode: color-dodge;
-    opacity: 0;
-    pointer-events: none;
-    position: absolute;
-    right: -0.1em;
-    text-transform: uppercase;
-    transition: opacity 0.3s var(--ease-out-quart), transform 0.3s var(--ease-out-quart);
-    transition-delay: 0.2s;
-    white-space: nowrap;
-  }
-
-  @container (width < 1200px) {
-    .lb-xnai-kv::after {
-      font-size: 14cqw;
-    }
-  }
-
-  {{#when::keep::toggle::lb-xnai.kv.fx}}.lb-xnai-kv::after {
-    opacity: 1;
-  }
-  @media (hover: hover) {
-    .lb-xnai-kv-wrapper:hover .lb-xnai-kv::after {
-      opacity: 0;
-      transform: translateX(2.5em);
-      transition-delay: 0s;
-    }
-  }{{/when}}
 
   .lb-xnai-kv > img {
     border-radius: 0 !important;
@@ -261,6 +207,7 @@
     {{:else}}
       max-width: 600px;
     {{/}}
+    overflow: hidden;
     position: relative;
   }
 
@@ -459,9 +406,10 @@
     transform-origin: bottom center;
   }
 
-  .lb-xnai-menu > button {
+  .lb-xnai-menu > :is(button, label) {
     align-items: center;
     color: inherit;
+    cursor: pointer;
     display: flex;
     gap: 0.5em;
     padding: 0.5em 0;
@@ -470,11 +418,78 @@
     transition:
       color 0.15s cubic-bezier(0.25, 1, 0.5, 1);
   }
-  .lb-xnai-menu > button:hover {
+  .lb-xnai-menu > :is(button, label):hover {
     color: var(--fg);
   }
-  .lb-xnai-menu > button > svg {
+  .lb-xnai-menu > :is(button, label) > svg {
     height: 1em;
     width: 1em;
+  }
+
+  .lb-xnai-loading-overlay {
+    align-items: center;
+    backdrop-filter: blur(2px);
+    background: oklch(from var(--bg, #000) l c h / 0.55);
+    border-radius: inherit;
+    box-sizing: border-box;
+    color: var(--accent);
+    cursor: wait;
+    display: none;
+    font-size: 0.85em;
+    font-weight: 600;
+    gap: 0.6em;
+    inset: 2px;
+    justify-content: center;
+    pointer-events: all;
+    position: absolute;
+    z-index: 3;
+  }
+
+  @layer lb-xnai-all {
+    /* 1. Hide menus during generation */
+    .chattext:has(:is(.x-risu-lb-xnai-all-state, .x-risu-lb-xnai-img-state, .x-risu-lb-xnai-placeholder-state):checked) .x-risu-lb-xnai-menu {
+      display: none !important;
+    }
+
+    /* 2. Block all other operations in message while any generation is running */
+    .chattext:has(:is(.x-risu-lb-xnai-all-state, .x-risu-lb-xnai-img-state, .x-risu-lb-xnai-placeholder-state):checked) :is(.x-risu-lb-xnai-inlay-actions, .x-risu-lb-xnai-kv-actions) {
+      display: none !important;
+    }
+
+    .chattext:has(:is(.x-risu-lb-xnai-all-state, .x-risu-lb-xnai-img-state, .x-risu-lb-xnai-placeholder-state):checked) :is(.x-risu-lb-xnai-inlay > button, .x-risu-lb-xnai-kv) {
+      cursor: wait !important;
+      pointer-events: none !important;
+    }
+
+    .chattext:has(:is(.x-risu-lb-xnai-all-state, .x-risu-lb-xnai-img-state, .x-risu-lb-xnai-placeholder-state):checked) .x-risu-lb-xnai-placeholder:not(:has(:checked)) {
+      cursor: wait !important;
+      opacity: 0.4 !important;
+      pointer-events: none !important;
+    }
+
+    /* 3. Empty placeholders: whole generation vs individual */
+    .chattext:has(.x-risu-lb-xnai-all-state:checked) .x-risu-lb-xnai-placeholder {
+      cursor: wait;
+      pointer-events: none;
+    }
+    .chattext:has(.x-risu-lb-xnai-all-state:checked) .x-risu-lb-xnai-placeholder .x-risu-lb-xnai-placeholder-idle {
+      display: none !important;
+    }
+    .chattext:has(.x-risu-lb-xnai-all-state:checked) .x-risu-lb-xnai-placeholder .x-risu-lb-xnai-placeholder-loading {
+      display: inline-flex !important;
+    }
+
+    /* 4. Show loading overlay */
+    .chattext:has(.x-risu-lb-xnai-all-state:checked) :is(.x-risu-lb-xnai-inlay, .x-risu-lb-xnai-kv) .x-risu-lb-xnai-loading-overlay,
+    .x-risu-lb-xnai-inlay:has(.x-risu-lb-xnai-img-state:checked) .x-risu-lb-xnai-loading-overlay,
+    .x-risu-lb-xnai-kv-wrapper:has(.x-risu-lb-xnai-img-state:checked) .x-risu-lb-xnai-loading-overlay {
+      display: flex !important;
+    }
+
+    /* 5. Close lightbox on individual regeneration */
+    .x-risu-lb-xnai-inlay:has(.x-risu-lb-xnai-img-state:checked) .x-risu-lb-xnai-fullsize-pop,
+    .x-risu-lb-xnai-kv-wrapper:has(.x-risu-lb-xnai-img-state:checked) .x-risu-lb-xnai-fullsize-pop {
+      display: none !important;
+    }
   }
 </style>

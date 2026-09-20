@@ -146,6 +146,16 @@ local function compileDescriptor(desc, comicPrompt)
   }
 end
 
+local function buildKeyvisTitlePrompt()
+  local charName = trimText(getName())
+  if charName ~= '' then
+    return 'A title "' ..
+        charName ..
+        '" is written 0.75::in the very middle of the image, horizontally and vertically centered, like a movie title or a book title. ::'
+  end
+  return ''
+end
+
 ---@param triggerId string
 ---@param desc XNAIDescriptor
 ---@return XNAIPromptSet
@@ -158,6 +168,12 @@ local function buildRawPrompt(triggerId, desc)
 
   if compiled.setup ~= '' then
     table.insert(positiveParts, compiled.setup)
+  end
+  if desc and desc.slot == nil and getGlobalVar(triggerId, 'toggle_lb-xnai.kv.title') == '1' then
+    local titlePrompt = buildKeyvisTitlePrompt()
+    if titlePrompt ~= '' then
+      table.insert(positiveParts, titlePrompt)
+    end
   end
   if compiled.description ~= '' then
     table.insert(positiveParts, compiled.description)
@@ -182,6 +198,50 @@ local function buildRawPrompt(triggerId, desc)
   }
 end
 
+---@param input string
+---@param factor? number
+---@return string
+local function attenuatePrompt(input, factor)
+  if type(input) ~= 'string' or not input:match('%S') then
+    return input or ''
+  end
+
+  factor = factor or 0.75
+  local result = {}
+  local lastIndex = 1
+  local pattern = '()([%-]?%d*%.?%d+)::(.-)::()'
+
+  for startIndex, weightStr, content, endIndex in input:gmatch(pattern) do
+    if startIndex > lastIndex then
+      local prefix = input:sub(lastIndex, startIndex - 1)
+      local trimmed = prefix:gsub('%s+$', '')
+      if trimmed:match('[%w%z\128-\255]') then
+        table.insert(result, string.format('%g::%s ::', factor, trimmed))
+      elseif trimmed:match('%S') then
+        table.insert(result, trimmed .. ' ')
+      end
+    end
+
+    local weight = tonumber(weightStr) or 1
+    local scaled = weight * factor
+    local trimmedContent = content:gsub('^%s*(.-)%s*$', '%1')
+    table.insert(result, string.format('%g::%s ::', scaled, trimmedContent))
+    lastIndex = endIndex
+  end
+
+  if lastIndex <= #input then
+    local suffix = input:sub(lastIndex)
+    local trimmed = suffix:gsub('%s+$', '')
+    if trimmed:match('[%w%z\128-\255]') then
+      table.insert(result, string.format('%g::%s ::', factor, trimmed))
+    elseif trimmed:match('%S') then
+      table.insert(result, trimmed)
+    end
+  end
+
+  return table.concat(result, '')
+end
+
 ---@param triggerId string
 ---@param desc XNAIDescriptor
 ---@return ImagePromptSet?
@@ -196,9 +256,24 @@ local function buildPresetPrompt(triggerId, desc)
   prelude.verbose(triggerId, 'lb-xnai.gen', 'Building prompt. preset=' .. tostring(preset))
 
   local comfy = getGlobalVar(triggerId, 'toggle_lb-xnai.compat.comfy') == '1'
+  if not comfy and getGlobalVar(triggerId, 'toggle_lb-xnai.preset.attenuate') == '1' then
+    if compiled.setup ~= '' then
+      compiled.setup = attenuatePrompt(compiled.setup)
+    end
+    if compiled.description ~= '' then
+      compiled.description = attenuatePrompt(compiled.description)
+    end
+  end
+
   local positiveNote = getGlobalVar(triggerId, 'toggle_lb-xnai.positive') or ''
   if positiveNote == null then
     positiveNote = ''
+  end
+  if desc and desc.slot == nil and getGlobalVar(triggerId, 'toggle_lb-xnai.kv.title') == '1' then
+    local titlePrompt = buildKeyvisTitlePrompt()
+    if titlePrompt ~= '' then
+      positiveNote = positiveNote ~= '' and (positiveNote .. ', ' .. titlePrompt) or titlePrompt
+    end
   end
   local negativeNote = getGlobalVar(triggerId, 'toggle_lb-xnai.negative') or ''
   if negativeNote == null then
@@ -657,7 +732,9 @@ local function persistStateAndHistory(triggerId, xnaiState)
 end
 
 ---@class XNAIGen
+---@field attenuatePrompt fun (input: string, factor?: number): string
 ---@field buildContextSlotMap fun (triggerId: string, text: string): string, string, fun(text: string): string
+---@field buildPresetPrompt fun (triggerId: string, desc: XNAIDescriptor): ImagePromptSet?
 ---@field buildRawPrompt fun (triggerId: string, desc: XNAIDescriptor): XNAIPromptSet
 ---@field buildSlotMap fun (text: string): string, string, fun(text: string): string
 ---@field cleanDescriptionBlocks fun (text: string): string
@@ -669,7 +746,9 @@ end
 ---@field validateSceneSlots fun (tid: string, scenes: XNAIDescriptor[]?, slotted: string?): string[]
 
 return {
+  attenuatePrompt = attenuatePrompt,
   buildContextSlotMap = buildContextSlotMap,
+  buildPresetPrompt = buildPresetPrompt,
   buildRawPrompt = buildRawPrompt,
   buildSlotMap = buildSlotMap,
   cleanDescriptionBlocks = cleanDescriptionBlocks,
