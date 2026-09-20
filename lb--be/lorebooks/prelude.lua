@@ -408,31 +408,53 @@ local function getRawPriorityLoreBook(triggerId, name)
   return priority
 end
 
-local function resolveLoreBook(triggerId, book)
+local MAX_REQUIRE_DEPTH = 5
+
+local function resolveLoreBookContent(triggerId, content, depth, stack)
+  return (content or ''):gsub('<!%-%-%s*lb:require:(.-)%s*%-%->', function(name)
+    if depth >= MAX_REQUIRE_DEPTH then
+      return ''
+    end
+
+    local loreName = trim(name)
+    local allName = loreName:match('^all:(.*)$')
+    local requiredName = allName ~= nil and trim(allName) or loreName
+    if requiredName == '' or stack[requiredName] then
+      return ''
+    end
+
+    stack[requiredName] = true
+    local replacement
+
+    if allName ~= nil then
+      local contents = {}
+      for _, required in ipairs(getLoreBooks(triggerId, requiredName) or {}) do
+        if required.content and required.content ~= '' then
+          t_insert(contents, (resolveLoreBookContent(triggerId, required.content, depth + 1, stack)))
+        end
+      end
+      replacement = table.concat(contents, '\n\n')
+    else
+      local required = getRawPriorityLoreBook(triggerId, requiredName)
+      if not required or not required.content then
+        replacement = ''
+      else
+        replacement = resolveLoreBookContent(triggerId, required.content, depth + 1, stack)
+      end
+    end
+
+    stack[requiredName] = nil
+    return replacement
+  end)
+end
+
+local function resolveLoreBook(triggerId, name, book)
   local resolved = {}
   for key, value in pairs(book) do
     resolved[key] = value
   end
 
-  resolved.content = (book.content or ''):gsub('<!%-%-%s*lb:require:(.-)%s*%-%->', function(name)
-    local loreName = trim(name)
-    local allName = loreName:match('^all:(.*)$')
-    if allName ~= nil then
-      local contents = {}
-      for _, required in ipairs(getLoreBooks(triggerId, trim(allName)) or {}) do
-        if required.content and required.content ~= '' then
-          t_insert(contents, required.content)
-        end
-      end
-      return table.concat(contents, '\n\n')
-    end
-
-    local required = getRawPriorityLoreBook(triggerId, loreName)
-    if not required or not required.content then
-      return ''
-    end
-    return required.content
-  end)
+  resolved.content = resolveLoreBookContent(triggerId, book.content, 0, { [name] = true })
 
   return resolved
 end
@@ -443,7 +465,7 @@ end
 local function getResolvedLoreBooks(triggerId, name)
   local resolved = {}
   for _, book in ipairs(getLoreBooks(triggerId, name) or {}) do
-    t_insert(resolved, resolveLoreBook(triggerId, book))
+    t_insert(resolved, resolveLoreBook(triggerId, name, book))
   end
   return resolved
 end
@@ -458,7 +480,7 @@ local function getPriorityLoreBook(triggerId, name)
     return nil
   end
 
-  return resolveLoreBook(triggerId, book)
+  return resolveLoreBook(triggerId, name, book)
 end
 
 ---Locates the target chat index for sideEffect operations.

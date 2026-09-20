@@ -84,24 +84,10 @@ local function applyImagePreset(triggerId, source, options)
 
       if comfy and options.characterPromptSeparated then
         local rawPositive = trimText(positive)
-        local remainder = rawPositive
-        local subject = 'character'
-
-        if rawPositive:match('^girl,%s*') then
-          remainder = prelude.trim(rawPositive:gsub('^girl,%s*', '', 1))
-          subject = 'girl'
-        elseif rawPositive:match('^boy,%s*') then
-          remainder = prelude.trim(rawPositive:gsub('^boy,%s*', '', 1))
-          subject = 'boy'
-        elseif rawPositive:match('^character,%s*') then
-          remainder = prelude.trim(rawPositive:gsub('^character,%s*', '', 1))
-        end
-
-        local head = 'the ' .. subject
-        if remainder ~= '' then
-          positive = head .. ' is ' .. remainder
+        if rawPositive ~= '' and not rawPositive:match('^[Tt]he%s+') then
+          positive = 'the ' .. rawPositive
         else
-          positive = head
+          positive = rawPositive
         end
       end
 
@@ -204,6 +190,8 @@ local function applyImagePreset(triggerId, source, options)
       positive = positive:gsub(naiWeight, '%2')
       negative = negative:gsub(naiWeight, '%2')
     end
+    positive = positive:gsub('[{}]', ''):gsub('%[', ''):gsub('%]', '')
+    negative = negative:gsub('[{}]', ''):gsub('%[', ''):gsub('%]', '')
   else
     positive = positive:gsub('%(', '\\('):gsub('%)', '\\)')
   end

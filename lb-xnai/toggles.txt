@@ -1,5 +1,6 @@
 =🌠삽화=group
 lb-xnai.mode=모　　　드=select=끄기,메인,보조
+=프롬프트 생성 후 이미지까지 즉시 생성?=caption
 lb-xnai.lazy=발　　　동=select=즉시,누르면
 lb-xnai.generation=이미지발동=select=즉시,누르면
 =프롬프트 생성 후 이미지까지 즉시 생성?=caption
@@ -53,7 +54,7 @@ lb-xnai.positive=긍정　프롬=textarea
 lb-xnai.negative=부정　프롬=textarea
 =항상 맨 뒤에 추가=caption
 ==divider
-=라이트보드 삽화 4.4.0—amonamona=caption
+=라이트보드 삽화 4.4.1—amonamona=caption
 ==groupEnd
 
 =🌠삽화 (고급)=group
@@ -62,6 +63,7 @@ lb-xnai.showOld=오래된 삽화 표시하기
 =클릭 시 확대는 불가, 크게 보려면 새 탭에서 열 것=caption
 lb-xnai.context=컨텍스트 유지
 =이전 태그 기록을 다음 요청에 전달?=caption
+lb-xnai.description=자　연　어=select=높음,낮음,완전
 lb-xnai.thoughts=생각　보조=select=적고 제거,생각만,안하기
 =↑ 분석력, 품질 향상, 비용 증가=caption
 lb-xnai.maxLogs=포함채팅수=text
@@ -74,9 +76,8 @@ lb-xnai.maxSaves=저장　개수=text
 =↑ 분석력 향상, 비용 증가=caption
 =최소 1, 기본 5=caption
 =———————⚙️ComfyUI=divider
-=ComfyUI 출력 품질 테스트는 진행하지 않은 버전임=caption
 lb-xnai.compat.comfy=ComfyUI
-=괄호 유지=caption
+=이하 옵션은 모두 ComfyUI 체크 시에만 적용=caption
 lb-xnai.compat.charDivider=캐릭터구분=select=파이프,줄바꿈
 =charA | charB vs. charA⏎⏎charB=caption
 =ComfyUI 체크해야 적용=caption
@@ -88,5 +89,5 @@ lb-xnai.compat.weight=가　중　치=select=제거,Comfy
 =NAI 가중치를 제거하거나 변환=caption
 =ComfyUI 체크해야 적용=caption
 ==divider
-=라이트보드 삽화 4.4.0—amonamona=caption
+=라이트보드 삽화 4.4.1—amonamona=caption
 ==groupEnd

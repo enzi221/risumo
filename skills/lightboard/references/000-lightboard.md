@@ -192,7 +192,7 @@ Follow this template to produce the output:
 - Use `<!-- lb:require:NAME -->` in frontend prompt fragments (`{identifier}.lb` and `{identifier}.lb.*`, including interaction and extra instructions) to insert another lorebook's content.
 - Set `NAME` to the target lorebook's name. The backend inserts the matching lorebook with the highest insert order.
 - Use `<!-- lb:require:all:NAME -->` to insert every lorebook named `NAME`. The backend preserves lookup order, skips empty content, and separates inserted content with two line feeds.
-- Place each require in the source fragment. Expansion runs once; require comments inside inserted content remain unchanged.
+- Place requires in source or inserted fragments. Expansion recursively resolves up to five require levels.
 - Allow for missing targets: the backend replaces their require comments with empty strings.
 - Use requires only in prompt fragments, not ordinary context lorebooks or Lua callback sources.
 

@@ -84,6 +84,7 @@ function M.runPipeline(triggerId, man, fullChat, options)
     end
     prelude.verbose(triggerId, man.identifier, 'Received response.')
 
+    local rawOutput = llmResponse.result
     local processSuccess, processResult = pcall(cleanLLMResult, man, llmResponse)
     if not processSuccess then
       error('응답을 처리하지 못했습니다. ' .. tostring(processResult))
@@ -96,7 +97,7 @@ function M.runPipeline(triggerId, man, fullChat, options)
         prelude.verbose(triggerId, man.identifier, 'Reiteration ' .. ri .. '/' .. man.reiteration)
 
         table.insert(prom, {
-          content = processResult,
+          content = rawOutput,
           role = 'char'
         })
 
@@ -123,6 +124,7 @@ Carefully think, then if it is OK, output %s node without any changes. If it nee
         end
 
         if reiterResult and reiterResult ~= '' then
+          rawOutput = reiterResponse.result
           processResult = reiterResult
         end
       end
@@ -181,7 +183,7 @@ Carefully think, then if it is OK, output %s node without any changes. If it nee
       man.identifier .. ". Retrying (" .. attempts .. "/" .. maxRetries .. "): " .. tostring(validationError))
 
     table.insert(prom, {
-      content = processResult,
+      content = rawOutput,
       role = 'char'
     })
 

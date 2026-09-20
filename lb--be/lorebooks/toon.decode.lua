@@ -227,8 +227,15 @@ local function parseHeader(headerStr)
   return {
     key = beforeBracket ~= "" and beforeBracket or nil,
     delimiter = delimiter,
-    fields = fields
+    fields = fields,
+    length = tonumber(lengthStr)
   }
+end
+
+local function assertArrayLength(expected, actual)
+  if expected ~= nil and expected ~= actual then
+    error(string.format("Array length mismatch: expected %d, got %d", expected, actual))
+  end
 end
 
 local function parseLines(text, config)
@@ -381,6 +388,7 @@ local function decodeListItem(lines, startIdx, targetDepth, config, parentDelimi
       idx = nextIdx
     end
 
+    assertArrayLength(headerInfo.length, #arr)
     return arr, idx
   end
 
@@ -420,6 +428,7 @@ local function decodeListItem(lines, startIdx, targetDepth, config, parentDelimi
       end
     end
 
+    assertArrayLength(keyHeaderInfo.length, #arr)
     obj[keyHeaderInfo.key] = arr
   elseif value == "" then
     local nextLine = lines[startIdx + 1]
@@ -488,12 +497,15 @@ function decodeValue(lines, startIdx, targetDepth, config, parentDelimiter, expe
         for _, token in ipairs(tokens) do
           table.insert(arr, parseValue(token))
         end
+        assertArrayLength(headerInfo.length, #arr)
         return arr, startIdx + 1
       end
     end
 
     if headerInfo.fields then
-      return parseTabularRows(lines, startIdx + 1, targetDepth + 1, headerInfo, config)
+      local tabularArr, nextIdx = parseTabularRows(lines, startIdx + 1, targetDepth + 1, headerInfo, config)
+      assertArrayLength(headerInfo.length, #tabularArr)
+      return tabularArr, nextIdx
     end
 
     local idx = startIdx + 1
@@ -524,6 +536,7 @@ function decodeValue(lines, startIdx, targetDepth, config, parentDelimiter, expe
       end
     end
 
+    assertArrayLength(headerInfo.length, #arr)
     return arr, idx
   end
 

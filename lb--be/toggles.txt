@@ -33,5 +33,5 @@ lightboard.skipUpdateCheck=업데이트 알림 끄기
 lightboard.logLevel=로그　수준=select=VERBOSE,INFO,NONE
 =브라우저 콘솔 로그=caption
 ==divider
-=라이트보드 백엔드 4.4.0 · amonamona=caption
+=라이트보드 백엔드 4.4.1 · amonamona=caption
 ==groupEnd

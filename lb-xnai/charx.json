@@ -16,16 +16,43 @@
     {
       "comment": "lb-xnai.lb",
       "file": "lorebooks/lb/_.md",
+      "folder": "lb-xnai.lb/",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-xnai.lb.description.high",
+      "file": "lorebooks/lb/description.high.md",
+      "folder": "lb-xnai.lb/",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-xnai.lb.description.low",
+      "file": "lorebooks/lb/description.low.md",
+      "folder": "lb-xnai.lb/",
       "insertOrder": 1
     },
     {
       "comment": "lb-xnai.lb.example.comic",
       "file": "lorebooks/lb/example.comic.md",
+      "folder": "lb-xnai.lb/",
       "insertOrder": 1
     },
     {
       "comment": "lb-xnai.lb.example.scene",
       "file": "lorebooks/lb/example.scene.md",
+      "folder": "lb-xnai.lb/",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-xnai.lb.whole.nl",
+      "file": "lorebooks/lb/whole.nl.md",
+      "folder": "lb-xnai.lb/",
+      "insertOrder": 1
+    },
+    {
+      "comment": "lb-xnai.lb.whole.tag",
+      "file": "lorebooks/lb/whole.tag.md",
+      "folder": "lb-xnai.lb/",
       "insertOrder": 1
     },
     {
@@ -108,7 +135,7 @@
     }
   ],
   "lowLevelAccess": true,
-  "name": "🔦라이트보드 🌠 삽화 4.4.0",
+  "name": "🔦라이트보드 🌠 삽화 4.4.1",
   "namespace": "lb-xnai",
   "regex": [
     "regex/lazy.md",
@@ -130,5 +157,5 @@
       "type": "start"
     }
   ],
-  "version": "4.4.0"
+  "version": "4.4.1"
 }

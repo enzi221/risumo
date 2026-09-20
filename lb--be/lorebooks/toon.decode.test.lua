@@ -551,7 +551,7 @@ describe("escaped quotes outside quoted strings", function()
   end)
 
   it("parses escaped quotes in tabular data", function()
-    local toon_str = '[4|]{target|text|locator|desc}\n  마스터|마스터|\\"마스터...|description'
+    local toon_str = '[1|]{target|text|locator|desc}\n  마스터|마스터|\\"마스터...|description'
     assertDeepEquals(toon.decode(toon_str), {
       { target = "마스터", text = "마스터", locator = '"마스터...', desc = "description" }
     }, "parse escaped quote in tabular row")
@@ -614,6 +614,26 @@ describe("deep indentation tolerance", function()
     local toon_str = "items[2]:\n    value1\n        value2"
     assertDeepEquals(toon.decode(toon_str, { indent = 4 }), { items = { "value1", "    value2" } },
       "custom indent size with excess indent")
+  end)
+end)
+
+describe("array length validation", function()
+  it("fails when inline primitive array length mismatches", function()
+    test.assertFails(function()
+      toon.decode("tags[3]: a,b")
+    end, "Array length mismatch", "inline array length mismatch")
+  end)
+
+  it("fails when tabular array length mismatches", function()
+    test.assertFails(function()
+      toon.decode("items[2]{a,b}:\n  1,2")
+    end, "Array length mismatch", "tabular array length mismatch")
+  end)
+
+  it("fails when list array length mismatches", function()
+    test.assertFails(function()
+      toon.decode("items[2]:\n  - a\n  - b\n  - c")
+    end, "Array length mismatch", "list array length mismatch")
   end)
 end)
 

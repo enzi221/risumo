@@ -75,7 +75,7 @@ function prelude.split(str, sep) end
 
 `prelude.verbose()` and `prelude.info()` follow the backend `lightboard.logLevel` toggle. Its levels are `VERBOSE`, `INFO`, and `NONE`, with `VERBOSE` as the default. Use `prelude.logEnabled()` before constructing an expensive log value. Errors are not controlled by this diagnostic log level.
 
-`prelude.getLoreBooks()` and `prelude.getPriorityLoreBook()` return copied lorebooks with single-level `<!-- lb:require:NAME -->` and `<!-- lb:require:all:NAME -->` references resolved in `content`. Require comments inside inserted content remain unchanged.
+`prelude.getLoreBooks()` and `prelude.getPriorityLoreBook()` return copied lorebooks with `<!-- lb:require:NAME -->` and `<!-- lb:require:all:NAME -->` references recursively resolved in `content`. Expansion supports five require levels. A circular reference or a require beyond the fifth level resolves to empty content.
 
 For example, `prelude.split('a,b,c', ',')` returns `{ 'a', 'b', 'c' }`.
 
