@@ -22,8 +22,8 @@ How to direct: Update, add, or remove Scenes and Key Visual according to the use
   Replace the corresponding scene at `/scenes/{index}` or specific fields within it. Keep its `slot` number unchanged unless relocating.
 - Removing scenes:
   Remove the corresponding scene at `/scenes/{index}`.
-- Key Visual updates:
-  Update, replace, or add `/keyvis` when requested.
+- Adding or modifying Key Visual:
+  Add, update, or replace `/keyvis`.
 
 Express each change as the smallest practical set of patch operations. Keep untouched scenes and fields out of the patch.
 

@@ -38,7 +38,6 @@ lb-xnai.kv.width=최대　너비=text
 =픽셀, 숫자만 입력, 기본 1200=caption
 lb-xnai.kv.position=위　　　치=select=위,아래
 lb-xnai.kv.align=정　　　렬=select=중앙,왼쪽
-lb-xnai.kv.font=글　　　꼴=select=Gloock (세리프),Kalnia (세리프),HS봄바람체 2.1 (명조),Inter (샌즈),Asta Sans (고딕),평창평화체 (고딕)
 lb-xnai.kv.title=타이틀 추가
 =캐릭터 이름을 텍스트 프롬프트로 추가=caption
 =———————🖼️씬=divider
@@ -58,7 +57,7 @@ lb-xnai.positive=긍정　프롬=textarea
 lb-xnai.negative=부정　프롬=textarea
 =항상 맨 뒤에 추가=caption
 ==divider
-=라이트보드 삽화 4.4.1—amonamona=caption
+=라이트보드 삽화 4.5.0—amonamona=caption
 ==groupEnd
 
 =🌠삽화 (고급)=group
@@ -93,5 +92,5 @@ lb-xnai.compat.weight=가　중　치=select=제거,Comfy
 =NAI 가중치를 제거하거나 변환=caption
 =ComfyUI 체크해야 적용=caption
 ==divider
-=라이트보드 삽화 4.4.1—amonamona=caption
+=라이트보드 삽화 4.5.0—amonamona=caption
 ==groupEnd

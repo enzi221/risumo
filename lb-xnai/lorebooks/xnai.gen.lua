@@ -149,9 +149,9 @@ end
 local function buildKeyvisTitlePrompt()
   local charName = trimText(getName())
   if charName ~= '' then
-    return 'A title "' ..
+    return '1.2::A title text of "' ..
         charName ..
-        '" is written 0.75::in the very middle of the image, horizontally and vertically centered, like a movie title or a book title. ::'
+        '" is written in the very center of the image:: 0.75::like a movie title or a book title. ::'
   end
   return ''
 end

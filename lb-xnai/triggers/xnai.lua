@@ -157,14 +157,14 @@ local function createModuleMenu(chatIndex, operationID)
         popovertarget = menuID,
         risu_btn = createGenerationCode(chatIndex, operationID),
         h.lb_xnai_ff_icon { closed = true },
-        '이미지 전체 생성',
+        '이미지 모두 재생성',
       },
       h.button {
         popovertarget = menuID,
         risu_btn = 'lb-reroll__lb-xnai',
         type = 'button',
         h.lb_reroll_icon { closed = true },
-        '다시 만들기',
+        '처음부터 다시 만들기',
       },
       h.button {
         popovertarget = menuID,
@@ -223,7 +223,7 @@ local function renderInline(data, chatIndex, stackItem)
                 'lb-interaction__lb-xnai__id=scene-', slot, ';immediate',
                 '#RegenerateScene/ChatIndex:', chatIndex, '/Slot:', slot,
               }),
-              title = '씬 프롬프트 재생성',
+              title = '프롬프트 재생성',
               type = 'button',
               h.lb_reroll_icon { closed = true },
             } or nil,
@@ -232,7 +232,7 @@ local function renderInline(data, chatIndex, stackItem)
               htmlFor = imgStateID,
               popovertarget = fullsizePop and popID or nil,
               risu_btn = createGenerationCode(chatIndex, operationID, slot),
-              title = '재생성',
+              title = '이미지 재생성',
               h.lb_play_icon { closed = true },
             } or nil,
             h.button['lb-xnai-toolbar-btn'] {
@@ -323,7 +323,7 @@ local function renderInline(data, chatIndex, stackItem)
               htmlFor = kvImgStateID,
               popovertarget = fullsizePop and popID or nil,
               risu_btn = createGenerationCode(chatIndex, operationID, '-1'),
-              title = '재생성',
+              title = '이미지 재생성',
               h.lb_play_icon { closed = true },
             } or nil,
             fullsizePop and inStack and h.label['lb-xnai-toolbar-btn'] {
