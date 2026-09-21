@@ -1,6 +1,6 @@
 {
   "devDependencies": {
-    "risupack": "^0.2.3"
+    "risupack": "^0.2.4"
   },
   "name": "risums",
   "private": true,

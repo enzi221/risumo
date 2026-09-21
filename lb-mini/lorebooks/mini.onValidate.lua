@@ -23,6 +23,72 @@ local function parseCons(content)
   return identifiers
 end
 
+local function denseArray(value)
+  if type(value) ~= 'table' then
+    return false
+  end
+
+  local count = 0
+  for key in pairs(value) do
+    if type(key) ~= 'number' or key < 1 or key % 1 ~= 0 then
+      return false
+    end
+    count = count + 1
+  end
+  return count == #value
+end
+
+local function requireString(value, label)
+  if type(value) ~= 'string' then
+    error('InvalidOutput: ' .. label .. ' must be a string.')
+  end
+end
+
+local function requireNumber(value, label)
+  if type(value) ~= 'number' then
+    error('InvalidOutput: ' .. label .. ' must be a number.')
+  end
+end
+
+local function validateBoard(board)
+  if type(board) ~= 'table' then
+    error('InvalidOutput: Board root must be an object.')
+  end
+  requireString(board.name, 'name')
+  if board.name == '' then
+    error('InvalidOutput: name must not be empty.')
+  end
+  if not denseArray(board.posts) then
+    error('InvalidOutput: posts must be an array.')
+  end
+  for postIndex, post in ipairs(board.posts) do
+    local postLabel = 'posts[' .. tostring(postIndex - 1) .. ']'
+    if type(post) ~= 'table' then
+      error('InvalidOutput: ' .. postLabel .. ' must be an object.')
+    end
+
+    requireString(post.author, postLabel .. '.author')
+    requireString(post.content, postLabel .. '.content')
+    requireNumber(post.downvotes, postLabel .. '.downvotes')
+    requireString(post.time, postLabel .. '.time')
+    requireString(post.title, postLabel .. '.title')
+    requireNumber(post.upvotes, postLabel .. '.upvotes')
+
+    if not denseArray(post.comments) then
+      error('InvalidOutput: ' .. postLabel .. '.comments must be an array.')
+    end
+    for commentIndex, comment in ipairs(post.comments) do
+      local commentLabel = postLabel .. '.comments[' .. tostring(commentIndex - 1) .. ']'
+      if type(comment) ~= 'table' then
+        error('InvalidOutput: ' .. commentLabel .. ' must be an object.')
+      end
+      requireString(comment.author, commentLabel .. '.author')
+      requireString(comment.content, commentLabel .. '.content')
+      requireString(comment.time, commentLabel .. '.time')
+    end
+  end
+end
+
 local function validateCons(posts)
   for _, post in ipairs(posts) do
     local postContent = post.content or ''
@@ -105,7 +171,7 @@ local function validateKeyFigures(triggerId, data)
   end
 end
 
-local function main(triggerId, output)
+local function main(triggerId, output, context)
   local patchNodes = prelude.queryNodes('lb-mini-patch', output)
   if #patchNodes > 0 then
     local success, patch = pcall(json.decode, prelude.trim(patchNodes[#patchNodes].content))
@@ -114,6 +180,32 @@ local function main(triggerId, output)
     end
 
     validatePatch(patch)
+
+    if context and context.previousNode then
+      local previousNode = context.previousNode
+      local decodeSuccess, previous = pcall(prelude.toon.decode, previousNode.content)
+      if decodeSuccess and type(previous) == 'table' then
+        local previousPosts = {}
+        if type(previous.posts) == 'table' then
+          previousPosts = previous.posts
+        elseif #previous > 0 or next(previous) == nil then
+          previousPosts = previous
+        end
+
+        local board = {
+          name = previousNode.attributes and previousNode.attributes.name or '미니보드',
+          posts = previousPosts,
+        }
+
+        local patchSuccess, patched = pcall(prelude.applyJSONPatch, board, patch)
+        if not patchSuccess then
+          error('InvalidOutput: Failed to apply JSON Patch. ' .. tostring(patched))
+        end
+
+        validateBoard(patched)
+        validateCons(patched.posts)
+      end
+    end
     return
   end
 

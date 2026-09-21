@@ -37,11 +37,20 @@ local function cleanLLMResult(man, response)
   end
 end
 
+--- @class PipelineOptions
+--- @field blockID string?
+--- @field chatIndex number?
+--- @field chatOffset number?
+--- @field extras string?
+--- @field lazy boolean?
+--- @field previousNode MutationNode?
+--- @field type 'generation'|'interaction'|'reroll'
+
 --- Pipeline for prompt creation, LLM execution, and result processing.
 --- @param triggerId string
 --- @param man Manifest
 --- @param fullChat Chat[]
---- @param options table
+--- @param options PipelineOptions
 --- @return string?
 function M.runPipeline(triggerId, man, fullChat, options)
   local modeType = options.type
@@ -139,7 +148,14 @@ Carefully think, then if it is OK, output the required node without any changes.
       valid = false
       validationError = 'You did not return any output.'
     elseif man.onValidate and processResult then
-      local success, err = pcall(man.onValidate, triggerId, processResult)
+      local validationContext = {
+        blockID = options.blockID,
+        chatIndex = options.chatIndex,
+        identifier = man.identifier,
+        previousNode = options.previousNode,
+        type = modeType,
+      }
+      local success, err = pcall(man.onValidate, triggerId, processResult, validationContext)
       if not success then
         local cleanErr = tostring(err):gsub("^.-:%d+: ", "")
         if cleanErr:find("^" .. VALIDATION_ERROR_PREFIX) then

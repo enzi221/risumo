@@ -4,7 +4,7 @@ Read this file before changing a module manifest, module directory layout, Lua t
 
 ## Build command
 
-Build a module from its manifest.
+Build a module from its manifest. Do not dig into the script sources.
 
 ```sh
 npm run build:charx -- lb-xnai/charx.json

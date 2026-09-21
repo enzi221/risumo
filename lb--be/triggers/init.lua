@@ -354,7 +354,12 @@ local function reroll(identifier, blockID)
   local contextSlice = { table.unpack(fullChat, 1, targetIdx) }
 
   local success, result = pcall(function()
-    return pipeline.runPipelineAsync(triggerId, man, contextSlice, { type = 'reroll', lazy = false }):await()
+    return pipeline.runPipelineAsync(triggerId, man, contextSlice, {
+      blockID = blockID,
+      chatIndex = targetJsIdx,
+      lazy = false,
+      type = 'reroll',
+    }):await()
   end)
 
   if not success or not result or result == '' then
@@ -395,18 +400,6 @@ end
 --- @field blockID string?
 --- @field immediate boolean
 --- @field preserve boolean
-
----@class MutationNode
----@field attributes table<string, string>
----@field content string
----@field raw string
-
----@class MutationContext
----@field blockID string?
----@field chatIndex number
----@field identifier string
----@field output string
----@field previousNode MutationNode?
 
 ---@param node Node?
 ---@param source string
@@ -493,16 +486,56 @@ Action: `%s`
 
 %s]], man.identifier, direction, modifiers.action, interactionGuideline.content)
 
+  -- Lua to JS index offset
+  local jsIndex = idx - 1
+
+  -- Pure modules in separated mode: nodes live in the LBDATA chat, not the target chat.
+  local lbdataJsIdx = lbdata.findLastLBDATAChat(fullChat)
+  local isSeparated = lbdataJsIdx ~= nil and lbdataJsIdx ~= jsIndex
+  local workContent = isSeparated and fullChat[lbdataJsIdx + 1].data or originalContent
+  local workJsIdx = isSeparated and lbdataJsIdx or jsIndex
+  local cleanedWorkContent, lazyPosition = lbdata.removeNode(workContent, 'lb-lazy', { id = identifier })
+
+  local previousNode = nil
+  local baseContent = cleanedWorkContent
+  local targetPosition = nil
+  local targetNode = nil
+
+  if modifiers.preserve then
+    local existingNodes = prelude.queryNodes(identifier, cleanedWorkContent)
+
+    if modifiers.blockID and #existingNodes > 0 then
+      for _, node in ipairs(existingNodes) do
+        if node.attributes.id == modifiers.blockID then
+          targetNode = node
+          break
+        end
+      end
+    elseif #existingNodes > 0 then
+      targetNode = existingNodes[#existingNodes]
+    end
+
+    if targetNode then
+      previousNode = createMutationNode(targetNode, cleanedWorkContent)
+    end
+  else
+    local removedNode
+    baseContent, targetPosition, _, removedNode = lbdata.removeNode(cleanedWorkContent, identifier,
+      modifiers.blockID and { id = modifiers.blockID } or nil)
+
+    previousNode = createMutationNode(removedNode, cleanedWorkContent)
+  end
+
   local contextSlice = { table.unpack(fullChat, 1, idx) }
   local success, result = pcall(function()
     return pipeline.runPipelineAsync(triggerId, man, contextSlice, {
+      blockID = modifiers.blockID,
+      chatIndex = workJsIdx,
+      extras = extraPrompt,
+      previousNode = previousNode,
       type = 'interaction',
-      extras = extraPrompt
     }):await()
   end)
-
-  -- Lua to JS index offset
-  local jsIndex = idx - 1
 
   if not success then
     setChat(triggerId, jsIndex, originalContent)
@@ -520,54 +553,27 @@ Action: `%s`
 
   if success and man.sideEffect then
     sideeffect.handleSideEffectResult(triggerId, {
-      man = man,
       action = 'interaction',
-      result = result,
-      identifier = identifier,
       blockID = modifiers.blockID,
+      identifier = identifier,
+      man = man,
       onError = function(msg)
         setChat(triggerId, jsIndex, originalContent)
         alertError(triggerId, msg)
       end,
+      result = result,
     })
     return
   end
 
-  -- Pure modules in separated mode: nodes live in the LBDATA chat, not the target chat.
-  local lbdataJsIdx = lbdata.findLastLBDATAChat(fullChat)
-  local isSeparated = lbdataJsIdx ~= nil and lbdataJsIdx ~= jsIndex
-  local workContent = isSeparated and fullChat[lbdataJsIdx + 1].data or originalContent
-  local workJsIdx = isSeparated and lbdataJsIdx or jsIndex
-  local cleanedWorkContent, lazyPosition = lbdata.removeNode(workContent, 'lb-lazy', { id = identifier })
-  local previousNode = nil
-
   if modifiers.preserve then
-    local existingNodes = prelude.queryNodes(identifier, cleanedWorkContent)
-    local targetNode = nil
-
-    if modifiers.blockID and #existingNodes > 0 then
-      for _, node in ipairs(existingNodes) do
-        if node.attributes.id == modifiers.blockID then
-          targetNode = node
-          break
-        end
-      end
-    elseif #existingNodes > 0 then
-      targetNode = existingNodes[#existingNodes]
-    end
-
     if targetNode then
-      previousNode = createMutationNode(targetNode, cleanedWorkContent)
       finalChat = cleanedWorkContent:sub(1, targetNode.rangeEnd) ..
           '\n' .. result .. cleanedWorkContent:sub(targetNode.rangeEnd + 1)
     else
       finalChat = insertResult(cleanedWorkContent, lazyPosition, result)
     end
   else
-    local baseContent, targetPosition, _, removedNode = lbdata.removeNode(cleanedWorkContent, identifier,
-      modifiers.blockID and { id = modifiers.blockID } or nil)
-
-    previousNode = createMutationNode(removedNode, cleanedWorkContent)
     finalChat = insertResult(baseContent, targetPosition or lazyPosition, result)
   end
 

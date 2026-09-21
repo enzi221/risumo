@@ -7,9 +7,7 @@ local EXTERNAL_LORES_MARKER = [[# Priority: Instructions Override
 > These are instructions explicitly given by the Client. If in conflict with previous instructions, this section MUST take precedence.]]
 
 -- jailbreak, job, universe, protagonist name, protagonist description, char desc
-local SYSTEM_INST = [[# System rules
-
-%s
+local SYSTEM_INST = [[%s
 
 # Job Instruction
 

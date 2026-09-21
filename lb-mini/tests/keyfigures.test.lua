@@ -103,6 +103,14 @@ describe('Miniboard key-figure state', function()
     })
     test.assertTrue(updated:find('keyFigures', 1, true) == nil, 'Mutation keeps key figures out of board output')
     test.assertEquals(variables['lb-mini.keyfigures'], mergedPreserved, 'Mutation preserves cached key figures')
+
+    operations = { {
+      op = 'replace',
+      path = '/posts/99/upvotes',
+      value = 2,
+    } }
+    test.assertTrue(not pcall(validate, 'test', patch, { previousNode = previousNode }),
+      'Invalid patch fails validation with previousNode')
   end)
 end)
 

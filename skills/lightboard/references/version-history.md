@@ -4,6 +4,10 @@
 
 - Added nested field groups to TOON tabular arrays and keyed tabular objects to `prelude.toon.encode()` and `prelude.toon.decode()`.
 
+## 4.5.2
+
+- Added validation context to `onValidate`, including type and the previous module node for interactions.
+
 ## 4.4.0
 
 - Added `prelude.getLoreBooks()` and single-level `<!-- lb:require:NAME -->` and `<!-- lb:require:all:NAME -->` expansion to both Prelude lorebook getters.

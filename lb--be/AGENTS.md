@@ -79,7 +79,7 @@ Optional callbacks loaded from lorebooks (`<id>.lb.<name>`): `onInput`, `onInstr
 2. Build the prompt via `prompts.make`.
 3. Send to LLM (primary or auxiliary based on mode).
 4. Strip markdown fences and internal process tags from the response.
-5. Run `onValidate` if provided. On validation failure, retry up to `maxRetries` times, appending the error as a correction prompt.
+5. Run `onValidate` if provided, passing `ValidationContext`. On validation failure, retry up to `maxRetries` times, appending the error as a correction prompt.
 6. Run `onOutput` post-processor if provided.
 
 ## Prompt Structure

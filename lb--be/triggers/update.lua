@@ -1,6 +1,6 @@
 local M = {}
 
-local CURRENT_VERSION = '4.5.0'
+local CURRENT_VERSION = '4.5.2'
 local CHECKED_KEY = 'lightboard.updateChecked'
 local VERSION_URL = 'https://raw.githubusercontent.com/enzi221/risumo/main/lb--be/version'
 

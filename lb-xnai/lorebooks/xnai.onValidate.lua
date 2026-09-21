@@ -219,7 +219,7 @@ local function validatePatch(errors, tid, patch, gen, comic)
   end
 end
 
-local function main(tid, output)
+local function main(tid, output, context)
   ---@type XNAIGen
   local gen = prelude.import(tid, 'lb-xnai.gen')
   local comicMode = getGlobalVar(tid, 'toggle_lb-xnai.scene.comic')
@@ -235,6 +235,65 @@ local function main(tid, output)
 
     local errors = {}
     validatePatch(errors, tid, patch, gen, comic)
+
+    if context and #errors == 0 then
+      local stackItem = nil
+      local xnaiState = getState(tid, 'lb-xnai-stack') or {}
+      if type(xnaiState) == 'table' then
+        if context.chatIndex then
+          for _, item in ipairs(xnaiState) do
+            if item.chatIndex == context.chatIndex then
+              stackItem = item
+              break
+            end
+          end
+        end
+        if not stackItem and #xnaiState > 0 then
+          stackItem = xnaiState[#xnaiState]
+        end
+      end
+
+      if stackItem and type(stackItem.data) == 'table' then
+        local sortedSlots = {}
+        for slotStr in pairs(stackItem.data.scenes or {}) do
+          table.insert(sortedSlots, tonumber(slotStr) or slotStr)
+        end
+        table.sort(sortedSlots, function(a, b)
+          return (tonumber(a) or 0) < (tonumber(b) or 0)
+        end)
+
+        local originalScenes = {}
+        for _, s in ipairs(sortedSlots) do
+          local sceneDesc = stackItem.data.scenes[tostring(s)]
+          if sceneDesc then
+            table.insert(originalScenes, sceneDesc)
+          end
+        end
+
+        local targetDocument = {
+          keyvis = stackItem.data.keyvis,
+          scenes = originalScenes,
+        }
+
+        local patchSuccess, patched = pcall(prelude.applyJSONPatch, targetDocument, patch)
+        if not patchSuccess then
+          table.insert(errors, 'Failed to apply JSON Patch: ' .. tostring(patched))
+        else
+          if type(patched.scenes) == 'table' then
+            for sceneIndex, scene in ipairs(patched.scenes) do
+              validateDescriptor(errors, scene, 'Patched scene ' .. (sceneIndex - 1), comic, true)
+            end
+            for _, slotError in ipairs(gen.validateSceneSlots(tid, patched.scenes)) do
+              table.insert(errors, slotError)
+            end
+          end
+          if patched.keyvis ~= nil then
+            validateDescriptor(errors, patched.keyvis, 'Patched keyvis', false, false)
+          end
+        end
+      end
+    end
+
     if #errors > 0 then
       verbose(tid, 'Patch validation failed. errors=' .. tostring(#errors))
       error('InvalidOutput: Malformed patch. Aggregated errors:\n\n' .. table.concat(errors, '\n'))

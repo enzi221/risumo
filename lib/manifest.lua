@@ -20,6 +20,13 @@
 --- @field output string
 --- @field previousNode MutationNode?
 
+--- @class ValidationContext
+--- @field blockID string?
+--- @field chatIndex number?
+--- @field identifier string
+--- @field previousNode MutationNode?
+--- @field type 'generation'|'interaction'|'reroll'
+
 --- @class Manifest
 --- @field authorsNote boolean
 --- @field charDesc boolean
@@ -41,4 +48,4 @@
 --- @field onInstructions (fun (triggerId: string, instructions: LightboardInstructions, meta: LightboardInstructionMeta): LightboardInstructions)?
 --- @field onOutput (fun (triggerId: string, output: string, fullChatContent: string?, chatIndex: number?): string)?
 --- @field onMutation (fun (triggerId: string, action: string, fullChat: string, mutation: MutationContext?): string)?
---- @field onValidate (fun (triggerId: string, output: string): boolean)?
+--- @field onValidate (fun (triggerId: string, output: string, validation: ValidationContext?): boolean)?

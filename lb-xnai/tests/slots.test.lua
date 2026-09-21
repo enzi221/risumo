@@ -196,6 +196,10 @@ describe('XNAI slot mapping', function()
     gen.setInputSlots('test', interactionText)
     patchResponse = { { op = 'replace', path = '/scenes/0', value = descriptor(47) } }
     test.assertTrue(pcall(onValidate, 'test', '<lb-xnai-patch>data</lb-xnai-patch>'), 'Existing interaction node remains eligible')
+    patchResponse = { { op = 'replace', path = '/scenes/99', value = descriptor(47) } }
+    test.assertTrue(not pcall(onValidate, 'test', '<lb-xnai-patch>data</lb-xnai-patch>', { chatIndex = 22 }),
+      'Invalid patch fails validation with context')
+    patchResponse = { { op = 'replace', path = '/scenes/0', value = descriptor(47) } }
     getChat = function()
       return { data = 'A\nB' }
     end

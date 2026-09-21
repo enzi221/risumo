@@ -256,6 +256,10 @@ describe('Messenger key-figure state', function()
     test.assertEquals(replacedKeyFigures[1].nickname, '귤셋', 'Replacement updates the nickname')
     test.assertEquals(replacedKeyFigures[1].note,
       '모두에게 짧게 보내고 친한 친구에게만 문장 끝을 생략함', 'Replacement updates the note')
+
+    operations = { { op = 'replace', path = '/messages/99/time', value = 'test' } }
+    test.assertTrue(not pcall(validate, 'test', patchOutput, { previousNode = runtime.extract(stored) }),
+      'Invalid patch fails validation with previousNode')
   end)
 end)
 

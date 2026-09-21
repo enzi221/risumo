@@ -10,7 +10,7 @@ Use common, objective, visualizable concepts. (No "Swordmaster outfit" or "Guild
 
 {{#when::toggle::lb-xnai.japanese}}Use Danbooru tag concepts, but render every tag in Japanese. Treat every English tag and phrase in this guideline as a semantic reference that requires Japanese translation in the output.{{:else}}Use Danbooru tags.{{/when}}
 
-{{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.characters}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.characters}} != null }}}}}}Limit substantially visible featured characters in each individual-image Scene and Key Visual to max {{getglobalvar::toggle_lb-xnai.characters}}. A character is substantially visible when the frame shows the face or a substantial upper- or lower-body region, even if the rest is cropped.{{#when::keep::lb-xnai.scene.comic::tisnot::0}} For a multi-panel Scene, apply this limit to distinct substantially visible featured characters across the complete Scene, not separately to each panel.{{/when}} Anonymous background figures do not count toward this limit. A featured character shown only as an isolated extremity or similarly small body fragment may exceed the limit and still needs a character entry and count tag, such as `boy, out of frame, fair skin, hand`.{{/when}}
+{{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.characters}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.characters}} != null }}}}}}Limit substantially visible featured characters in each individual-image Scene{{#when::keep::lb-xnai.kv.off::tisnot::1}} and Key Visual{{/}} to max {{getglobalvar::toggle_lb-xnai.characters}}. A character is substantially visible when the frame shows the face or a substantial upper- or lower-body region, even if the rest is cropped.{{#when::keep::lb-xnai.scene.comic::tisnot::0}} For a multi-panel Scene, apply this limit to distinct substantially visible featured characters across the complete Scene, not separately to each panel.{{/when}} Anonymous background figures do not count toward this limit. A featured character shown only as an isolated extremity or similarly small body fragment may exceed the limit and still needs a character entry and count tag, such as `boy, out of frame, fair skin, hand`.{{/when}}
 
 #### Tagging Principles
 
@@ -31,24 +31,23 @@ For a locked specification with unspecified completion, {{#when::lb-xnai.appeara
 Stage a specific visible action within its environment. Choose the camera position, framing, depth, foreground elements, and motivated lighting according to the focal information. Describe the visible result of each composition technique rather than naming the technique.
 
 - Choose the framing that best reveals the focal information, including the relevant expression, body region, action, interaction, or spatial context. Retain every participant and visual cue needed to understand the moment, but do not widen the framing merely to keep every participant fully visible. Crop or partially occlude a secondary participant when their identity and role remain legible.
-- For each individual-image Scene and Key Visual, establish at least two depth planes. When multiple featured characters share the image, use unequal camera distance, overlap, or foreground occlusion rather than environmental layers alone.
+- For each individual-image Scene{{#when::keep::lb-xnai.kv.off::tisnot::1}} and Key Visual{{/}}, establish at least two depth planes. When multiple featured characters share the image, use unequal camera distance, overlap, or foreground occlusion rather than environmental layers alone.
 - Place the focal action deliberately within the frame. Use asymmetry, foreground occlusion, leading lines, frame-within-frame elements, or negative space when those choices strengthen the scene.
 - Use prominent props and environmental boundaries to reveal where the action occurs, guide attention, constrain movement, separate characters, or connect characters.
 - Connect lighting to the physical scene. State the light source or direction in `scene`, and put each featured character's lighting relationship in that character's `description` when the relationship matters.
 - Keep the focal action and each featured character's identity legible while allowing controlled cropping, overlap, and occlusion. Give one subject or action clear primary visual weight and keep secondary details subordinate.
-- For each individual-image Scene and Key Visual, avoid equal-sized subjects aligned on the same camera-distance plane{{#when::lb-xnai.camera::tisnot::0}} and flat profile staging like side-by-side cowboy shots{{/when}}, an isolated centered character, empty space without a compositional role, and a generic backdrop that could be replaced without changing the scene.
+- For each individual-image Scene{{#when::keep::lb-xnai.kv.off::tisnot::1}} and Key Visual{{/}}, avoid equal-sized subjects aligned on the same camera-distance plane{{#when::lb-xnai.camera::tisnot::0}} and flat profile staging like side-by-side cowboy shots{{/when}}, an isolated centered character, empty space without a compositional role, and a generic backdrop that could be replaced without changing the scene.
 
 ### Camera
 
-{{#when::lb-xnai.scene.comic::tisnot::0}}For Key Visual, put exactly one Base Perspective and one Character Framing in `keyvis.camera`.{{:else}}Put exactly one Base Perspective and one Character Framing in every `camera`.{{/when}}
+{{#when::lb-xnai.scene.comic::tisnot::0}}{{#when::keep::lb-xnai.kv.off::tisnot::1}}For Key Visual, put exactly one Base Perspective and one Character Framing in `keyvis.camera`.{{/kv}}{{:else}}Put exactly one Base Perspective and one Character Framing in every `camera`.{{/when}}
 
 #### Base Perspective
 
 - from (above, from behind, from below, from side)
 - high up
-- sideways
-- straight-on
-- upside-down
+- straight-on{{#when::lb-xnai.kv.off::tisnot::1}}
+- sideways, upside-down (For Key Visual only){{/kv}}
 
 Use modifier sets supported by the depicted content and composition: `over-the-shoulder`; `foreshortening`; `depth of field` with `blurred background` or `blurred foreground`; `fisheye`; `dynamic angle`; `dutch angle`. {{#when::lb-xnai.camera::tis::0}}Add at most one set when viewpoint or geometry requires it.{{/when}}{{#when::lb-xnai.camera::tis::1}}Layer up to two compatible sets when viewpoint, depth, motion, or tension supports them.{{/when}}{{#when::lb-xnai.camera::tis::2}}Layer up to three compatible sets, favoring stronger combinations as motion or tension increases.{{/when}}
 
@@ -85,7 +84,7 @@ Put the exact featured character count in `cast` with strictly number + girl(s) 
 - 2girls
 - 1girl, 1boy
 
-And so on. Partially visible featured characters also contribute to the number.{{#when::keep::lb-xnai.scene.comic::tisnot::0}} For a multi-panel Scene, derive `scenes[].cast` from the union of featured character identities across every panel, counting a recurring character once. For Key Visual, `keyvis.cast` counts the featured characters visible in the image.{{/when}}{{#when::keep::lb-xnai.scene.comic::tis::0}} Each `scenes[].cast` and `keyvis.cast` counts the featured characters visible in that image.{{/when}}
+And so on. Partially visible featured characters also contribute to the number.{{#when::keep::lb-xnai.scene.comic::tisnot::0}} For a multi-panel Scene, derive `scenes[].cast` from the union of featured character identities across every panel, counting a recurring character once.{{#when::keep::lb-xnai.kv.off::tisnot::1}} For Key Visual, `keyvis.cast` counts the featured characters visible in the image.{{/kv}}{{/comic}}{{#when::keep::lb-xnai.scene.comic::tis::0}} Each `scenes[].cast`{{#when::keep::lb-xnai.kv.off::tisnot::1}} and `keyvis.cast`{{/kv}} counts the featured characters visible in that image.{{/scene}}
 
 Represent anonymous background population with separate visual environment tags such as `crowd`. Do not add those figures to `cast`.
 
@@ -181,7 +180,7 @@ The main promotional image of the log entry. Captures the overall theme or emoti
 Key Visual should be boldly produced like a magazine cover or album art. Be daring: unconventional framing and narrative devices are encouraged, even those that would never appear in a Scene.
 
 Make the Key Visual materially distinct from every Scene through composition, visual device, viewpoint, or environmental treatment while preserving source facts and character continuity.
-{{/when}}
+{{/}}
 
 ### Scene
 

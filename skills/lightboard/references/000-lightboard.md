@@ -478,11 +478,11 @@ return main
 
 This code gets the tag content, tries to parse it as JSON, and throws an `InvalidOutput` error if parsing fails.
 
-Use validation also to check field existence, types, and value formats.
+Use validation also to check field existence, types, and value formats. The optional third argument receives `ValidationContext` (`type`, `identifier`, `blockID`, `chatIndex`, and `previousNode` for interaction).
 
 ```lua
 -- my-module.lb.onValidate
-local function main(triggerId, output)
+local function main(triggerId, output, context)
   local node = prelude.queryNodes('identifier', output)
   if #node == 0 then
     error('InvalidOutput: Missing <identifier> node.')
