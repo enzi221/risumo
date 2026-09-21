@@ -1,6 +1,8 @@
 =♦️미니톡=group
 lb-minitalk.mode=모　　드=select=끄기,메인,보조
 lb-minitalk.lazy=발　　동=select=즉시,누르면
+lb-minitalk.jb=탈옥 (비망록)
+=모델 거부 완화. 무거움, 검열에 당한 게 아니라면 체크 해제=caption
 =———————📒주　제=divider
 lb-minitalk.preset=사전설정=select=기본(┗느낌),사이드스토리,혼잣말,혼잣말 다중인격
 lb-minitalk.mood=┗느　낌=text

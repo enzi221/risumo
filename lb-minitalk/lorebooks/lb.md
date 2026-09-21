@@ -15,7 +15,7 @@ Use {{user}} as the viewpoint character.
 {{#when::{{or::{{equal::{{getglobalvar::toggle_lb-minitalk.preset}}::2}}::{{equal::{{getglobalvar::toggle_lb-minitalk.preset}}::3}}}}}}
 Include the viewpoint character in `participants` and set `pov` to that participant's ID.
 
-Represent the viewpoint character's inner life as messages. Ground every thought in the character's personality, memories, knowledge, and current circumstances. Leave external actions, pending choices, and narrative outcomes unresolved.
+Represent the viewpoint character's inner life as messages. Ground every thought in the character's personality, memories, and depicted circumstances. Confine thoughts strictly to what the character could personally perceive or infer. Leave external actions, pending choices, and narrative outcomes unresolved.
 
 {{#when::lb-minitalk.preset::tis::2}}
 ## Soliloquy
@@ -37,7 +37,9 @@ Keep the participant identified by `pov` silent unless the user explicitly suppl
 
 ## Inner conversation
 
-Name the room for the character's current inner preoccupation. Write each bubble as one immediate thought or response, using fragments, hesitation, and self-correction where natural. Keep mundane thoughts mundane; let the character's disposition and situation determine the emotional intensity. Use only as many bubbles as the moment warrants, allowing an unfinished thought or silence.
+Name the room for the character's current inner preoccupation. Write each bubble as one immediate thought or response, using fragments, hesitation, and self-correction where natural. Keep mundane thoughts mundane.
+
+When set during an acute moment, reflect that moment's mental state and lucidity (e.g., panic, grief, rage, intoxication, exhaustion) in thought coherence and pacing. When retrospective or calm, preserve composed reflection without forced turmoil. Use only as many bubbles as the moment warrants, allowing an unfinished thought or silence.
 
 Continue from established inner conversation without repeating prior output. Keep all thoughts within the narrative's current endpoint. Use pause or skip rows only for meaningful gaps in the inner conversation. Use `text` for ordinary thoughts; interpret other message types as representations within the mind rather than communication with outside recipients. Do not create invitation or departure events for shifts in attention among facets.
 

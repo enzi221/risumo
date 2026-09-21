@@ -19,6 +19,16 @@
     },
     {
       "alwaysActive": false,
+      "comment": "lb-minitalk.lb.job",
+      "file": "lorebooks/lb.job.md"
+    },
+    {
+      "alwaysActive": false,
+      "comment": "lb-minitalk.lb.jailbreak",
+      "file": "lorebooks/lb.jailbreak.md"
+    },
+    {
+      "alwaysActive": false,
       "comment": "lb-minitalk.lb.onInput",
       "file": "lorebooks/lb-minitalk.onInput.lua"
     },
@@ -66,6 +76,16 @@
       "alwaysActive": false,
       "comment": "lb-minitalk.lb.thoughts-interaction",
       "file": "lorebooks/lb.thoughts-interaction.md"
+    },
+    {
+      "alwaysActive": false,
+      "comment": "lb-minitalk.lb.prefill",
+      "file": "lorebooks/lb.prefill.md"
+    },
+    {
+      "alwaysActive": false,
+      "comment": "lb-minitalk.lb.prefill-user",
+      "file": "lorebooks/lb.prefill-user.md"
     },
     {
       "alwaysActive": true,
