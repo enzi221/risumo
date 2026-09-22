@@ -20,5 +20,5 @@ lb-minitalk.theme=테　　마=select=♦️,💎,✨,🌳
 =———————⚙️시스템=divider
 lb-minitalk.thoughts=생각보조=select=적고 제거,생각만,안하기
 lb-minitalk.context=컨　　텍=select=포함,제거
-=라이트보드 미니톡 4.5.2=caption
+=라이트보드 미니톡 4.5.3=caption
 ==groupEnd
