@@ -312,10 +312,10 @@ local function main(tid, output, fullChatContent, index)
   local forcedInsertion = getGlobalVar(tid, 'toggle_lb-xnai.forcedinsertion') == '1'
   verbose(tid, 'Processing output. chatIndex=' .. tostring(index) .. ', forcedInsertion=' .. tostring(forcedInsertion))
 
-  output = output:gsub('wfsn', 'nsfw')
   if forcedInsertion then
     output = output:gsub('%%', '')
   end
+  output = output:gsub('wfsn', 'nsfw')
 
   local patchNodes = prelude.queryNodes('lb-xnai-patch', output)
   if #patchNodes > 0 then
