@@ -561,6 +561,7 @@ Action: `%s`
         setChat(triggerId, jsIndex, originalContent)
         alertError(triggerId, msg)
       end,
+      previousNode = previousNode,
       result = result,
     })
     return

@@ -5,7 +5,7 @@ flag: gms
 type: editdisplay
 ---
 IN:
-(?:<lb-lazy id="lb-xnai"\s*\/>)|(?:<lb-lazy id="lb-xnai"\s*>(.\*?)<\/lb-lazy>)\n?
+(?:<lb-lazy id="lb-xnai"\s*\/>)|(?:<lb-lazy id="lb-xnai"\s*>(.*?)<\/lb-lazy>)\n?
 OUT:
 {{#when::{{chat_index}}::>=::{{lastmessageid}}}}
 <div class="lb-module-opener-root" data-id="lb-xnai">

@@ -117,10 +117,6 @@ local function validateNode(errors, tid, node, label, gen, comic)
   --- @type XNAIResponse
   local response = content
 
-  if response.interaction ~= nil and response.interaction ~= true then
-    table.insert(errors, label .. ' interaction marker must be true when present.')
-  end
-
   if response.scenes ~= nil and type(response.scenes) ~= 'table' then
     table.insert(errors, label .. ' scenes is not a valid array. Parsed type: ' .. type(response.scenes))
   else
@@ -134,15 +130,6 @@ local function validateNode(errors, tid, node, label, gen, comic)
 
   if response.keyvis ~= nil then
     validateDescriptor(errors, response.keyvis, label .. ', keyvis', false, false)
-  end
-
-  if response.interaction == true then
-    if type(response.scenes) ~= 'table' or #response.scenes ~= 1 then
-      table.insert(errors, label .. ' interaction must contain exactly one Scene.')
-    end
-    if response.keyvis ~= nil then
-      table.insert(errors, label .. ' interaction cannot contain a Key Visual.')
-    end
   end
 end
 
@@ -300,6 +287,10 @@ local function main(tid, output, context)
     end
     verbose(tid, 'Patch validation completed.')
     return
+  end
+
+  if context and context.type == 'interaction' then
+    error('InvalidOutput: Interaction requires a JSON Patch array wrapped in <lb-xnai-patch>, not a complete <lb-xnai> block.')
   end
 
   local nodes = prelude.queryNodes('lb-xnai', output)

@@ -6,7 +6,7 @@ type: editdisplay
 ---
 
 IN:
-(?:<lb-lazy id="lb-minitalk"\s*\/>)|(?:<lb-lazy id="lb-minitalk"\s*>(.\*?)<\/lb-lazy>)\n?
+(?:<lb-lazy id="lb-minitalk"\s*\/>)|(?:<lb-lazy id="lb-minitalk"\s*>(.*?)<\/lb-lazy>)\n?
 OUT:
 {{#if {{greater_equal::{{chat_index}}::{{? {{lastmessageid}} - 3}}}}}}
 

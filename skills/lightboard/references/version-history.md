@@ -4,6 +4,10 @@
 
 - Added nested field groups to TOON tabular arrays and keyed tabular objects to `prelude.toon.encode()` and `prelude.toon.decode()`.
 
+## 4.5.4
+
+- Added callback context to `onOutput`, matching `onValidate`. Pure modules receive it as the third argument, side-effect modules as the fifth.
+
 ## 4.5.2
 
 - Added validation context to `onValidate`, including type and the previous module node for interactions.

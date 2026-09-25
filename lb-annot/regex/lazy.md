@@ -5,7 +5,7 @@ flag: gs
 type: editdisplay
 ---
 IN:
-(?:<lb-lazy id="lb-annot"\s*\/>)|(?:<lb-lazy id="lb-annot"\s*>(.\*?)<\/lb-lazy>)\n?
+(?:<lb-lazy id="lb-annot"\s*\/>)|(?:<lb-lazy id="lb-annot"\s*>(.*?)<\/lb-lazy>)\n?
 OUT:
 {{#if {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}}}}}}}
 
@@ -16,5 +16,4 @@ OUT:
 </span>
 </button>
 </div>
-
 {{/if}}

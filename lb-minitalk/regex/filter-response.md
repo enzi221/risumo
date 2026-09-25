@@ -6,5 +6,5 @@ type: editoutput
 ---
 
 IN:
-<lb-minitalk(?:\s+[^>]_)?>(?:[\s\S]_?)<\/lb-minitalk>\n?
+<lb-minitalk(?:\s+[^>]*)?>(?:[\s\S]*?)<\/lb-minitalk>\n?
 OUT:

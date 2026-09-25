@@ -94,7 +94,7 @@
       "insertOrder": 4567
     }
   ],
-  "name": "🔦라이트보드 ♦️미니톡 4.5.3",
+  "name": "🔦라이트보드 ♦️미니톡 4.5.4",
   "namespace": "lb-minitalk",
   "regex": [
     "regex/display-timer-icon.md",
@@ -111,5 +111,5 @@
       "type": "start"
     }
   ],
-  "version": "4.5.3"
+  "version": "4.5.4"
 }

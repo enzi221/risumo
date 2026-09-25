@@ -75,6 +75,15 @@ function M.runPipeline(triggerId, man, fullChat, options)
   local prom = promptResult
   prelude.verbose(triggerId, man.identifier, 'Prompt created.')
 
+  --- @type CallbackContext
+  local callbackContext = {
+    blockID = options.blockID,
+    chatIndex = options.chatIndex,
+    identifier = man.identifier,
+    previousNode = options.previousNode,
+    type = modeType,
+  }
+
   local maxRetries = tonumber(getGlobalVar(triggerId, C.CONFIG.MAX_RETRIES)) or 0
   local retryMode = getGlobalVar(triggerId, C.CONFIG.RETRY_MODE) or '0'
 
@@ -148,14 +157,7 @@ Carefully think, then if it is OK, output the required node without any changes.
       valid = false
       validationError = 'You did not return any output.'
     elseif man.onValidate and processResult then
-      local validationContext = {
-        blockID = options.blockID,
-        chatIndex = options.chatIndex,
-        identifier = man.identifier,
-        previousNode = options.previousNode,
-        type = modeType,
-      }
-      local success, err = pcall(man.onValidate, triggerId, processResult, validationContext)
+      local success, err = pcall(man.onValidate, triggerId, processResult, callbackContext)
       if not success then
         local cleanErr = tostring(err):gsub("^.-:%d+: ", "")
         if cleanErr:find("^" .. VALIDATION_ERROR_PREFIX) then
@@ -178,7 +180,7 @@ Carefully think, then if it is OK, output the required node without any changes.
       end
 
       if man.onOutput and processResult and not man.sideEffect then
-        local success, modifiedOutput = pcall(man.onOutput, triggerId, processResult)
+        local success, modifiedOutput = pcall(man.onOutput, triggerId, processResult, callbackContext)
         if success and modifiedOutput and modifiedOutput ~= '' then
           processResult = modifiedOutput
         else

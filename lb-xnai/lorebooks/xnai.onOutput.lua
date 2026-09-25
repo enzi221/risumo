@@ -308,7 +308,8 @@ end
 ---@param output string
 ---@param fullChatContent string
 ---@param index number
-local function main(tid, output, fullChatContent, index)
+---@param context CallbackContext?
+local function main(tid, output, fullChatContent, index, context)
   local forcedInsertion = getGlobalVar(tid, 'toggle_lb-xnai.forcedinsertion') == '1'
   verbose(tid, 'Processing output. chatIndex=' .. tostring(index) .. ', forcedInsertion=' .. tostring(forcedInsertion))
 
@@ -317,11 +318,16 @@ local function main(tid, output, fullChatContent, index)
   end
   output = output:gsub('wfsn', 'nsfw')
 
+  ---@type XNAIGen
+  local gen = prelude.import(tid, 'lb-xnai.gen')
+
   local patchNodes = prelude.queryNodes('lb-xnai-patch', output)
   if #patchNodes > 0 then
-    ---@type XNAIGen
-    local gen = prelude.import(tid, 'lb-xnai.gen')
     return applyPatchInteraction(tid, patchNodes[#patchNodes], fullChatContent, index, gen)
+  end
+
+  if context and context.type == 'interaction' then
+    error('모델이 전체 응답 재생성을 시도해 거부했습니다. 다시 시도해 주세요.')
   end
 
   if not string.find(output, '<lb%-xnai') then
@@ -334,9 +340,6 @@ local function main(tid, output, fullChatContent, index)
 
   local nodes = prelude.queryNodes('lb-xnai', output)
   verbose(tid, 'Output nodes found. count=' .. tostring(#nodes))
-
-  ---@type XNAIGen
-  local gen = prelude.import(tid, 'lb-xnai.gen')
 
   local node = nodes[#nodes]
   local cleanedContent = gen.cleanDescriptionBlocks(node.content)

@@ -36,7 +36,6 @@ end
 ---@field slot? number
 
 ---@class XNAIResponse
----@field interaction? boolean
 ---@field keyvis? XNAIDescriptor
 ---@field scenes? XNAIDescriptor[]
 

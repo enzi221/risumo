@@ -20,7 +20,7 @@
 --- @field output string
 --- @field previousNode MutationNode?
 
---- @class ValidationContext
+--- @class CallbackContext
 --- @field blockID string?
 --- @field chatIndex number?
 --- @field identifier string
@@ -46,6 +46,6 @@
 --- @field thoughts '0'|'1'|'2' write down, in reasoning, none
 --- @field onInput (fun (triggerId: string, input: string, index: number): string)?
 --- @field onInstructions (fun (triggerId: string, instructions: LightboardInstructions, meta: LightboardInstructionMeta): LightboardInstructions)?
---- @field onOutput (fun (triggerId: string, output: string, fullChatContent: string?, chatIndex: number?): string)?
+--- @field onOutput (fun (triggerId: string, output: string, fullChatContentOrContext: string|CallbackContext|nil, chatIndex: number?, context: CallbackContext?): string)?
 --- @field onMutation (fun (triggerId: string, action: string, fullChat: string, mutation: MutationContext?): string)?
---- @field onValidate (fun (triggerId: string, output: string, validation: ValidationContext?): boolean)?
+--- @field onValidate (fun (triggerId: string, output: string, context: CallbackContext?): boolean)?

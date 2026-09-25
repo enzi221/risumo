@@ -135,7 +135,7 @@
     }
   ],
   "lowLevelAccess": true,
-  "name": "🔦라이트보드 🌠 삽화 4.5.3",
+  "name": "🔦라이트보드 🌠 삽화 4.5.4",
   "namespace": "lb-xnai",
   "regex": [
     "regex/lazy.md",
@@ -157,5 +157,5 @@
       "type": "start"
     }
   ],
-  "version": "4.5.3"
+  "version": "4.5.4"
 }

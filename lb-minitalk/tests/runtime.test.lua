@@ -99,7 +99,7 @@ describe('Messenger validation', function()
       '[con:wave]', 'Text may contain literal MiniCon syntax')
 
     local multiline = fixture:gsub('찾으면 말해줘', '찾으면\\u000A말해줘')
-    test.assertTrue(output('test', multiline:gsub('\\u000A', '\\n')):find('\\u000A', 1, true),
+    test.assertTrue(output('test', (multiline:gsub('\\u000A', '\\n'))):find('\\u000A', 1, true),
       'Stored newline normalized')
     validate('test', normalized)
     decoded = runtime.decode('test', content, true)

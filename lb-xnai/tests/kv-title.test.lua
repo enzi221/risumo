@@ -41,7 +41,7 @@ describe('Key visual title prompt', function()
     })
     test.assertEquals(
       prompts.positive,
-      'solo, night sky, 1.2::A title text "Envy" is written in the very center of the image:: 0.75::like a movie or a book title. ::',
+      'solo, night sky, 1.2::A title text of "Envy" is written in the very center of the image:: 0.75::like a movie title or a book title. ::',
       'Keyvis gets title prompt with character name from getName()'
     )
     getName = nil

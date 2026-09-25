@@ -310,7 +310,9 @@ If the callback throws an error beginning with `InvalidOutput: `, the backend tr
 
 This section applies to `sideEffect: false` modules.
 
-Receives `(triggerId, Lightboard response text)`. Return the modified response text.
+Receives `(triggerId, Lightboard response text, context)`. Return the modified response text.
+
+`context` is `CallbackContext` (`type`, `identifier`, `blockID`, `chatIndex`, and `previousNode` for interaction). Treat a missing `context` as `generation`.
 
 Return a non-empty string. Returning `nil` or an empty string fails output processing. During automatic generation, the backend reports the error and emits an `<lb-lazy>` placeholder. During rerolls and interactions, the backend restores the original chat and reports the error.
 
@@ -320,7 +322,7 @@ Use this callback to remove unnecessary text, parse and save response data, or e
 
 This section applies to `sideEffect: true` modules.
 
-Receives `(triggerId, Lightboard response text, full target chat text, target chat index)`. Return `(edited full target chat text, a string to append to the LBDATA block)`:
+Receives `(triggerId, Lightboard response text, full target chat text, target chat index, context)`. `context` is the same `CallbackContext` as in pure modules. Return `(edited full target chat text, a string to append to the LBDATA block)`:
 
 Return a non-empty edited chat text as the first value. Returning `nil` or an empty string as the first value fails output processing. The second LBDATA value is optional and may be `nil` or an empty string.
 
@@ -478,7 +480,7 @@ return main
 
 This code gets the tag content, tries to parse it as JSON, and throws an `InvalidOutput` error if parsing fails.
 
-Use validation also to check field existence, types, and value formats. The optional third argument receives `ValidationContext` (`type`, `identifier`, `blockID`, `chatIndex`, and `previousNode` for interaction).
+Use validation also to check field existence, types, and value formats. The optional third argument receives `CallbackContext` (`type`, `identifier`, `blockID`, `chatIndex`, and `previousNode` for interaction).
 
 ```lua
 -- my-module.lb.onValidate

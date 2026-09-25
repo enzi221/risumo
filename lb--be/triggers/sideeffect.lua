@@ -19,8 +19,9 @@ end
 --- @param pipelineResult string
 --- @param chatContent string
 --- @param chatIndex number
+--- @param context CallbackContext
 --- @return string modifiedChatContent, string? lbdataContent
-local function runSideEffectOnOutput(triggerId, man, pipelineResult, chatContent, chatIndex)
+local function runSideEffectOnOutput(triggerId, man, pipelineResult, chatContent, chatIndex, context)
   if not man.onOutput then
     print('[Lightboard Backend] Warning: sideEffect manifest ' .. man.identifier .. ' has no onOutput callback')
     return chatContent, nil
@@ -31,7 +32,8 @@ local function runSideEffectOnOutput(triggerId, man, pipelineResult, chatContent
     triggerId,
     pipelineResult,
     chatContent,
-    chatIndex)
+    chatIndex,
+    context)
   if success and modifiedOutput and prelude.trim(modifiedOutput) ~= '' then
     prelude.verbose(triggerId, man.identifier,
       'SideEffect callback returned. modifiedLength=' .. tostring(#modifiedOutput) ..
@@ -50,6 +52,7 @@ end
 --- @field identifier string
 --- @field blockID string?
 --- @field onError fun(msg: string)
+--- @field previousNode MutationNode?
 
 --- Handles sideEffect result processing (shared between reroll and interact).
 --- @param triggerId string
@@ -88,7 +91,14 @@ function M.handleSideEffectResult(triggerId, params)
     params.man,
     params.result,
     cleanedContent,
-    targetIdx)
+    targetIdx,
+    {
+      blockID = params.blockID,
+      chatIndex = targetIdx,
+      identifier = params.identifier,
+      previousNode = params.previousNode,
+      type = params.action,
+    })
 
   if not onOutputSuccess or not modifiedContent then
     params.onError('[Lightboard] sideEffect 출력 처리 실패 (' .. params.identifier .. ').\n' .. tostring(modifiedContent))
@@ -211,7 +221,12 @@ function M.applySideEffects(triggerId, params)
           man,
           pipelineResult,
           currentChatContent,
-          targetIdx)
+          targetIdx,
+          {
+            chatIndex = targetIdx,
+            identifier = man.identifier,
+            type = 'generation',
+          })
         if success and result then
           currentChatContent = result
           prelude.verbose(triggerId, man.identifier, 'SideEffect callback applied to batch.')
