@@ -394,7 +394,14 @@ local function makePrompt(triggerId, man, fullChat, type, extras, chatOffset)
     end
   end
 
-  return prompt
+  local filtered = {}
+  for _, p in ipairs(prompt) do
+    if prelude.trim(p.content) ~= '' then
+      table.insert(filtered, p)
+    end
+  end
+
+  return filtered
 end
 
 return {
