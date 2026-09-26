@@ -258,6 +258,6 @@ Each leading `⇥` represents one TOON indentation level of exactly two spaces. 
 
 Optional fields must be OMITTED, not left with a empty line.
 
-{{#when::toggle::lb-xnai.scene.quantityexact}}Required{{:else}}Requested{{/when}} Scene count: {{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.scene.quantity}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.scene.quantity}} != null }}}}}}"{{trim::{{getglobalvar::toggle_lb-xnai.scene.quantity}} }}"{{:else}}1-5{{/when}}.
+{{#when::toggle::lb-xnai.scene.quantityexact}}Required{{:else}}Requested{{/when}} Scene count: {{#when::keep::{{and::{{? {{length::{{trim::{{getglobalvar::toggle_lb-xnai.scene.quantity}} }} }} > 0 }}::{{? {{getglobalvar::toggle_lb-xnai.scene.quantity}} != null }}}}}}"{{trim::{{getglobalvar::toggle_lb-xnai.scene.quantity}} }}"{{:else}}1-5{{/when}}.{{#when::keep::toggle::lb-xnai.scene.quantityexact}} Produce exactly this many Scenes. When fewer eligible slots exist, use every eligible slot.{{/when}}
 
 {{#when::toggle::lb-xnai.japanese}}Write every generated text value in Japanese, including all camera, cast, positive, negative, name, description, and scene values. Translate canonical tag spellings into concise Japanese visual terms. Keep the `<lb-xnai>` markup, TOON field keys, numeric values, Boolean values, and tag-weight syntax unchanged.{{:else}}Write every generated text value in English.{{/when}}

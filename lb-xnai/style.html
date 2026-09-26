@@ -445,23 +445,17 @@
 
   @layer lb-xnai-all {
     /* 1. Hide menus during generation */
-    .chattext:has(:is(.x-risu-lb-xnai-all-state, .x-risu-lb-xnai-img-state, .x-risu-lb-xnai-placeholder-state):checked) .x-risu-lb-xnai-menu {
+    .chattext:has(.x-risu-lb-xnai-all-state:checked) .x-risu-lb-xnai-menu {
       display: none !important;
     }
 
-    /* 2. Block all other operations in message while any generation is running */
-    .chattext:has(:is(.x-risu-lb-xnai-all-state, .x-risu-lb-xnai-img-state, .x-risu-lb-xnai-placeholder-state):checked) :is(.x-risu-lb-xnai-inlay-actions, .x-risu-lb-xnai-kv-actions) {
+    /* 2. Block all other operations in message during whole generation */
+    .chattext:has(.x-risu-lb-xnai-all-state:checked) :is(.x-risu-lb-xnai-inlay-actions, .x-risu-lb-xnai-kv-actions) {
       display: none !important;
     }
 
-    .chattext:has(:is(.x-risu-lb-xnai-all-state, .x-risu-lb-xnai-img-state, .x-risu-lb-xnai-placeholder-state):checked) :is(.x-risu-lb-xnai-inlay > button, .x-risu-lb-xnai-kv) {
+    .chattext:has(.x-risu-lb-xnai-all-state:checked) :is(.x-risu-lb-xnai-inlay > button, .x-risu-lb-xnai-kv) {
       cursor: wait !important;
-      pointer-events: none !important;
-    }
-
-    .chattext:has(:is(.x-risu-lb-xnai-all-state, .x-risu-lb-xnai-img-state, .x-risu-lb-xnai-placeholder-state):checked) .x-risu-lb-xnai-placeholder:not(:has(:checked)) {
-      cursor: wait !important;
-      opacity: 0.4 !important;
       pointer-events: none !important;
     }
 

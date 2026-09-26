@@ -29,4 +29,4 @@ The following template is your internal guide. Reason through it thoroughly, eve
      - Derive the Scene-wide `cast` from the union of featured character identities across all panels. Count a recurring character once.{{/when}}{{#when::keep::lb-xnai.kv.off::tis::0}}
 7. Key Visual: `[Theme, Framing, Visible Body Span, List of Cropped-Out Attire]`{{/when}}
 
-Lastly, verify the steps. Fix invalid items.
+Lastly, verify the steps. Fix invalid items.{{#when::keep::toggle::lb-xnai.scene.quantityexact}} Confirm that #6 has exactly the Selected Count of Scenes, or one Scene per eligible slot from #5 when fewer eligible slots exist.{{/when}}
