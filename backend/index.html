@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>라이트보드 백엔드</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
+    <link rel="stylesheet" crossorigin href="/risumo/assets/common-DfliSgH7.css">
+    <link rel="stylesheet" crossorigin href="/risumo/assets/doc-XkTAzv8s.css">
+  </head>
+  <body>
+    <header>
+      <a class="brand" href="../">라이트보드 V<span class="plus">＋</span></a>
+    </header>
+    <section class="hero">
+      <img alt="" src="/risumo/assets/boen-CxjcdLOh.png" />
+      <div class="hero-text">
+        <h1>라이트보드 백엔드</h1>
+      </div>
+    </section>
+    <article>
+      <section class="block">
+        <h2>소개</h2>
+        <div class="body">
+          <p class="lead">라이트보드 백엔드는 모든 라이트보드 모듈에 필요한 필수 모듈이에요</p>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2>다운로드</h2>
+        <div class="body">
+          <a class="download" href="https://drive.proton.me/urls/2JHZPG4EF0#JEZWkA3BCW1h"
+            >통합 다운로드<span class="plus">＋</span></a
+          >
+        </div>
+      </section>
+
+      <section class="block">
+        <h2>모듈 만들기</h2>
+        <div class="body">
+          <p class="lead">보조 모델 호출에 필요한 다양한 기능을 대신 처리해줘요. 에이전트에게 의뢰하세요.</p>
+          <ul class="links">
+            <li>
+              <a href="https://arca.live/b/characterai/181427398">라이트보드 스킬<span class="plus">＋</span></a>
+            </li>
+          </ul>
+          <pre class="command">
+npx skills add https://codeberg.org/amonamona/risumo/src/branch/main/skills/lightboard</pre>
+        </div>
+      </section>
+    </article>
+    <main>
+      <div class="sheet">
+        <section class="block toggles">
+          <div class="head">
+            <h2>토글</h2>
+            <p>권장 토글은 <a href="../guide/">처음사용자용 가이드</a> 참고</p>
+          </div>
+          <div class="groups">
+            <dl>
+              <div>
+                <dt>전원</dt>
+                <dd class="value">체크</dd>
+                <dd>일괄 켜기/끄기</dd>
+              </div>
+              <div>
+                <dt>언어 명시</dt>
+                <dd class="value">원하는 언어</dd>
+                <dd>채팅 언어와 별개로 프론트엔드 출력 언어 지정</dd>
+              </div>
+            </dl>
+            <h3>요청</h3>
+            <dl>
+              <div>
+                <dt>라우팅 식별자</dt>
+                <dd>지원하는 프로바이더 플러그인에서 모듈별 요청 분리 가능</dd>
+              </div>
+              <div>
+                <dt>응답 스트리밍</dt>
+                <dd>524 오류가 발생할 때 도움이 될 수 있음</dd>
+              </div>
+              <div>
+                <dt>최대 컨텍</dt>
+                <dd class="value">20000</dd>
+                <dd>
+                  보조 모델에 보낼 최대 토큰 수. 높일수록 기억력 향상, 비용 증가. 커뮤니티 모듈 사용 시 높게 설정. 최소
+                  8,000, 기본 8,000, 최대 리스 설정
+                </dd>
+              </div>
+              <div>
+                <dt>포함채팅수</dt>
+                <dd class="value">10</dd>
+                <dd>
+                  보조 모델에 보낼 최대 채팅 메시지 수. 높일수록 기억력 향상, 비용 증가. 커뮤니티 모듈 사용 시 높게
+                  설정. 최소 1, 기본 4
+                </dd>
+              </div>
+              <div>
+                <dt>유저메시지</dt>
+                <dd class="value">포함</dd>
+                <dd>유저 메시지 전달 여부. 유저 내용을 전부 포함하는 완전 사칭 프롬프트라면 제외해도 무방</dd>
+              </div>
+              <div>
+                <dt>동시요청수</dt>
+                <dd class="value">1</dd>
+                <dd>
+                  즉시 발동 프론트엔드의 병렬 요청 수. "누르면" 발동 설정된 모듈에는 영향 없음. 최소 1, 기본 1, 최대 5
+                </dd>
+              </div>
+            </dl>
+            <h3>호환</h3>
+            <dl>
+              <div>
+                <dt>XML 태그 보존</dt>
+                <dd>이상징후가 있을 때만 활성화. 로어북을 못 읽는 것 같거나, 삽화가 본문 사이에 들어가질 않는 등</dd>
+              </div>
+              <div>
+                <dt>출력 위치</dt>
+                <dd class="value">아래</dd>
+                <dd>
+                  호환용 설정. 한국어 외 언어로 출력 후 번역 시 "분리"로 설정하면 번역 보존 가능. 번역 또는 봇과 충돌 시
+                  분리 권장
+                </dd>
+              </div>
+            </dl>
+            <h3>자동수정</h3>
+            <dl>
+              <div>
+                <dt>최대 시도</dt>
+                <dd class="value">1</dd>
+                <dd>데이터 오류 자동 수정 최대 횟수. 데이터 오류가 줄어들지만 보조 모델 비용 발생 가능</dd>
+              </div>
+              <div>
+                <dt>시도 모델</dt>
+                <dd class="value">보조 강제</dd>
+                <dd>데이터 오류 자동 수정에 쓸 모델</dd>
+              </div>
+            </dl>
+            <h3>고급</h3>
+            <dl>
+              <div>
+                <dt>업데이트 알림 끄기</dt>
+              </div>
+              <div>
+                <dt>로그 수준</dt>
+                <dd>브라우저 콘솔 로그</dd>
+              </div>
+            </dl>
+          </div>
+        </section>
+      </div>
+    </main>
+    <footer>
+      <h2>ATTRIBUTION / LICENSE</h2>
+      <div class="body">
+        <p>
+          헌터넷 프롬프트와 CSS를 제외한 전체를
+          <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>로 배포<br />헌터넷 프롬프트와
+          CSS는 <a href="https://arca.live/b/characterai/133962148">얼터네이트 헌터즈 V1</a> 기반
+        </p>
+        <p>
+          출처: <a href="https://arca.live/b/characterai/137652449">Comfy·NAI</a> ·
+          <a href="https://arca.live/b/characterai/136708153">웹소설 댓글창</a> ·
+          <a href="https://arca.live/b/characterai/138858363">카카오톡</a> ·
+          <a href="https://arca.live/b/characterai/132830594">허니팟</a> ·
+          <a href="https://arca.live/b/characterai/133174930">디시갤러리</a>
+        </p>
+        <p>
+          기본 탈옥 문구는 동일 라이선스 하에 🥤마나젬에서 발췌<br />일부 모듈의 탈옥 문구는 동일 라이선스 하에
+          ✒️🅰️1️⃣🅾️올인원 프롬프트에서 발췌
+        </p>
+        <h3>삽화</h3>
+        <p>
+          다음 글 또는 댓글의 내용이 일부 반영됨:
+          <a href="https://arca.live/b/characterai/181748881">1</a>
+          <a href="https://arca.live/b/characterai/181637302">2</a>
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

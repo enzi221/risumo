@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>라이트보드 삽화</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+    <link rel="stylesheet" crossorigin href="/risumo/assets/common-DfliSgH7.css">
+    <link rel="stylesheet" crossorigin href="/risumo/assets/doc-XkTAzv8s.css">
+  </head>
+  <body style="--glow: #edba28; --hero: #edba28; --hero-ink: #15171d; --tint: #7d5f00">
+    <header>
+      <a class="brand" href="../">라이트보드 V<span class="plus">＋</span></a>
+    </header>
+    <section class="hero">
+      <img alt="" src="/risumo/assets/bohwa-4mk7Rvtt.png" />
+      <div class="hero-text">
+        <h1>라이트보드 삽화</h1>
+      </div>
+    </section>
+    <article>
+      <section class="block">
+        <h2>소개</h2>
+        <div class="body">
+          <p class="lead">본문 사이사이에 AI 일러스트를 그려 넣을 수 있어요</p>
+          <div class="addon">
+            <h3>키 비주얼</h3>
+            <p>채팅 상/하단에 배치되는 메인 이미지</p>
+            <figure class="shot">
+              <img alt="" src="/risumo/assets/keyvis-Bf6KrYpu.png" />
+            </figure>
+          </div>
+          <div class="addon">
+            <h3>씬</h3>
+            <p>본문 사이사이에 삽입되는 장면들</p>
+            <figure class="shot">
+              <img alt="" src="/risumo/assets/scene-BYFnaKwh.png" width="413" />
+            </figure>
+          </div>
+          <p class="note"><a href="../guide/">라이트보드 백엔드 설정</a>을 먼저 진행하세요</p>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2>다운로드</h2>
+        <div class="body">
+          <a class="download" href="https://drive.proton.me/urls/2JHZPG4EF0#JEZWkA3BCW1h">통합 다운로드<span class="plus">＋</span></a>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2>가이드</h2>
+        <div class="body">
+          <div class="addon">
+            <h3>권장 모델</h3>
+            <p>Gemini 3.8 Flash, Gemini 4 Argon, GLM 5.3, DeepSeek V4.1 Flash</p>
+          </div>
+          <div class="addon">
+            <h3>NAI 설정</h3>
+            <ol class="steps">
+              <li>NovelAI 로그인 &gt; 사이드바 &gt; 환경설정</li>
+              <li>Account &gt; Get Persistent API Token &gt; 복사. 분실 시 재발급 필요, 질문글 등에 노출 금지</li>
+              <li>리스 설정 &gt; 기타 봇 &gt; 이미지 생성 &gt; 이미지 생성 공급자 Novel AI, API Key 붙여넣기</li>
+            </ol>
+            <dl class="files">
+              <div>
+                <dt>URL</dt>
+                <dd>https://image.novelai.net/ai/generate-image</dd>
+              </div>
+              <div>
+                <dt>Model</dt>
+                <dd>nai-diffusion-5-full</dd>
+              </div>
+              <div>
+                <dt>Width, Height</dt>
+                <dd>1216x832, 1152x896, 1024x1024, 896x1152, 832x1216 중 하나 권장</dd>
+              </div>
+              <div>
+                <dt>Noise Schedule</dt>
+                <dd>karras 권장</dd>
+              </div>
+            </dl>
+            <p class="note">권장 해상도 외 입력 시 API 오류 발생 가능</p>
+          </div>
+          <div class="addon">
+            <h3>ComfyUI 설정</h3>
+            <ul class="links">
+              <li>
+                <a href="https://arca.live/b/characterai/163122881">로컬에서 삽화모듈을 사용해보자<span class="plus">＋</span></a>
+              </li>
+            </ul>
+          </div>
+          <div class="addon" id="preset">
+            <h3>프리셋</h3>
+            <ol class="steps">
+              <li>캐릭터 로어북 또는 활성화된 모듈에 "프리셋 (이름)" 로어북 생성</li>
+              <li>활성화 키는 비우고, 언제나 활성화는 체크 금지</li>
+              <li>내용 교체</li>
+            </ol>
+            <pre class="command">
+[Positive]
+{prompt}, year 2025, masterpiece
+
+[Negative]
+bad quality, worst quality</pre
+            >
+            <p class="note">
+              [Positive]와 [Negative] 아래 내용은 사용 중인 그림체 관련 태그를 사용하세요. {prompt}의 위치는 적절한 곳으로 바꿀 수 있어요.<br />[Negative]에도
+              똑같이 넣을 수 있어요
+            </p>
+            <pre class="command">
+[Positive]
+..., year 2025,
+
+{prompt},
+
+masterpiece, ...</pre
+            >
+            <p class="note"> 삽화 토글의 "프리셋" 칸에 "이름"을 입력하면, 재생성을 포함한 이후 이미지는 그 프리셋을 사용해 생성돼요 </p>
+          </div>
+          <div class="addon" id="extra">
+            <h3>태그 가이드</h3>
+            <ol class="steps">
+              <li>캐릭터 로어북 또는 활성화된 모듈에 정확히 "lb-xnai.lb.extra" 로어북 생성</li>
+              <li>활성화 키는 비우고, 언제나 활성화는 체크 금지</li>
+              <li>내용 작성</li>
+            </ol>
+            <p class="note">
+              정해진 형식은 없어요. 단, ##부터 시작하세요. 태그를 제일 잘 표현할 수 있는 형태로 작성하세요. 캐릭터 외에 장소같은 것도 지정할 수 있어요
+            </p>
+            <pre class="command">
+## Tagging Guide
+
+### Mephistopheles
+Mephistopheles is red. State such with e.g. `interior, red bus` etc.
+
+### Project Moon Characters
+For appearance, ALWAYS prepend "x (project moon)" where `x` is the character's English name, e.g. "yi sang (project moon)".
+LCB sinner uniform in its full set: Black jacket or coat, black vest, white shirt, red necktie, black shoes. Sinners may not wear some items.
+
+#### Don Quixote
+`short blonde hair`</pre
+            >
+            <p class="note">Limbus Company에서의 예시</p>
+            <h4>고급</h4>
+            <p class="note"> lb-xnai.lb.extra는 여러 개 넣으면 여러 개 들어가요. 그래서 이런 식으로 구성할 수도 있어요 </p>
+            <dl class="files">
+              <div>
+                <dt>페소 외형 태그용</dt>
+                <dd>외부 모듈 로어북</dd>
+              </div>
+              <div>
+                <dt>캐릭터 외형 태그용</dt>
+                <dd>캐릭터 로어북</dd>
+              </div>
+              <div>
+                <dt>기타 태그 강화용 가이드</dt>
+                <dd>외부 모듈 로어북</dd>
+              </div>
+            </dl>
+            <h4>외형 준수 단계</h4>
+            <p class="note">외형 태그 시, 삽화는 준수 수준을 3단계로 나눠 생각해요</p>
+            <dl class="modules">
+              <div>
+                <dt>Reference (참조)</dt>
+                <dd>상황에 따라 모델이 자유롭게 재구성할 수 있어요</dd>
+              </div>
+              <div>
+                <dt>Locked (잠김)</dt>
+                <dd> 주어진 태그는 반드시 넣어야 하지만, 주어지지 않은 태그는 상황에 따라 모델이 자유롭게 추가할 수 있어요 </dd>
+              </div>
+              <div>
+                <dt>Closed (확정)</dt>
+                <dd>주어진 태그는 반드시 넣어야 하고, 넣지 않은 태그는 임의로 추가하지 않아요</dd>
+              </div>
+            </dl>
+            <p class="note"> 참조인지 잠김인지 따로 적지 않으면 외형고정 토글을 따라요. 한 개의 가이드 안에서 서로 다른 단계를 지정하려면 이 용어를 쓰세요 </p>
+            <pre class="command">
+## Tagging Guide for {{char}}
+
+Locked tags for her appearance: `medium blonde hair, 1.1::golden eyes::, ...`
+Reference tags for her signature fashion: `black techpunk jacket with blue lining, black boots, ...`</pre
+            >
+          </div>
+        </div>
+      </section>
+    </article>
+    <main>
+      <div class="sheet">
+        <section class="block toggles">
+          <div class="head">
+            <h2>토글</h2>
+          </div>
+          <div class="groups">
+            <dl>
+              <div>
+                <dt>모드</dt>
+                <dd class="value">메인, 보조 (기타)</dd>
+              </div>
+              <div>
+                <dt>발동</dt>
+              </div>
+              <div>
+                <dt>이미지발동</dt>
+              </div>
+              <div>
+                <dt>NSFW 프롬프트</dt>
+                <dd class="value">Argon에선 항상 활성화</dd>
+                <dd>체크 시 민감 키워드 추가 포함, Argon에선 오히려 검열이 줄어드는 경향</dd>
+              </div>
+              <div>
+                <dt>탈옥</dt>
+                <dd class="value">Gemini Flash에서 비망록, GLM에서 권위</dd>
+                <dd>Argon/DeepSeek에선 비활성화 권장</dd>
+              </div>
+              <div>
+                <dt>태그 칼질</dt>
+                <dd class="value">Gemini 모델에서만 활성화</dd>
+                <dd>모든 출력 태그 중간에 특수문자를 삽입하도록 시켜 출력 필터 무력화</dd>
+              </div>
+              <div>
+                <dt>일본어 출력</dt>
+              </div>
+            </dl>
+            <h3>스타일</h3>
+            <dl>
+              <div>
+                <dt>프리셋</dt>
+              </div>
+              <div>
+                <dt>프롬프트 가중치 약화</dt>
+                <dd class="value">활성화</dd>
+                <dd>태그와 자연어 가중치를 75% 낮춰서 그림체 방어 시도 (NAI 전용)</dd>
+              </div>
+              <div>
+                <dt>포커스</dt>
+                <dd>삽화에 반드시 포함할 중심 인물(들)의 이름</dd>
+              </div>
+              <div>
+                <dt>최대캐릭터</dt>
+                <dd class="value">Anima 사용 시 1</dd>
+                <dd>삽화 한 개에 포함할 캐릭터 최대 수</dd>
+              </div>
+              <div>
+                <dt>작가의노트</dt>
+                <dd>간단한 추가 지침. <a href="#extra">lb-xnai.lb.extra</a>보다 짧은 내용을 바꿔가며 넣을 때</dd>
+              </div>
+              <div>
+                <dt>외형 고정</dt>
+                <dd class="value">기본</dd>
+                <dd>
+                  <ul class="options">
+                    <li><b>기본</b> 참조</li>
+                    <li><b>준수</b> 잠김</li>
+                    <li> <b>모조리</b> 확정. 잠김으로 적은 것도 확정으로 취급하여 외형과 옷차림 태그를 빼거나 더하지 않음 </li>
+                  </ul>
+                  단계를 따로 적지 않은 외형 태그에 적용
+                </dd>
+              </div>
+              <div>
+                <dt>카메라연출</dt>
+                <dd class="value">강화</dd>
+              </div>
+              <div>
+                <dt>밝기</dt>
+                <dd>삽화 모듈 버튼 테마, 이미지에는 영향 없음</dd>
+              </div>
+            </dl>
+            <h3>키 비주얼</h3>
+            <dl>
+              <div>
+                <dt>비활성화</dt>
+              </div>
+              <div>
+                <dt>방향</dt>
+                <dd class="value">가로</dd>
+                <dd>
+                  <ul class="options">
+                    <li><b>설정</b> 이미지 설정의 해상도 그대로</li>
+                    <li><b>가로</b> 설정 해상도의 긴 변을 가로로</li>
+                    <li><b>세로</b> 설정 해상도의 긴 변을 세로로</li>
+                  </ul>
+                  NAI 전용
+                </dd>
+              </div>
+              <div>
+                <dt>가로세로비</dt>
+                <dd>이미지 표시 비율, 생성에는 영향을 주지 않음</dd>
+              </div>
+              <div>
+                <dt>최대 너비</dt>
+              </div>
+              <div>
+                <dt>위치</dt>
+              </div>
+              <div>
+                <dt>정렬</dt>
+              </div>
+              <div>
+                <dt>글꼴</dt>
+              </div>
+              <div>
+                <dt>특수효과</dt>
+              </div>
+              <div>
+                <dt>타이틀 추가</dt>
+              </div>
+            </dl>
+            <h3>씬</h3>
+            <dl>
+              <div>
+                <dt>분량</dt>
+                <dd>소요 시간은 이미지 수에 비례해 늘어남</dd>
+              </div>
+              <div>
+                <dt>완벽 준수</dt>
+                <dd>씬 배치 제한 완화, 분량 우선</dd>
+              </div>
+              <div>
+                <dt>형식</dt>
+              </div>
+              <div>
+                <dt>방향</dt>
+                <dd>
+                  <ul class="options">
+                    <li><b>설정</b> 이미지 설정의 해상도 그대로</li>
+                    <li><b>가로</b> 설정 해상도의 긴 변을 가로로</li>
+                    <li><b>세로</b> 설정 해상도의 긴 변을 세로로</li>
+                    <li><b>자동</b> 장면 구도에 따라 모델이 가로 또는 세로 선택. 만화와 칸분할은 항상 세로</li>
+                  </ul>
+                  NAI 전용
+                </dd>
+              </div>
+              <div>
+                <dt>가로세로비</dt>
+                <dd>이미지 표시 비율, 생성에는 영향을 주지 않음</dd>
+              </div>
+              <div>
+                <dt>최대 너비</dt>
+              </div>
+              <div>
+                <dt>정렬</dt>
+              </div>
+            </dl>
+            <h3>시스템</h3>
+            <dl>
+              <div>
+                <dt>긍정 프롬</dt>
+                <dd>LLM에 전달되지 않고 프리셋 [Positive]의 {prompt} 맨 뒤에 항상 추가</dd>
+              </div>
+              <div>
+                <dt>부정 프롬</dt>
+                <dd>LLM에 전달되지 않고 프리셋 [Negative]의 {prompt} 맨 뒤에 항상 추가</dd>
+              </div>
+            </dl>
+          </div>
+        </section>
+
+        <section class="block toggles">
+          <div class="head">
+            <h2>고급 토글</h2>
+          </div>
+          <div class="groups">
+            <dl>
+              <div>
+                <dt>오래된 삽화 표시하기</dt>
+              </div>
+              <div>
+                <dt>컨텍스트 유지</dt>
+                <dd class="value">활성화</dd>
+              </div>
+              <div>
+                <dt>자연어</dt>
+                <dd class="value">기본</dd>
+              </div>
+              <div>
+                <dt>생각 보조</dt>
+                <dd class="value">Gemini 사용 시 생각만, 이외 모델은 적고 제거</dd>
+              </div>
+              <div>
+                <dt>포함채팅수</dt>
+                <dd class="value">5, 완전사칭 2-3</dd>
+              </div>
+              <div>
+                <dt>다듬기횟수</dt>
+                <dd class="value">0-1</dd>
+                <dd>모델을 여러 번 돌려서 스스로 결과를 재검증</dd>
+              </div>
+              <div>
+                <dt>저장 개수</dt>
+              </div>
+            </dl>
+            <h3>ComfyUI</h3>
+            <dl>
+              <div>
+                <dt>ComfyUI</dt>
+                <dd class="value">NAI가 아니면 활성화</dd>
+              </div>
+              <div>
+                <dt>캐릭터구분</dt>
+                <dd class="value">줄바꿈</dd>
+              </div>
+              <div>
+                <dt>가중치</dt>
+                <dd class="value">제거</dd>
+              </div>
+            </dl>
+          </div>
+        </section>
+      </div>
+    </main>
+    <footer>
+      <h2>ATTRIBUTION / LICENSE</h2>
+      <div class="body">
+        <p>
+          헌터넷 프롬프트와 CSS를 제외한 전체를
+          <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>로 배포<br />헌터넷 프롬프트와 CSS는
+          <a href="https://arca.live/b/characterai/133962148">얼터네이트 헌터즈 V1</a> 기반
+        </p>
+        <p>
+          출처: <a href="https://arca.live/b/characterai/137652449">Comfy·NAI</a> · <a href="https://arca.live/b/characterai/136708153">웹소설 댓글창</a> ·
+          <a href="https://arca.live/b/characterai/138858363">카카오톡</a> · <a href="https://arca.live/b/characterai/132830594">허니팟</a> ·
+          <a href="https://arca.live/b/characterai/133174930">디시갤러리</a>
+        </p>
+        <p> 기본 탈옥 문구는 동일 라이선스 하에 🥤마나젬에서 발췌<br />일부 모듈의 탈옥 문구는 동일 라이선스 하에 ✒️🅰️1️⃣🅾️올인원 프롬프트에서 발췌 </p>
+        <h3>삽화</h3>
+        <p>
+          다음 글 또는 댓글의 내용이 일부 반영됨:
+          <a href="https://arca.live/b/characterai/181748881">1</a>
+          <a href="https://arca.live/b/characterai/181637302">2</a>
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

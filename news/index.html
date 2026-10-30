@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>라이트보드 뉴스</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
+    <link rel="stylesheet" crossorigin href="/risumo/assets/common-DfliSgH7.css">
+    <link rel="stylesheet" crossorigin href="/risumo/assets/doc-XkTAzv8s.css">
+  </head>
+  <body style="--glow: #e8546a; --hero: #e7e7e5; --hero-ink: #15171d; --tint: #c8102e">
+    <header>
+      <a class="brand" href="../">라이트보드 V<span class="plus">＋</span></a>
+    </header>
+    <section class="hero">
+      <div class="hero-text">
+        <h1>라이트보드 뉴스</h1>
+      </div>
+    </section>
+    <article>
+      <section class="block">
+        <h2>소개</h2>
+        <div class="body">
+          <p class="lead">범용 뉴스 모듈</p>
+          <figure class="shot">
+            <img alt="" src="/risumo/assets/main-OpCkn-Ko.png" />
+          </figure>
+          <p class="note"><a href="../guide/">라이트보드 백엔드 설정</a>을 먼저 진행하세요</p>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2>다운로드</h2>
+        <div class="body">
+          <a class="download" href="https://drive.proton.me/urls/2JHZPG4EF0#JEZWkA3BCW1h"
+            >통합 다운로드<span class="plus">＋</span></a
+          >
+        </div>
+      </section>
+    </article>
+    <main>
+      <div class="sheet">
+        <section class="block toggles">
+          <div class="head">
+            <h2>토글</h2>
+          </div>
+          <div class="groups">
+            <dl>
+              <div>
+                <dt>모드</dt>
+                <dd class="value">메인, 보조 (기타)</dd>
+              </div>
+              <div>
+                <dt>발동</dt>
+                <dd class="value">누르면</dd>
+                <dd>매번 생성 시 질림</dd>
+              </div>
+            </dl>
+            <h3>주제</h3>
+            <dl>
+              <div>
+                <dt>주제</dt>
+              </div>
+              <div>
+                <dt>사생활</dt>
+                <dd class="value">강보호</dd>
+                <dd>
+                  <ul class="options">
+                    <li><b>이목집중</b> 모든 기자가 대상을 취재함. 매번 대상을 다룬 기사가 하나 이상</li>
+                    <li>
+                      <b>자율</b> 목격자 없는 사적 공간의 행동은 기사화 금지. 여파가 클 때만 소문이나 공식 발표로 다룸
+                    </li>
+                    <li>
+                      <b>약보호</b> 대상을 평범한 사람으로 취급. 지역 유명인, 정치인, 기업인처럼 중요 인물일 때만 기사화
+                    </li>
+                    <li>
+                      <b>강보호</b> 세계를 구한 영웅처럼 가장 중요한 인물이거나, 오래가는 대규모 영향을 끼쳤을 때만
+                      기사화
+                    </li>
+                    <li><b>언급금지</b> 대상은 언급 금지, 행동의 여파만 기사화</li>
+                  </ul>
+                </dd>
+              </div>
+              <div>
+                <dt>누구</dt>
+                <dd>누구의 사생활? 기본 {{user}}</dd>
+              </div>
+              <div>
+                <dt>사전설정</dt>
+                <dd>
+                  <ul class="options">
+                    <li><b>기본</b> 인터넷 기사</li>
+                    <li><b>1980</b> 1980년대 신문, 국한문혼용체</li>
+                    <li><b>됴션휘보</b> 개화기 근대 한국어 신문, 국한문혼용체</li>
+                  </ul>
+                </dd>
+              </div>
+              <div>
+                <dt>느낌</dt>
+                <dd>언론사 톤 앤 매너. 특정 분위기나 말투 따위의 언론사를 만들고 싶을 때</dd>
+              </div>
+            </dl>
+            <h3>외형</h3>
+            <dl>
+              <div>
+                <dt>대표사진</dt>
+                <dd><a href="../xnai/">라이트보드 삽화</a> 모듈 활성화 필요</dd>
+              </div>
+              <div>
+                <dt>프리셋</dt>
+                <dd><a href="../xnai/#preset">라이트보드 삽화</a> 설명 참고</dd>
+              </div>
+              <div>
+                <dt>밝기</dt>
+              </div>
+            </dl>
+            <h3>시스템</h3>
+            <dl>
+              <div>
+                <dt>다양성 강화</dt>
+                <dd>
+                  두 개의 응답을 생성하게 한 후 뒤의 것을 채택. 비용 증가. 비슷한 상황에서 비슷한 응답만 보여서 질리면
+                  가끔 체크
+                </dd>
+              </div>
+              <div>
+                <dt>생각보조</dt>
+                <dd class="value">적고 제거</dd>
+                <dd>사칭 방지, 사생활 보호, 현재 상태 파악에 도움이 됨</dd>
+              </div>
+              <div>
+                <dt>컨텍</dt>
+                <dd class="value">제거</dd>
+                <dd>포함 시 메인 모델이 다음 턴에 뉴스 내용을 반영할 수 있지만 비용 추가 발생, 컨텍스트 변화</dd>
+              </div>
+            </dl>
+          </div>
+        </section>
+      </div>
+    </main>
+    <footer>
+      <h2>ATTRIBUTION / LICENSE</h2>
+      <div class="body">
+        <p>
+          헌터넷 프롬프트와 CSS를 제외한 전체를
+          <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>로 배포<br />헌터넷 프롬프트와
+          CSS는 <a href="https://arca.live/b/characterai/133962148">얼터네이트 헌터즈 V1</a> 기반
+        </p>
+        <p>
+          출처: <a href="https://arca.live/b/characterai/137652449">Comfy·NAI</a> ·
+          <a href="https://arca.live/b/characterai/136708153">웹소설 댓글창</a> ·
+          <a href="https://arca.live/b/characterai/138858363">카카오톡</a> ·
+          <a href="https://arca.live/b/characterai/132830594">허니팟</a> ·
+          <a href="https://arca.live/b/characterai/133174930">디시갤러리</a>
+        </p>
+        <p>
+          기본 탈옥 문구는 동일 라이선스 하에 🥤마나젬에서 발췌<br />일부 모듈의 탈옥 문구는 동일 라이선스 하에
+          ✒️🅰️1️⃣🅾️올인원 프롬프트에서 발췌
+        </p>
+        <h3>삽화</h3>
+        <p>
+          다음 글 또는 댓글의 내용이 일부 반영됨:
+          <a href="https://arca.live/b/characterai/181748881">1</a>
+          <a href="https://arca.live/b/characterai/181637302">2</a>
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>
